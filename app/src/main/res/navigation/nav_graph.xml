@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/projectListFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="org.cerion.projecthub.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="org.cerion.projecthub.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
+    <fragment
+        android:id="@+id/projectListFragment"
+        android:name="org.cerion.projecthub.ui.ProjectListFragment"
+        android:label="ProjectListFragment" >
+        <action
+            android:id="@+id/action_projectListFragment_to_projectHomeFragment"
+            app:destination="@id/projectHomeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/projectHomeFragment"
+        android:name="org.cerion.projecthub.ui.ProjectHomeFragment"
+        android:label="project_home_fragment"
+        tools:layout="@layout/fragment_project_home" >
+        <argument
+            android:name="projectId"
+            app:argType="integer" />
+    </fragment>
+</navigation>
