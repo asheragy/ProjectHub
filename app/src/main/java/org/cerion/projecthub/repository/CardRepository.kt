@@ -1,22 +1,63 @@
 package org.cerion.projecthub.repository
 
+import GetCardsForColumnQuery
+import android.graphics.Color
 import android.util.Log
+import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.coroutines.toDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.cerion.projecthub.TAG
 import org.cerion.projecthub.github.GitHubIssue
 import org.cerion.projecthub.github.GitHubService
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
+import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.NoteCard
 
 
-class CardRepository(private val service: GitHubService) {
+class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
 
     private val lock = Mutex()
     private val map = mutableMapOf<String, List<GitHubIssue>>()
 
+    suspend fun getCardsForColumn(columnId: String): List<Card> = withContext(Dispatchers.IO) {
+        Log.d(TAG, "getColumnsForProject($columnId)")
+
+        val query = GetCardsForColumnQuery.builder().id(columnId).build()
+        val response = apolloClient.query(query).toDeferred().await()
+        val nodes = response.data()?.node()?.fragments()?.columnDetailFragment()?.cards()?.nodes()
+
+        nodes!!.map {
+            val id = it.databaseId()!!
+            val node = it.id()
+
+            val issue = it.content()?.fragments()?.issueFragment()
+            // TODO add pull request type
+            if (issue != null)
+                IssueCard(id, node).apply {
+                    this.closed = issue.closed()
+                    this.title = issue.title()
+                    this.number = issue.number()
+                    this.repository = issue.repository().name()
+                    this.author = issue.author()?.login() ?: ""
+
+                    issue.labels()?.nodes()?.forEach { label ->
+                        this.labels.add(Label(label.name(), Color.parseColor("#" + label.color())))
+                    }
+                }
+            else
+                NoteCard(id, node).apply {
+                    this.note = it.note() ?: ""
+                    this.creator = it.creator()?.login() ?: ""
+                }
+        }
+
+
+    }
+
+    /*
     suspend fun getCardsForColumn(id: Int): List<Card> = withContext(Dispatchers.IO) {
         val cards = service.getCardsForColumn(id).await()
 
@@ -60,4 +101,6 @@ class CardRepository(private val service: GitHubService) {
             return map[key]!!
         }
     }
+
+     */
 }

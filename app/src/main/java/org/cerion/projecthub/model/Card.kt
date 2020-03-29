@@ -1,14 +1,19 @@
 package org.cerion.projecthub.model
 
-import org.cerion.projecthub.github.GitHubCard
-import org.cerion.projecthub.github.GitHubIssue
-
 abstract class Card
 
-data class NoteCard(val note: String) : Card()
+data class NoteCard(val id: Int, val nodeId: String) : Card() {
+    var note = ""
+    var creator = ""
+}
 
-data class IssueCard(private val card: GitHubCard, private val issue: GitHubIssue) : Card() {
-    val title = issue.title
-    val body = ""
-    val closed = issue.state != "open"
+data class IssueCard(val id: Int, val nodeId: String) : Card() {
+    var number = 0
+    var author = ""
+    var repository = ""
+    var title: String = ""
+    var body: String = ""
+    var closed = false
+
+    val labels = mutableListOf<Label>()
 }

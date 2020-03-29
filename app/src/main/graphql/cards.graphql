@@ -1,0 +1,49 @@
+query getCardsForColumn($id: ID!) { 
+	node(id: $id) {
+		...ColumnDetailFragment 
+	}
+}
+
+fragment ColumnDetailFragment on ProjectColumn {
+	cards {
+		nodes {
+			databaseId
+			id
+			note
+			content {
+				...IssueFragment
+				...PullRequestFragment
+			}
+			creator {
+				login
+			}
+		}
+	}
+}
+
+fragment IssueFragment on Issue {
+	databaseId
+	id
+	title
+	closed
+	number
+	repository {
+		name
+	}
+	author {
+		login
+	}
+	labels(first: 5) {
+		nodes {
+			color
+			name
+		}
+	}
+}
+
+fragment PullRequestFragment on PullRequest {
+	databaseId
+	id
+	closed
+	body
+}

@@ -40,10 +40,18 @@
                     tools:text="Title"/>
 
                 <TextView
+                    android:id="@+id/openedBy"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{card.body}"
-                    tools:text="Body">
+                    tools:text="#1 opened by username">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/labels"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    tools:text="Label1; Label2">
                 </TextView>
 
             </LinearLayout>

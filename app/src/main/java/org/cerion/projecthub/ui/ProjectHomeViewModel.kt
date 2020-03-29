@@ -46,7 +46,7 @@ class ColumnViewModel(private val repo: CardRepository, private val column: Colu
 
     init {
         viewModelScope.launch {
-            _cards.value = repo.getCardsForColumn(column.id)
+            _cards.value = repo.getCardsForColumn(column.node_id)
         }
     }
 }

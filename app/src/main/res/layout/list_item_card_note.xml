@@ -39,6 +39,12 @@
                     android:textStyle="bold"
                     tools:text="Title"/>
 
+                <TextView
+                    android:id="@+id/createdBy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="Added by username"/>
+
             </LinearLayout>
 
         </LinearLayout>

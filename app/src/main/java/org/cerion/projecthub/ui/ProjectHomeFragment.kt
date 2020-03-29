@@ -19,6 +19,7 @@ import org.cerion.projecthub.databinding.ListItemCardIssueBinding
 import org.cerion.projecthub.databinding.ListItemCardNoteBinding
 import org.cerion.projecthub.databinding.ListItemColumnBinding
 import org.cerion.projecthub.github.GitHubService
+import org.cerion.projecthub.github.getGraphQLClient
 import org.cerion.projecthub.github.getService
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
@@ -59,12 +60,14 @@ class ProjectHomeFragment : Fragment() {
 class ProjectColumnListAdapter(context: Context, private val lifecycleOwner: LifecycleOwner) : RecyclerView.Adapter<ProjectColumnListAdapter.ViewHolder>() {
 
     private val service: GitHubService = getService(context)
-    private val repo = CardRepository(service)
+    private val repo = CardRepository(service, getGraphQLClient(context))
 
     private var items = emptyList<ColumnViewModel>()
     private var width = 0
 
     fun setItems(items: List<Column>) {
+
+
         this.items = items.map { ColumnViewModel(repo, it) }
         notifyDataSetChanged()
     }
@@ -144,6 +147,7 @@ class ColumnCardListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     inner class NoteViewHolder(private val binding: ListItemCardNoteBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: NoteCard) {
             binding.card = item
+            binding.createdBy.text = "Added by ${item.creator}"
             binding.executePendingBindings()
         }
     }
@@ -151,6 +155,10 @@ class ColumnCardListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: IssueCard) {
             binding.card = item
+            // TODO add repository if this is a multi repo project (associated to user/org)
+            binding.openedBy.text = "#${item.number} opened by ${item.author}"
+            binding.labels.text = item.labels.joinToString { it.name + " " }
+            binding.labels.visibility = if (item.labels.size > 0) View.VISIBLE else View.GONE
             binding.executePendingBindings()
         }
     }
