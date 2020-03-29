@@ -1,0 +1,20 @@
+query getColumnsForProject($id: ID!) {
+	node(id: $id) {
+		...ProjectFragment
+	}
+}
+
+
+fragment ProjectFragment on Project {
+	columns(first: 100) {
+		nodes {		
+			...ColumnFragment
+		}
+	}
+}
+
+fragment ColumnFragment on ProjectColumn {
+	databaseId
+	id
+	name
+}

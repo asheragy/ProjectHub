@@ -1,24 +1,25 @@
 package org.cerion.projecthub.repository
 
+import GetColumnsForProjectQuery
+import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.coroutines.toDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.cerion.projecthub.github.GitHubService
 import org.cerion.projecthub.model.Column
 
 
-class ColumnRepository(private val service: GitHubService) {
+class ColumnRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
 
-    fun getAll(): List<Column> {
-        return listOf(Column(6954118, "To do"),
-            Column(6954119, "In Progress"),
-            Column(6954120, "Done"))
-    }
+    suspend fun getColumnsForProject(projectId: String): List<Column> = withContext(Dispatchers.IO) {
+        val query = GetColumnsForProjectQuery.builder().id(projectId).build()
+        val response = apolloClient.query(query).toDeferred().await()
 
-    suspend fun getColumnsForProject(projectId: Int) = withContext(Dispatchers.IO) {
-        val columns = service.getProjectColumns(projectId).await()
+        val nodes = response.data()?.node()?.fragments()?.projectFragment()?.columns()?.nodes()!!
 
-        columns.map {
-            Column(it.id, it.name)
+        nodes.map {
+            val col = it.fragments().columnFragment()
+            Column(col.databaseId()!!, col.id(), col.name())
         }
     }
 }

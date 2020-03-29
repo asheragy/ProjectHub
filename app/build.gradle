@@ -2,7 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'androidx.navigation.safeargs.kotlin'
+apply plugin: 'com.apollographql.android'
 
 def apikeyPropertiesFile = rootProject.file("apikey.properties")
 def apikeyProperties = new Properties()
@@ -63,6 +64,9 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:2.5.0"
     implementation "com.squareup.retrofit2:converter-moshi:2.5.0"
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2"
+    implementation 'com.apollographql.apollo:apollo-runtime:1.0.0'
+    implementation "com.apollographql.apollo:apollo-android-support:1.0.0"
+    implementation "com.apollographql.apollo:apollo-coroutines-support:1.0.0"
 
     // Test
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'

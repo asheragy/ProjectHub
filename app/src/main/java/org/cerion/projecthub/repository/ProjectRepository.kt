@@ -7,7 +7,7 @@ enum class ProjectType {
     Org
 }
 
-data class Project(val id: Int, val ownerUrl: String, val name: String, val description: String) {
+data class Project(val id: Int, val nodeId: String, val ownerUrl: String, val name: String, val description: String) {
 
     private val urlParts = ownerUrl.split("/")
 
@@ -31,7 +31,11 @@ class ProjectRepository {
 
     fun getAll(): List<Project> {
         return listOf(
-            Project(1481924, "https://api.github.com/repos/PhilJay/MPAndroidChart", "Support", ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"),
-            Project(3436425, "https://api.github.com/users/asheragy","Projects", ""))
+            Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", "https://api.github.com/repos/PhilJay/MPAndroidChart", "Support", ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"),
+            Project(3436425, "MDc6UHJvamVjdDM0MzY0MjU=", "https://api.github.com/users/asheragy","Projects", ""))
+    }
+
+    fun getById(id: Int): Project? {
+        return getAll().firstOrNull { it.id == id }
     }
 }

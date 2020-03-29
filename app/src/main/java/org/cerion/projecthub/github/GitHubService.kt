@@ -2,6 +2,7 @@ package org.cerion.projecthub.github
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.apollographql.apollo.ApolloClient
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -15,7 +16,7 @@ import retrofit2.http.Path
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-data class GitHubColumn(val id: Int, val name: String)
+//data class GitHubColumn(val id: Int, val name: String)
 data class GitHubProject(val id: Int, val name: String, val state: String, val updated_at: Date)
 data class GitHubCard(val id: Int, val note: String?, val content_url: String?)
 data class GitHubIssue(val id: Int, val title: String, val state: String, val url: String)
@@ -24,8 +25,8 @@ interface GitHubService {
     @GET("users/asheragy/projects")
     fun getProjectsAsync(): Deferred<List<GitHubProject>>
 
-    @GET("projects/{id}/columns")
-    fun getProjectColumns(@Path("id")id: Int): Deferred<List<GitHubColumn>>
+    //@GET("projects/{id}/columns")
+    //fun getProjectColumns(@Path("id")id: Int): Deferred<List<GitHubColumn>>
 
     @GET("projects/columns/{id}/cards")
     fun getCardsForColumn(@Path("id")id: Int): Deferred<List<GitHubCard>>
@@ -36,12 +37,34 @@ interface GitHubService {
 
 private const val BASE_URL = "https://api.github.com/"
 
-fun getService(context: Context): GitHubService {
-    val token =
-        PreferenceManager.getDefaultSharedPreferences(context).getString("access_token", null)
-            ?: throw Exception("access token not found")
+fun getGraphQLClient(context: Context): ApolloClient {
+    val accessToken = getAccessToken(context)
 
+    // TODO may be able to share client with REST version
+    val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("Authorization", "token $accessToken")
+                .addHeader("Accept", "application/vnd.github.inertia-preview+json")
+                .build()
+            chain.proceed(request)
+        }
+        .build()
+
+    return ApolloClient.builder()
+        .serverUrl("https://api.github.com/graphql")
+        .okHttpClient(okHttpClient)
+        .build()
+}
+
+fun getService(context: Context): GitHubService {
+    val token = getAccessToken(context)
     return getService(token)
+}
+
+private fun getAccessToken(context: Context): String {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString("access_token", null)
+            ?: throw Exception("access token not found")
 }
 
 fun getService(accessToken: String): GitHubService {
