@@ -27,7 +27,7 @@
             </ImageView>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
@@ -46,13 +46,15 @@
                     tools:text="#1 opened by username">
                 </TextView>
 
-                <TextView
+                <com.google.android.material.chip.ChipGroup
                     android:id="@+id/labels"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    tools:text="Label1; Label2">
-                </TextView>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- For designer only -->
+                    <include layout="@layout/label_chip"/>
+
+                </com.google.android.material.chip.ChipGroup>
 
             </LinearLayout>
 

@@ -1,6 +1,7 @@
 package org.cerion.projecthub.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +15,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
+import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.cerion.projecthub.databinding.ListItemCardIssueBinding
 import org.cerion.projecthub.databinding.ListItemCardNoteBinding
@@ -157,8 +160,15 @@ class ColumnCardListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             binding.card = item
             // TODO add repository if this is a multi repo project (associated to user/org)
             binding.openedBy.text = "#${item.number} opened by ${item.author}"
-            binding.labels.text = item.labels.joinToString { it.name + " " }
-            binding.labels.visibility = if (item.labels.size > 0) View.VISIBLE else View.GONE
+
+            binding.labels.removeAllViews()
+            item.labels.forEach {
+                val chip = LayoutInflater.from(binding.root.context).inflate(R.layout.label_chip, binding.labels, false) as Chip
+                chip.text = it.name
+                chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
+                binding.labels.addView(chip)
+            }
+
             binding.executePendingBindings()
         }
     }
