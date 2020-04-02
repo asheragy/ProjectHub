@@ -9,9 +9,12 @@ import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -21,9 +24,15 @@ data class GitHubProject(val id: Int, val name: String, val state: String, val u
 data class GitHubCard(val id: Int, val note: String?, val content_url: String?)
 data class GitHubIssue(val id: Int, val title: String, val state: String, val url: String)
 
+// position values: top / bottom / after:<card_id>
+data class MoveCardParams(val column_id: Int, val position: String = "bottom")
+
 interface GitHubService {
     @GET("users/asheragy/projects")
     fun getProjectsAsync(): Deferred<List<GitHubProject>>
+
+    @POST("projects/columns/cards/{card_id}/moves")
+    fun moveCard(@Path("card_id")cardId: Int, @Body params: MoveCardParams): Deferred<ResponseBody>
 
     //@GET("projects/{id}/columns")
     //fun getProjectColumns(@Path("id")id: Int): Deferred<List<GitHubColumn>>

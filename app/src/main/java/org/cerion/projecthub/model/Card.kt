@@ -1,13 +1,15 @@
 package org.cerion.projecthub.model
 
-abstract class Card
+abstract class Card {
+    abstract val id: Int
+}
 
-data class NoteCard(val id: Int, val nodeId: String) : Card() {
+data class NoteCard(override val id: Int, val nodeId: String) : Card() {
     var note = ""
     var creator = ""
 }
 
-data class IssueCard(val id: Int, val nodeId: String) : Card() {
+data class IssueCard(override val id: Int, val nodeId: String) : Card() {
     var number = 0
     var author = ""
     var repository = ""

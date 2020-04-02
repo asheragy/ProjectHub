@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.github.GitHubService
+import org.cerion.projecthub.github.MoveCardParams
 import org.cerion.projecthub.github.getGraphQLClient
 import org.cerion.projecthub.github.getService
 import org.cerion.projecthub.model.Card
@@ -21,15 +22,37 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
     private val graphQL = getGraphQLClient(context)
     private val projectRepo = ProjectRepository()
     private val columnRepo = ColumnRepository(service, graphQL)
+    private val cardRepo = CardRepository(service, graphQL)
 
-    private val _columns = MutableLiveData<List<Column>>()
-    val columns: LiveData<List<Column>>
+    private val _columns = MutableLiveData<List<ColumnViewModel>>()
+    val columns: LiveData<List<ColumnViewModel>>
         get() = _columns
 
     fun load(projectId: Int) {
         viewModelScope.launch {
             val nodeId = projectRepo.getById(projectId)!!.nodeId
-            _columns.value = columnRepo.getColumnsForProject(nodeId)
+            val cols = columnRepo.getColumnsForProject(nodeId)
+            _columns.value = cols.map { ColumnViewModel(cardRepo, it) }
+        }
+    }
+
+    fun moveCard(card: Card, columnId: Int) {
+        val oldColumn = _columns.value!!.first { it.containsCard(card) }
+        val newColumn = _columns.value!!.first { it.id == columnId}
+
+        viewModelScope.launch {
+            try {
+                oldColumn.removeCard(card)
+                service.moveCard(card.id, MoveCardParams(columnId)).await()
+                newColumn.addCard(card)
+            }
+            catch(e: Exception) {
+                e.printStackTrace()
+
+                // TODO may fail because no internet, can undo operation by moving back
+                oldColumn.loadCards()
+                newColumn.loadCards()
+            }
         }
     }
 }
@@ -46,7 +69,21 @@ class ColumnViewModel(private val repo: CardRepository, private val column: Colu
 
     init {
         viewModelScope.launch {
-            _cards.value = repo.getCardsForColumn(column.node_id)
+            loadCards()
         }
+    }
+
+    fun containsCard(card: Card): Boolean = _cards.value?.contains(card) ?: false
+
+    fun removeCard(card: Card) {
+        _cards.value = _cards.value?.filter { it.id != card.id }
+    }
+
+    fun addCard(card: Card) {
+        _cards.value = cards.value?.plus(card)
+    }
+
+    suspend fun loadCards() {
+        _cards.value = repo.getCardsForColumn(column.node_id)
     }
 }
