@@ -1,8 +1,6 @@
 package org.cerion.projecthub.github
 
 import android.content.Context
-import androidx.preference.PreferenceManager
-import com.apollographql.apollo.ApolloClient
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -12,10 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -27,12 +22,17 @@ data class GitHubIssue(val id: Int, val title: String, val state: String, val ur
 // position values: top / bottom / after:<card_id>
 data class MoveCardParams(val column_id: Int, val position: String = "bottom")
 
+data class UpdateCardParams(val note: String, val archived: Boolean = false)
+
 interface GitHubService {
     @GET("users/asheragy/projects")
     fun getProjectsAsync(): Deferred<List<GitHubProject>>
 
     @POST("projects/columns/cards/{card_id}/moves")
     fun moveCard(@Path("card_id")cardId: Int, @Body params: MoveCardParams): Deferred<ResponseBody>
+
+    @PATCH("projects/columns/cards/{card_id}")
+    fun updateCard(@Path("card_id")cardId: Int, @Body params: UpdateCardParams): Deferred<ResponseBody>
 
     //@GET("projects/{id}/columns")
     //fun getProjectColumns(@Path("id")id: Int): Deferred<List<GitHubColumn>>
@@ -44,39 +44,9 @@ interface GitHubService {
     fun getIssuesForRepo(@Path("user") user: String, @Path("repo")repo: String): Deferred<List<GitHubIssue>>
 }
 
-private const val BASE_URL = "https://api.github.com/"
-
-fun getGraphQLClient(context: Context): ApolloClient {
-    val accessToken = getAccessToken(context)
-
-    // TODO may be able to share client with REST version
-    val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor { chain ->
-            val request = chain.request().newBuilder()
-                .addHeader("Authorization", "token $accessToken")
-                .addHeader("Accept", "application/vnd.github.inertia-preview+json")
-                .build()
-            chain.proceed(request)
-        }
-        .build()
-
-    return ApolloClient.builder()
-        .serverUrl("https://api.github.com/graphql")
-        .okHttpClient(okHttpClient)
-        .build()
-}
 
 fun getService(context: Context): GitHubService {
-    val token = getAccessToken(context)
-    return getService(token)
-}
-
-private fun getAccessToken(context: Context): String {
-    return PreferenceManager.getDefaultSharedPreferences(context).getString("access_token", null)
-            ?: throw Exception("access token not found")
-}
-
-fun getService(accessToken: String): GitHubService {
+    val accessToken = getAccessToken(context)
 
     val client = OkHttpClient.Builder()
         .connectTimeout(3, TimeUnit.SECONDS)
@@ -94,7 +64,7 @@ fun getService(accessToken: String): GitHubService {
     val retrofit = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .baseUrl(BASE_URL)
+        .baseUrl("https://api.github.com/")
         .client(client)
         .build()
 
@@ -105,5 +75,3 @@ private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
     .add(Date::class.java, Rfc3339DateJsonAdapter())
     .build()
-
-

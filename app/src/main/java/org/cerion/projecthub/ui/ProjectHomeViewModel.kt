@@ -3,12 +3,10 @@ package org.cerion.projecthub.ui
 import android.app.Application
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import org.cerion.projecthub.github.GitHubService
-import org.cerion.projecthub.github.MoveCardParams
-import org.cerion.projecthub.github.getGraphQLClient
-import org.cerion.projecthub.github.getService
+import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
+import org.cerion.projecthub.model.NoteCard
 import org.cerion.projecthub.repository.CardRepository
 import org.cerion.projecthub.repository.ColumnRepository
 import org.cerion.projecthub.repository.ProjectRepository
@@ -23,6 +21,7 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
     private val projectRepo = ProjectRepository()
     private val columnRepo = ColumnRepository(service, graphQL)
     private val cardRepo = CardRepository(service, graphQL)
+    var editCard: Card? = null
 
     private val _columns = MutableLiveData<List<ColumnViewModel>>()
     val columns: LiveData<List<ColumnViewModel>>
@@ -55,6 +54,25 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
             }
         }
     }
+
+    fun updateNote(card: NoteCard) {
+        viewModelScope.launch {
+            // TODO don't updated if not modified, maybe just take id+text as params
+            val column = findColumnForCard(card)
+
+            val params = UpdateCardParams(card.note)
+            service.updateCard(card.id, params).await()
+            column?.loadCards()
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // TODO look into how this can get called when using activity scope
+    }
+
+    private fun findColumnForCard(card: Card) = _columns.value?.first { it.containsCard(card) }
+
 }
 
 // TODO verify this gets destroyed + onCleared is called

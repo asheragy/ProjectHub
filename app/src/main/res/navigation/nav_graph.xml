@@ -31,5 +31,13 @@
         <argument
             android:name="projectId"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_projectHomeFragment_to_editNoteDialogFragment"
+            app:destination="@id/editNoteDialogFragment" />
     </fragment>
+
+    <dialog
+        android:id="@+id/editNoteDialogFragment"
+        android:name="org.cerion.projecthub.ui.dialog.EditNoteDialogFragment"
+        android:label="EditNoteDialogFragment" />
 </navigation>

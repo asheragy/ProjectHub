@@ -32,7 +32,8 @@ class ProjectRepository {
     fun getAll(): List<Project> {
         return listOf(
             Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", "https://api.github.com/repos/PhilJay/MPAndroidChart", "Support", ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"),
-            Project(3436425, "MDc6UHJvamVjdDM0MzY0MjU=", "https://api.github.com/users/asheragy","Projects", ""))
+            Project(3436425, "MDc6UHJvamVjdDM0MzY0MjU=", "https://api.github.com/users/asheragy","Projects", ""),
+            Project(4004540, "MDc6UHJvamVjdDQwMDQ1NDA=", "https://api.github.com/users/asheragy", "Simple", ""))
     }
 
     fun getById(id: Int): Project? {

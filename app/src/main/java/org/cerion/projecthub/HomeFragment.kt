@@ -13,7 +13,6 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.cerion.projecthub.github.getService
 
 
 class HomeFragment : Fragment() {
@@ -43,29 +42,6 @@ class HomeFragment : Fragment() {
 
     private suspend fun testApi(accessToken: String) {
         withContext(Dispatchers.IO) {
-
-            /*
-            val url = "https://api.github.com/user"
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("Authorization", "token $accessToken")
-                .build()
-
-            val response = OkHttpClient().newCall(request).execute()
-            if (response.code != HttpURLConnection.HTTP_OK)
-                throw Exception("Response code ${response.code}")
-
-            val body = response.body?.string()
-            println(body)
-             */
-
-            val service = getService(accessToken)
-            val projects = service.getProjectsAsync().await()
-
-            println(projects)
-
-            //uri.getQueryParameter("access_token")!!
         }
     }
 

@@ -19,6 +19,7 @@ import org.cerion.projecthub.model.NoteCard
 
 interface BoardListener {
     fun move(card: Card)
+    fun onClick(card: Card)
 }
 
 class ProjectColumnListAdapter(private val lifecycleOwner: LifecycleOwner, private val listener: BoardListener) : RecyclerView.Adapter<ProjectColumnListAdapter.ViewHolder>() {
@@ -103,15 +104,22 @@ class ColumnCardListAdapter(private val listener: BoardListener) : RecyclerView.
             (holder as IssueViewHolder).bind(item as IssueCard)
     }
 
-    inner class NoteViewHolder(private val binding: ListItemCardNoteBinding) : RecyclerView.ViewHolder(binding.root) {
+    abstract inner class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener
+
+    inner class NoteViewHolder(private val binding: ListItemCardNoteBinding) : BaseViewHolder(binding.root) {
         fun bind(item: NoteCard) {
             binding.card = item
             binding.createdBy.text = "Added by ${item.creator}"
+            binding.root.setOnClickListener(this)
             binding.executePendingBindings()
+        }
+
+        override fun onClick(p0: View?) {
+            listener.onClick(binding.card!!)
         }
     }
 
-    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : RecyclerView.ViewHolder(binding.root), View.OnCreateContextMenuListener {
+    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : BaseViewHolder(binding.root), View.OnCreateContextMenuListener {
 
         init {
             binding.root.setOnCreateContextMenuListener(this)
@@ -142,6 +150,10 @@ class ColumnCardListAdapter(private val listener: BoardListener) : RecyclerView.
                     true
                 }
             }
+        }
+
+        override fun onClick(p0: View?) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
     }
 }

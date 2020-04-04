@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +24,7 @@ class ProjectHomeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
 
-        viewModel = ViewModelProviders.of(this).get(ProjectHomeViewModel::class.java)
+        viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
         //binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
@@ -41,6 +42,12 @@ class ProjectHomeFragment : Fragment() {
                 }
 
                 builder.show()
+            }
+
+            override fun onClick(card: Card) {
+                viewModel.editCard = card
+                val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment()
+                findNavController().navigate(action)
             }
         })
 
