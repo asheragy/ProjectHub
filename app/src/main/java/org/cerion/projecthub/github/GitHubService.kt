@@ -23,6 +23,7 @@ data class GitHubIssue(val id: Int, val title: String, val state: String, val ur
 data class MoveCardParams(val column_id: Int, val position: String = "bottom")
 
 data class UpdateCardParams(val note: String, val archived: Boolean = false)
+data class CreateCardParams(val note: String)
 
 interface GitHubService {
     @GET("users/asheragy/projects")
@@ -33,6 +34,9 @@ interface GitHubService {
 
     @PATCH("projects/columns/cards/{card_id}")
     fun updateCard(@Path("card_id")cardId: Int, @Body params: UpdateCardParams): Deferred<ResponseBody>
+
+    @POST("projects/columns/{column_id}/cards")
+    fun createCard(@Path("column_id")columnId: Int, @Body params: CreateCardParams): Deferred<ResponseBody>
 
     //@GET("projects/{id}/columns")
     //fun getProjectColumns(@Path("id")id: Int): Deferred<List<GitHubColumn>>

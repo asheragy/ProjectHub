@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.NoteCard
 
 
 class ProjectHomeFragment : Fragment() {
@@ -46,7 +47,7 @@ class ProjectHomeFragment : Fragment() {
 
             override fun onClick(card: Card) {
                 viewModel.editCard = card
-                val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment()
+                val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(card.id, (card as NoteCard).note)
                 findNavController().navigate(action)
             }
         })
@@ -57,6 +58,13 @@ class ProjectHomeFragment : Fragment() {
 
         viewModel.columns.observe(viewLifecycleOwner, Observer {
             adapter.setItems(it)
+        })
+
+        viewModel.addNote.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let { column ->
+                val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(column.id, null)
+                findNavController().navigate(action)
+            }
         })
 
         viewModel.load(args.projectId)

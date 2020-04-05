@@ -39,5 +39,13 @@
     <dialog
         android:id="@+id/editNoteDialogFragment"
         android:name="org.cerion.projecthub.ui.dialog.EditNoteDialogFragment"
-        android:label="EditNoteDialogFragment" />
+        android:label="EditNoteDialogFragment" >
+        <argument
+            android:name="columnOrCardId"
+            app:argType="integer" />
+        <argument
+            android:name="note"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 </navigation>
