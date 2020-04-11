@@ -23,7 +23,7 @@ class CardRepository(private val service: GitHubService, private val apolloClien
     private val map = mutableMapOf<String, List<GitHubIssue>>()
 
     suspend fun getCardsForColumn(columnId: String): List<Card> = withContext(Dispatchers.IO) {
-        Log.d(TAG, "getColumnsForProject($columnId)")
+        Log.d(TAG, "getCardsForColumn($columnId)")
 
         val query = GetCardsForColumnQuery.builder().id(columnId).build()
         val response = apolloClient.query(query).toDeferred().await()

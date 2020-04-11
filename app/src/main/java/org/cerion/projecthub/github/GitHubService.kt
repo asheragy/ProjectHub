@@ -1,6 +1,7 @@
 package org.cerion.projecthub.github
 
 import android.content.Context
+import android.util.Log
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -8,6 +9,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import okio.Buffer
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
@@ -24,19 +26,13 @@ data class MoveCardParams(val column_id: Int, val position: String = "bottom")
 
 data class UpdateCardParams(val note: String, val archived: Boolean = false)
 data class CreateCardParams(val note: String)
+data class CreateIssueCardParams(val content_id: Int, val content_type: String = "Issue")
+data class CreateIssueParams(val title: String, val body: String)
+
 
 interface GitHubService {
     @GET("users/asheragy/projects")
     fun getProjectsAsync(): Deferred<List<GitHubProject>>
-
-    @POST("projects/columns/cards/{card_id}/moves")
-    fun moveCard(@Path("card_id")cardId: Int, @Body params: MoveCardParams): Deferred<ResponseBody>
-
-    @PATCH("projects/columns/cards/{card_id}")
-    fun updateCard(@Path("card_id")cardId: Int, @Body params: UpdateCardParams): Deferred<ResponseBody>
-
-    @POST("projects/columns/{column_id}/cards")
-    fun createCard(@Path("column_id")columnId: Int, @Body params: CreateCardParams): Deferred<ResponseBody>
 
     //@GET("projects/{id}/columns")
     //fun getProjectColumns(@Path("id")id: Int): Deferred<List<GitHubColumn>>
@@ -46,8 +42,27 @@ interface GitHubService {
 
     @GET("repos/{user}/{repo}/issues?state=all&per_page=100")
     fun getIssuesForRepo(@Path("user") user: String, @Path("repo")repo: String): Deferred<List<GitHubIssue>>
-}
 
+    //region Cards
+    @POST("projects/columns/cards/{card_id}/moves")
+    fun moveCard(@Path("card_id")cardId: Int, @Body params: MoveCardParams): Deferred<ResponseBody>
+
+    @PATCH("projects/columns/cards/{card_id}")
+    fun updateCard(@Path("card_id")cardId: Int, @Body params: UpdateCardParams): Deferred<ResponseBody>
+
+    @POST("projects/columns/{column_id}/cards")
+    fun createCard(@Path("column_id")columnId: Int, @Body params: CreateCardParams): Deferred<ResponseBody>
+
+    @POST("projects/columns/{column_id}/cards")
+    fun createCard(@Path("column_id")columnId: Int, @Body params: CreateIssueCardParams): Deferred<ResponseBody>
+
+    //endregion
+
+    //region Issues
+    @POST("repos/{owner}/{repo}/issues")
+    fun createIssue(@Path("owner")owner: String, @Path("repo")repo: String, @Body params: CreateIssueParams): Deferred<GitHubIssue>
+    //endregion
+}
 
 fun getService(context: Context): GitHubService {
     val accessToken = getAccessToken(context)
@@ -60,6 +75,11 @@ fun getService(context: Context): GitHubService {
                 .addHeader("Authorization", "token $accessToken")
                 .addHeader("Accept", "application/vnd.github.inertia-preview+json")
                 .build()
+
+            val buffer = Buffer()
+            request.body?.writeTo(buffer)
+            Log.i("OkHttp", "Request: ${request.url}")
+            Log.i("OkHttp", "Body: ${buffer.readUtf8()}")
             chain.proceed(request)
         }
         //.proxy(Proxy.NO_PROXY)

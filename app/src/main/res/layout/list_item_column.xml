@@ -15,7 +15,7 @@
         tools:layout_width="300dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <TextView
@@ -32,10 +32,14 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.onAddNote()}"
-                android:text="Add Note">
+                android:onClick="@{() -> viewModel.addNote()}"
+                android:text="Note"/>
 
-            </Button>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> viewModel.addIssue()}"
+                android:text="Issue"/>
 
         </LinearLayout>
 

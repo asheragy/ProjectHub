@@ -45,11 +45,7 @@ class ProjectHomeFragment : Fragment() {
                 builder.show()
             }
 
-            override fun onClick(card: Card) {
-                viewModel.editCard = card
-                val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(card.id, (card as NoteCard).note)
-                findNavController().navigate(action)
-            }
+            override fun onClick(card: Card) = onEditNote(card as NoteCard)
         })
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -60,15 +56,31 @@ class ProjectHomeFragment : Fragment() {
             adapter.setItems(it)
         })
 
-        viewModel.addNote.observe(viewLifecycleOwner, Observer {
-            it.getContentIfNotHandled()?.let { column ->
-                val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(column.id, null)
-                findNavController().navigate(action)
-            }
+        viewModel.addNote.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.let { onAddNote(it.id) }
+        })
+
+        viewModel.addIssue.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.let { onAddIssue(it.id) }
         })
 
         viewModel.load(args.projectId)
 
         return binding.root
+    }
+
+    private fun onAddNote(columnId: Int) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(columnId, null)
+        findNavController().navigate(action)
+    }
+
+    private fun onAddIssue(columnId: Int) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(columnId)
+        findNavController().navigate(action)
+    }
+
+    private fun onEditNote(card: NoteCard) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(card.id, card.note)
+        findNavController().navigate(action)
     }
 }

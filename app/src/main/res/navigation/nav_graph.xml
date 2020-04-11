@@ -34,6 +34,9 @@
         <action
             android:id="@+id/action_projectHomeFragment_to_editNoteDialogFragment"
             app:destination="@id/editNoteDialogFragment" />
+        <action
+            android:id="@+id/action_projectHomeFragment_to_issueFragment"
+            app:destination="@id/issueFragment" />
     </fragment>
 
     <dialog
@@ -48,4 +51,12 @@
             app:argType="string"
             app:nullable="true" />
     </dialog>
+    <fragment
+        android:id="@+id/issueFragment"
+        android:name="org.cerion.projecthub.ui.IssueFragment"
+        android:label="IssueFragment" >
+        <argument
+            android:name="columnId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

@@ -7,36 +7,44 @@ enum class ProjectType {
     Org
 }
 
-data class Project(val id: Int, val nodeId: String, val ownerUrl: String, val name: String, val description: String) {
+data class Project(val id: Int, val nodeId: String, val type: ProjectType, val owner: String, val repo: String) {
+    var name: String = ""
+    var description: String = ""
 
-    private val urlParts = ownerUrl.split("/")
-
-    val type: ProjectType = when (urlParts[3]) {
-            "users" -> ProjectType.User
-            "repos" -> ProjectType.Repository
-            "orgs" -> ProjectType.Org
-            else -> throw NotImplementedError()
-        }
-
-    val user = when (type) {
-            ProjectType.User -> urlParts[4]
-            ProjectType.Repository -> urlParts[4]
-            ProjectType.Org -> urlParts[5]
-        }
-
-    val repo = if (type == ProjectType.Repository) urlParts[5] else null
+    /* TODO to support user/org projects repo is not required
+    init {
+        if (type == ProjectType.Repository && repo.isNullOrEmpty())
+            throw IllegalArgumentException("repository name must be specified")
+    }
+     */
 }
 
 class ProjectRepository {
 
+    // TODO store project as combo of type / owner / repo?
+    // Org/user projects can have multiple repos
+    //GET /repos/:owner/:repo/projects
+    //GET /orgs/:org/projects
+    //GET /users/:username/projects
+
     fun getAll(): List<Project> {
-        return listOf(
-            Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", "https://api.github.com/repos/PhilJay/MPAndroidChart", "Support", ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"),
-            Project(3436425, "MDc6UHJvamVjdDM0MzY0MjU=", "https://api.github.com/users/asheragy","Projects", ""),
-            Project(4004540, "MDc6UHJvamVjdDQwMDQ1NDA=", "https://api.github.com/users/asheragy", "Simple", ""))
+        val p1 = Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", ProjectType.Repository,"PhilJay" , "MPAndroidChart").apply {
+            name = "Support"
+            description = ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"
+        }
+
+        val p2 = Project(3436611, "MDc6UHJvamVjdDQwMDUxNjY=", ProjectType.Repository,"asheragy","TestForIssueTracking").apply {
+            name = "Project 3"
+        }
+
+        return listOf(p1, p2)
     }
 
     fun getById(id: Int): Project? {
         return getAll().firstOrNull { it.id == id }
     }
+
+    //GET /repos/:owner/:repo/projects
+    //GET /orgs/:org/projects
+    //GET /users/:username/projects
 }

@@ -9,10 +9,13 @@ import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.repository.CardRepository
 import org.cerion.projecthub.repository.ColumnRepository
+import org.cerion.projecthub.repository.Project
 import org.cerion.projecthub.repository.ProjectRepository
 
 
 class ProjectHomeViewModel(application: Application) : AndroidViewModel(application) {
+
+    private lateinit var project: Project
 
     val projectName = "My Project" // TODO load from database or web
 
@@ -22,8 +25,9 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
     private val projectRepo = ProjectRepository()
     private val columnRepo = ColumnRepository(service, graphQL)
     private val cardRepo = CardRepository(service, graphQL)
-    var editCard: Card? = null
+
     val addNote = MutableLiveData<SingleEvent<Column>>()
+    val addIssue = MutableLiveData<SingleEvent<Column>>()
 
     private val _columns = MutableLiveData<List<ColumnViewModel>>()
     val columns: LiveData<List<ColumnViewModel>>
@@ -32,8 +36,8 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
     fun load(projectId: Int) {
         val vm = this
         viewModelScope.launch {
-            val nodeId = projectRepo.getById(projectId)!!.nodeId
-            val cols = columnRepo.getColumnsForProject(nodeId)
+            project = projectRepo.getById(projectId)!!
+            val cols = columnRepo.getColumnsForProject(project.nodeId)
             _columns.value = cols.map { ColumnViewModel(vm, cardRepo, it) }
         }
     }
@@ -77,6 +81,16 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    fun addIssueForColumn(columnId: Int, title: String, body: String) {
+        viewModelScope.launch {
+            val params = CreateIssueParams(title, body)
+            val issue = service.createIssue(project.owner, project.repo, params).await()
+            service.createCard(columnId, CreateIssueCardParams(issue.id)).await()
+
+            findColumnById(columnId)?.loadCards()
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         // TODO look into how this can get called when using activity scope
@@ -111,12 +125,16 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val repo
         _cards.value = _cards.value?.filter { it.id != card.id }
     }
 
-    fun addCard(card: Card) {
+    internal fun addCard(card: Card) {
         _cards.value = cards.value?.plus(card)
     }
 
-    fun onAddNote() {
+    fun addNote() {
         parent.addNote.value = SingleEvent(column)
+    }
+
+    fun addIssue() {
+        parent.addIssue.value = SingleEvent(column)
     }
 
     suspend fun loadCards() {
