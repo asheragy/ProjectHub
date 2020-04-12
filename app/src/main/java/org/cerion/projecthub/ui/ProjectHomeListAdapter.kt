@@ -3,6 +3,7 @@ package org.cerion.projecthub.ui
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.view.*
+import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -104,9 +105,15 @@ class ColumnCardListAdapter(private val listener: BoardListener) : RecyclerView.
             (holder as IssueViewHolder).bind(item as IssueCard)
     }
 
-    abstract inner class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener
+    abstract inner class BaseViewHolder(binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+        override fun onClick(p0: View?) {
+            onClick()
+        }
 
-    inner class NoteViewHolder(private val binding: ListItemCardNoteBinding) : BaseViewHolder(binding.root) {
+        abstract fun onClick()
+    }
+
+    inner class NoteViewHolder(val binding: ListItemCardNoteBinding) : BaseViewHolder(binding) {
         fun bind(item: NoteCard) {
             binding.card = item
             binding.createdBy.text = "Added by ${item.creator}"
@@ -114,12 +121,12 @@ class ColumnCardListAdapter(private val listener: BoardListener) : RecyclerView.
             binding.executePendingBindings()
         }
 
-        override fun onClick(p0: View?) {
+        override fun onClick() {
             listener.onClick(binding.card!!)
         }
     }
 
-    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : BaseViewHolder(binding.root), View.OnCreateContextMenuListener {
+    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : BaseViewHolder(binding), View.OnCreateContextMenuListener {
 
         init {
             binding.root.setOnCreateContextMenuListener(this)
@@ -138,6 +145,7 @@ class ColumnCardListAdapter(private val listener: BoardListener) : RecyclerView.
                 binding.labels.addView(chip)
             }
 
+            binding.root.setOnClickListener(this)
             binding.executePendingBindings()
         }
 
@@ -152,8 +160,8 @@ class ColumnCardListAdapter(private val listener: BoardListener) : RecyclerView.
             }
         }
 
-        override fun onClick(p0: View?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        override fun onClick() {
+            listener.onClick(binding.card!!)
         }
     }
 }

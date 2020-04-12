@@ -15,7 +15,7 @@ import org.cerion.projecthub.repository.ProjectRepository
 
 class ProjectHomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private lateinit var project: Project
+    lateinit var project: Project
 
     val projectName = "My Project" // TODO load from database or web
 

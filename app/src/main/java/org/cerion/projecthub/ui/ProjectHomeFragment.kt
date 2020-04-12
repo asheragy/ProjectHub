@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
+// TODO https://issuetracker.google.com/issues/111614463
 
 class ProjectHomeFragment : Fragment() {
 
@@ -24,6 +26,7 @@ class ProjectHomeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
+
 
         viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
         //binding.viewModel = viewModel
@@ -45,7 +48,13 @@ class ProjectHomeFragment : Fragment() {
                 builder.show()
             }
 
-            override fun onClick(card: Card) = onEditNote(card as NoteCard)
+            override fun onClick(card: Card) {
+                when (card) {
+                    is NoteCard -> onEditNote(card)
+                    is IssueCard -> onEditIssue(card)
+                }
+
+            }
         })
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -64,6 +73,7 @@ class ProjectHomeFragment : Fragment() {
             event.getContentIfNotHandled()?.let { onAddIssue(it.id) }
         })
 
+        // TODO should not reload every time
         viewModel.load(args.projectId)
 
         return binding.root
@@ -74,13 +84,20 @@ class ProjectHomeFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-    private fun onAddIssue(columnId: Int) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(columnId)
-        findNavController().navigate(action)
-    }
-
     private fun onEditNote(card: NoteCard) {
         val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(card.id, card.note)
         findNavController().navigate(action)
     }
+
+    private fun onAddIssue(columnId: Int) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(columnId, null, null, 0)
+        findNavController().navigate(action)
+    }
+
+    private fun onEditIssue(issue: IssueCard) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(issue.id, viewModel.project.owner, issue.repository, issue.number)
+        findNavController().navigate(action)
+    }
+
+
 }

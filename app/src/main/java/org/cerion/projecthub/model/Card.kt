@@ -1,6 +1,6 @@
 package org.cerion.projecthub.model
 
-abstract class Card {
+sealed class Card {
     abstract val id: Int
 }
 

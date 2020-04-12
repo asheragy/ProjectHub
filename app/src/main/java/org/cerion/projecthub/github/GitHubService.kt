@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 //data class GitHubColumn(val id: Int, val name: String)
 data class GitHubProject(val id: Int, val name: String, val state: String, val updated_at: Date)
 data class GitHubCard(val id: Int, val note: String?, val content_url: String?)
-data class GitHubIssue(val id: Int, val title: String, val state: String, val url: String)
+data class GitHubIssue(val id: Int, val title: String, val body: String, val state: String, val url: String, val number: Int)
 
 // position values: top / bottom / after:<card_id>
 data class MoveCardParams(val column_id: Int, val position: String = "bottom")
@@ -28,7 +28,7 @@ data class UpdateCardParams(val note: String, val archived: Boolean = false)
 data class CreateCardParams(val note: String)
 data class CreateIssueCardParams(val content_id: Int, val content_type: String = "Issue")
 data class CreateIssueParams(val title: String, val body: String)
-
+data class UpdateIssueParams(val title: String, val body: String)
 
 interface GitHubService {
     @GET("users/asheragy/projects")
@@ -59,8 +59,16 @@ interface GitHubService {
     //endregion
 
     //region Issues
+
     @POST("repos/{owner}/{repo}/issues")
     fun createIssue(@Path("owner")owner: String, @Path("repo")repo: String, @Body params: CreateIssueParams): Deferred<GitHubIssue>
+
+    @POST("repos/{owner}/{repo}/issues/{number}")
+    fun getIssue(@Path("owner")owner: String, @Path("repo")repo: String, @Path("number")number: Int): Deferred<GitHubIssue>
+
+    @PATCH("repos/{owner}/{repo}/issues/{number}")
+    fun updateIssue(@Path("owner")owner: String, @Path("repo")repo: String, @Path("number")number: Int, @Body params: UpdateIssueParams): Deferred<GitHubIssue>
+
     //endregion
 }
 

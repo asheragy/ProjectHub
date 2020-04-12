@@ -58,5 +58,16 @@
         <argument
             android:name="columnId"
             app:argType="integer" />
+        <argument
+            android:name="repoOwner"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="repo"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="number"
+            app:argType="integer" />
     </fragment>
 </navigation>
