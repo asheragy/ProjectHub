@@ -1,23 +1,47 @@
 package org.cerion.projecthub.ui
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
-import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
 // TODO https://issuetracker.google.com/issues/111614463
+
+class ColumnPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    override fun getItemCount(): Int = 3
+    override fun createFragment(position: Int): Fragment = ColumnFragment()
+}
+
+fun ViewPager2.setShowSideItems() {
+    clipToPadding = false
+    clipChildren = false
+    offscreenPageLimit = 3
+
+    val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.pageMargin)
+    val offsetPx = resources.getDimensionPixelOffset(R.dimen.pagerOffset)
+
+    setPageTransformer { page, position ->
+        val offset = position * -(2 * offsetPx + pageMarginPx)
+        if (this.orientation == ViewPager2.ORIENTATION_HORIZONTAL) {
+            if (ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL)
+                page.translationX = -offset
+            else
+                page.translationX = offset
+        }
+        else
+            page.translationY = offset
+    }
+}
 
 class ProjectHomeFragment : Fragment() {
 
@@ -27,7 +51,10 @@ class ProjectHomeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
 
+        binding.viewPager.adapter = ColumnPagerAdapter(this)
+        binding.viewPager.setShowSideItems()
 
+        /*
         viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
         //binding.viewModel = viewModel
         binding.lifecycleOwner = this
@@ -76,6 +103,7 @@ class ProjectHomeFragment : Fragment() {
         // TODO should not reload every time
         viewModel.load(args.projectId)
 
+         */
         return binding.root
     }
 
