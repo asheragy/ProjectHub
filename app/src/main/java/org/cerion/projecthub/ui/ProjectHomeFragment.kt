@@ -6,20 +6,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
+
 // TODO https://issuetracker.google.com/issues/111614463
 
 class ColumnPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int = 3
-    override fun createFragment(position: Int): Fragment = ColumnFragment()
+
+    private var pages = listOf<Int>()
+
+    override fun getItemCount(): Int = pages.size
+    override fun createFragment(position: Int): Fragment = ColumnFragment(pages[position])
+
+    fun setPages(pages: List<Int>) {
+        this.pages = pages
+        this.notifyDataSetChanged()
+    }
 }
 
 fun ViewPager2.setShowSideItems() {
@@ -31,17 +44,15 @@ fun ViewPager2.setShowSideItems() {
     val offsetPx = resources.getDimensionPixelOffset(R.dimen.pagerOffset)
 
     setPageTransformer { page, position ->
+        val viewPager = page.parent.parent as ViewPager2
         val offset = position * -(2 * offsetPx + pageMarginPx)
-        if (this.orientation == ViewPager2.ORIENTATION_HORIZONTAL) {
-            if (ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL)
-                page.translationX = -offset
-            else
-                page.translationX = offset
-        }
+        if (ViewCompat.getLayoutDirection(viewPager) == ViewCompat.LAYOUT_DIRECTION_RTL)
+            page.translationX = -offset
         else
-            page.translationY = offset
+            page.translationX = offset
     }
 }
+
 
 class ProjectHomeFragment : Fragment() {
 
@@ -51,16 +62,29 @@ class ProjectHomeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
 
-        binding.viewPager.adapter = ColumnPagerAdapter(this)
-        binding.viewPager.setShowSideItems()
-
-        /*
         viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
         //binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
+        val pagerAdapter = ColumnPagerAdapter(this)
+        binding.viewPager.adapter = pagerAdapter
+        binding.viewPager.setShowSideItems()
+
+        binding.tabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
+        binding.tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = viewModel.columns.value!![position % 3].name
+        }.attach()
+
+
         requireActivity().title = viewModel.projectName
 
+        viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
+            val ids = columns.map { it.id }
+            pagerAdapter.setPages(ids)
+        })
+
+        /*
         val adapter = ProjectColumnListAdapter(viewLifecycleOwner, object : BoardListener {
             override fun move(card: Card) {
                 val items = viewModel.columns.value!!.map { it.name }.toTypedArray()
@@ -88,10 +112,6 @@ class ProjectHomeFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL))
 
-        viewModel.columns.observe(viewLifecycleOwner, Observer {
-            adapter.setItems(it)
-        })
-
         viewModel.addNote.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.let { onAddNote(it.id) }
         })
@@ -100,10 +120,11 @@ class ProjectHomeFragment : Fragment() {
             event.getContentIfNotHandled()?.let { onAddIssue(it.id) }
         })
 
+         */
+
         // TODO should not reload every time
         viewModel.load(args.projectId)
 
-         */
         return binding.root
     }
 
