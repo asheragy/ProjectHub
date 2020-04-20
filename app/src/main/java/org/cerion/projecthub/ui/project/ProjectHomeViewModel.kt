@@ -1,7 +1,10 @@
-package org.cerion.projecthub.ui
+package org.cerion.projecthub.ui.project
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.common.SingleEvent
 import org.cerion.projecthub.github.*
@@ -38,7 +41,9 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             project = projectRepo.getById(projectId)!!
             val cols = columnRepo.getColumnsForProject(project.nodeId)
-            _columns.value = cols.map { ColumnViewModel(vm, cardRepo, it) }
+            _columns.value = cols.map {
+                ColumnViewModel(vm, cardRepo, service, it)
+            }
         }
     }
 
@@ -62,25 +67,6 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    fun updateNote(cardId: Int, note: String) {
-        viewModelScope.launch {
-            // TODO don't updated if not modified, maybe just take id+text as params
-            val column = findColumnForCard(cardId)
-
-            val params = UpdateCardParams(note)
-            service.updateCard(cardId, params).await()
-            column?.loadCards()
-        }
-    }
-
-    fun addNoteForColumn(columnId: Int, note: String) {
-        viewModelScope.launch {
-            val params = CreateCardParams(note)
-            val result = service.createCard(columnId, params).await()
-            findColumnById(columnId)?.loadCards()
-        }
-    }
-
     fun addIssueForColumn(columnId: Int, title: String, body: String) {
         viewModelScope.launch {
             val params = CreateIssueParams(title, body)
@@ -96,48 +82,7 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
         // TODO look into how this can get called when using activity scope
     }
 
-    private fun findColumnById(id: Int) = _columns.value?.first { it.id == id}
+    fun findColumnById(id: Int) = _columns.value?.first { it.id == id}
     private fun findColumnForCard(id: Int) = _columns.value?.first { it.containsCard(id) }
 
-}
-
-// TODO verify this gets destroyed + onCleared is called
-class ColumnViewModel(private val parent: ProjectHomeViewModel, private val repo: CardRepository, private val column: Column) : ViewModel() {
-
-    val id = column.id
-    val name = column.name
-
-    private val _cards = MutableLiveData<List<Card>>()
-    val cards: LiveData<List<Card>>
-        get() = _cards
-
-    init {
-        viewModelScope.launch {
-            loadCards()
-        }
-    }
-
-    @Deprecated("use id version")
-    fun containsCard(card: Card): Boolean = _cards.value?.contains(card) ?: false
-    fun containsCard(cardId: Int): Boolean = _cards.value?.any { it.id == cardId} ?: false
-
-    fun removeCard(card: Card) {
-        _cards.value = _cards.value?.filter { it.id != card.id }
-    }
-
-    internal fun addCard(card: Card) {
-        _cards.value = cards.value?.plus(card)
-    }
-
-    fun addNote() {
-        parent.addNote.value = SingleEvent(column)
-    }
-
-    fun addIssue() {
-        parent.addIssue.value = SingleEvent(column)
-    }
-
-    suspend fun loadCards() {
-        _cards.value = repo.getCardsForColumn(column.node_id)
-    }
 }

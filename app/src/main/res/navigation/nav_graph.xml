@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/projectHomeFragment"
-        android:name="org.cerion.projecthub.ui.ProjectHomeFragment"
+        android:name="org.cerion.projecthub.ui.project.ProjectHomeFragment"
         android:label="project_home_fragment"
         tools:layout="@layout/fragment_project_home" >
         <argument
@@ -44,12 +44,11 @@
         android:name="org.cerion.projecthub.ui.dialog.EditNoteDialogFragment"
         android:label="EditNoteDialogFragment" >
         <argument
-            android:name="columnOrCardId"
+            android:name="columnId"
             app:argType="integer" />
         <argument
-            android:name="note"
-            app:argType="string"
-            app:nullable="true" />
+            android:name="cardId"
+            app:argType="integer" />
     </dialog>
     <fragment
         android:id="@+id/issueFragment"

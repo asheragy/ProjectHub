@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="viewModel" type="org.cerion.projecthub.ui.ColumnViewModel" />
+        <variable name="viewModel" type="org.cerion.projecthub.ui.project.ColumnViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

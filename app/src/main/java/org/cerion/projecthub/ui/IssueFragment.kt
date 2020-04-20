@@ -14,6 +14,7 @@ import org.cerion.projecthub.github.GitHubService
 import org.cerion.projecthub.github.UpdateIssueParams
 import org.cerion.projecthub.github.getService
 import org.cerion.projecthub.model.IssueCard
+import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 
 class IssueFragment : Fragment() {
 

@@ -9,10 +9,12 @@ import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import org.cerion.projecthub.R
-import org.cerion.projecthub.ui.ProjectHomeViewModel
+import org.cerion.projecthub.model.NoteCard
+import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 
 class EditNoteDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // TODO see if we can get viewmodel directly from column Fragment, then columnId doesnt need to be passed
         val args = EditNoteDialogFragmentArgs.fromBundle(requireArguments())
         val viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
 
@@ -20,15 +22,20 @@ class EditNoteDialogFragment : DialogFragment() {
     }
 }
 
-private class EditNoteDialog(context: Context, private val viewModel: ProjectHomeViewModel, private val args: EditNoteDialogFragmentArgs) : Dialog(context) {
+private class EditNoteDialog(context: Context, private val projectViewModel: ProjectHomeViewModel, private val args: EditNoteDialogFragmentArgs) : Dialog(context) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.dialog_edit_note)
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
-        val isNew = args.note == null
-        val note = args.note ?: ""
+        val viewModel = projectViewModel.findColumnById(args.columnId)!!
+
+        val isNew = args.cardId == 0
+        val note = if (isNew) "" else {
+            val card = viewModel.cards.value!!.first { it.id == args.cardId } as NoteCard
+            card.note
+        }
 
         val editText = findViewById<EditText>(R.id.text)
         editText.setText(note)
@@ -36,9 +43,9 @@ private class EditNoteDialog(context: Context, private val viewModel: ProjectHom
         findViewById<Button>(R.id.save).setOnClickListener {
             val newNote = editText.text.toString()
             if (isNew)
-                viewModel.addNoteForColumn(args.columnOrCardId, newNote)
+                viewModel.addNote(newNote)
             else
-                viewModel.updateNote(args.columnOrCardId, newNote)
+                viewModel.updateNote(args.cardId, newNote)
 
             dismiss()
         }

@@ -1,4 +1,4 @@
-package org.cerion.projecthub.ui
+package org.cerion.projecthub.ui.project
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,6 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -16,8 +15,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
-import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.model.NoteCard
 
 
 // TODO https://issuetracker.google.com/issues/111614463
@@ -27,7 +24,8 @@ class ColumnPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     private var pages = listOf<Int>()
 
     override fun getItemCount(): Int = pages.size
-    override fun createFragment(position: Int): Fragment = ColumnFragment(pages[position])
+    override fun createFragment(position: Int): Fragment =
+        ColumnFragment(pages[position])
 
     fun setPages(pages: List<Int>) {
         this.pages = pages
@@ -66,7 +64,8 @@ class ProjectHomeFragment : Fragment() {
         //binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        val pagerAdapter = ColumnPagerAdapter(this)
+        val pagerAdapter =
+            ColumnPagerAdapter(this)
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.setShowSideItems()
 
@@ -85,32 +84,6 @@ class ProjectHomeFragment : Fragment() {
         })
 
         /*
-        val adapter = ProjectColumnListAdapter(viewLifecycleOwner, object : BoardListener {
-            override fun move(card: Card) {
-                val items = viewModel.columns.value!!.map { it.name }.toTypedArray()
-
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("Move to")
-                builder.setItems(items) { _, which ->
-                    val column = viewModel.columns.value!!.firstOrNull { it.name == items[which] }!!
-                    viewModel.moveCard(card, column.id)
-                }
-
-                builder.show()
-            }
-
-            override fun onClick(card: Card) {
-                when (card) {
-                    is NoteCard -> onEditNote(card)
-                    is IssueCard -> onEditIssue(card)
-                }
-
-            }
-        })
-
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL))
 
         viewModel.addNote.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.let { onAddNote(it.id) }
@@ -126,26 +99,6 @@ class ProjectHomeFragment : Fragment() {
         viewModel.load(args.projectId)
 
         return binding.root
-    }
-
-    private fun onAddNote(columnId: Int) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(columnId, null)
-        findNavController().navigate(action)
-    }
-
-    private fun onEditNote(card: NoteCard) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(card.id, card.note)
-        findNavController().navigate(action)
-    }
-
-    private fun onAddIssue(columnId: Int) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(columnId, null, null, 0)
-        findNavController().navigate(action)
-    }
-
-    private fun onEditIssue(issue: IssueCard) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(issue.id, viewModel.project.owner, issue.repository, issue.number)
-        findNavController().navigate(action)
     }
 
 

@@ -1,65 +1,19 @@
-package org.cerion.projecthub.ui
+package org.cerion.projecthub.ui.project
 
 import android.content.res.ColorStateList
-import android.os.Bundle
 import android.view.*
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import org.cerion.projecthub.R
-import org.cerion.projecthub.databinding.FragmentColumnBinding
 import org.cerion.projecthub.databinding.ListItemCardIssueBinding
 import org.cerion.projecthub.databinding.ListItemCardNoteBinding
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
-interface BoardListener {
-    fun move(card: Card)
-    fun onClick(card: Card)
-}
 
-class ColumnFragment(columnId: Int) : Fragment() {
-
-    init {
-        val bundle = Bundle()
-        bundle.putInt(COLUMN_ID, columnId)
-        arguments = bundle
-    }
-
-    private lateinit var parentViewModel: ProjectHomeViewModel
-    private lateinit var viewModel: ColumnViewModel
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentColumnBinding.inflate(layoutInflater, container, false)
-
-        parentViewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
-        val columnId = arguments!!.getInt(COLUMN_ID)
-        viewModel = parentViewModel.columns.value!!.first { it.id == columnId }
-
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-        val adapter = ColumnCardListAdapter(null)
-        binding.recyclerView.adapter = adapter
-        //binding.recyclerView.addItemDecoration(DividerItemDecoration(parent.context, DividerItemDecoration.VERTICAL))
-
-        viewModel.cards.observe(viewLifecycleOwner, Observer {
-            adapter.setItems(it)
-        })
-
-        return binding.root
-    }
-
-    companion object {
-        private const val COLUMN_ID = "columnId"
-    }
-}
-
-
-class ColumnCardListAdapter(private val listener: BoardListener?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         private const val TypeNote = 0
         private const val TypeIssue = 1
@@ -109,7 +63,7 @@ class ColumnCardListAdapter(private val listener: BoardListener?) : RecyclerView
         }
 
         override fun onClick() {
-            listener?.onClick(binding.card!!)
+            listener.onClick(binding.card!!)
         }
     }
 
@@ -141,14 +95,14 @@ class ColumnCardListAdapter(private val listener: BoardListener?) : RecyclerView
 
             menu?.apply {
                 add(Menu.NONE, view.id, Menu.NONE, "Move").setOnMenuItemClickListener {
-                    listener?.move(card)
+                    listener.move(card)
                     true
                 }
             }
         }
 
         override fun onClick() {
-            listener?.onClick(binding.card!!)
+            listener.onClick(binding.card!!)
         }
     }
 }
