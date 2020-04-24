@@ -80,24 +80,18 @@ class ColumnFragment(columnId: Int) : Fragment() {
         return binding.root
     }
 
-    private fun onAddNote(columnId: Int) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(columnId, 0)
+    fun onAddNote() {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(viewModel.id, 0)
+        findNavController().navigate(action)
+    }
+
+    fun onAddIssue() {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(viewModel.id, null, null, 0)
         findNavController().navigate(action)
     }
 
     private fun onEditNote(card: NoteCard) {
         val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(viewModel.id, card.id)
-        findNavController().navigate(action)
-    }
-
-    private fun onAddIssue(columnId: Int) {
-        val action =
-            ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(
-                columnId,
-                null,
-                null,
-                0
-            )
         findNavController().navigate(action)
     }
 

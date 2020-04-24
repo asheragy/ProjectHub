@@ -35,19 +35,6 @@
                     tools:text="Title">
                 </TextView>
                 -->
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="@{() -> viewModel.addNote()}"
-                    android:text="Note"/>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="@{() -> viewModel.addIssue()}"
-                    android:text="Issue"/>
-
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -58,6 +45,7 @@
             </androidx.recyclerview.widget.RecyclerView>
 
         </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 
 

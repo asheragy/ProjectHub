@@ -20,15 +20,22 @@ import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 // TODO https://issuetracker.google.com/issues/111614463
 
 class ColumnPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-
     private var pages = listOf<Int>()
+    private var fragments = arrayOfNulls<ColumnFragment>(0)
+    var currentPosition = -1
+
+    val currentFragment: ColumnFragment
+        get() = fragments[currentPosition]!!
 
     override fun getItemCount(): Int = pages.size
-    override fun createFragment(position: Int): Fragment =
-        ColumnFragment(pages[position])
+    override fun createFragment(position: Int): Fragment {
+        fragments[position] = ColumnFragment(pages[position])
+        return fragments[position]!!
+    }
 
     fun setPages(pages: List<Int>) {
         this.pages = pages
+        this.fragments = arrayOfNulls(pages.size)
         this.notifyDataSetChanged()
     }
 }
@@ -56,6 +63,7 @@ class ProjectHomeFragment : Fragment() {
 
     private val args: ProjectHomeFragmentArgs by navArgs()
     private lateinit var viewModel: ProjectHomeViewModel
+    private lateinit var binding: FragmentProjectHomeBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
@@ -64,13 +72,19 @@ class ProjectHomeFragment : Fragment() {
         //binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        val pagerAdapter =
-            ColumnPagerAdapter(this)
+        val pagerAdapter = ColumnPagerAdapter(this)
+
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.setShowSideItems()
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                pagerAdapter.currentPosition = position
+            }
+        })
 
-        binding.tabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
-        binding.tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        binding.tabLayout.tabGravity = TabLayout.GRAVITY_CENTER;
+        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE;
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = viewModel.columns.value!![position % 3].name
         }.attach()
@@ -84,7 +98,6 @@ class ProjectHomeFragment : Fragment() {
         })
 
         /*
-
         viewModel.addNote.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.let { onAddNote(it.id) }
         })
@@ -92,8 +105,10 @@ class ProjectHomeFragment : Fragment() {
         viewModel.addIssue.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.let { onAddIssue(it.id) }
         })
-
          */
+
+        binding.fabGroup.add("Note") { pagerAdapter.currentFragment.onAddNote() }
+        binding.fabGroup.add("Issue") { pagerAdapter.currentFragment.onAddIssue() }
 
         // TODO should not reload every time
         viewModel.load(args.projectId)

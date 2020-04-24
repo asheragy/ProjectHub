@@ -3,4 +3,10 @@
     <dimen name="pageMargin">20dp</dimen>
     <dimen name="pagerOffset">30dp</dimen>
     <dimen name="pageMarginAndoffset">50dp</dimen>
+
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_small_margin">24dp</dimen>
+
+    <dimen name="fab_size_default">56dp</dimen>  <!-- Recommended sizes from material.io -->
+    <dimen name="fab_size_mini">40dp</dimen>
 </resources>
