@@ -99,7 +99,7 @@ class ColumnFragment(columnId: Int) : Fragment() {
         val action =
             ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(
                 issue.id,
-                parentViewModel.project.owner,
+                parentViewModel.project.value!!.owner,
                 issue.repository,
                 issue.number
             )

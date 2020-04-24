@@ -18,9 +18,9 @@ import org.cerion.projecthub.repository.ProjectRepository
 
 class ProjectHomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    lateinit var project: Project
-
-    val projectName = "My Project" // TODO load from database or web
+    private val _project = MutableLiveData<Project>()
+    val project: LiveData<Project>
+        get() = _project
 
     private val context = getApplication<Application>().applicationContext!!
     private var service: GitHubService = getService(context)
@@ -37,10 +37,16 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
         get() = _columns
 
     fun load(projectId: Int) {
+        // When loading new project clear everything first since delay in load
+        if (project.value != null && project.value!!.id != projectId) {
+            _columns.value = null
+            _project.value = null
+        }
+
         val vm = this
         viewModelScope.launch {
-            project = projectRepo.getById(projectId)!!
-            val cols = columnRepo.getColumnsForProject(project.nodeId)
+            _project.value = projectRepo.getById(projectId)
+            val cols = columnRepo.getColumnsForProject(_project.value!!.nodeId)
             _columns.value = cols.map {
                 ColumnViewModel(vm, cardRepo, service, it)
             }
@@ -70,6 +76,7 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
     fun addIssueForColumn(columnId: Int, title: String, body: String) {
         viewModelScope.launch {
             val params = CreateIssueParams(title, body)
+            val project = _project.value!!
             val issue = service.createIssue(project.owner, project.repo, params).await()
             service.createCard(columnId, CreateIssueCardParams(issue.id)).await()
 

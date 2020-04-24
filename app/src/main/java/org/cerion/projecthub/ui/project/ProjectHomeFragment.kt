@@ -69,6 +69,8 @@ class ProjectHomeFragment : Fragment() {
         val binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
 
         viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
+        viewModel.load(args.projectId)
+
         //binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
@@ -89,11 +91,12 @@ class ProjectHomeFragment : Fragment() {
             tab.text = viewModel.columns.value!![position % 3].name
         }.attach()
 
-
-        requireActivity().title = viewModel.projectName
+        viewModel.project.observe(viewLifecycleOwner, Observer {
+            requireActivity().title = it.name
+        })
 
         viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
-            val ids = columns.map { it.id }
+            val ids = columns?.map { it.id } ?: emptyList()
             pagerAdapter.setPages(ids)
         })
 
@@ -109,9 +112,6 @@ class ProjectHomeFragment : Fragment() {
 
         binding.fabGroup.add("Note") { pagerAdapter.currentFragment.onAddNote() }
         binding.fabGroup.add("Issue") { pagerAdapter.currentFragment.onAddIssue() }
-
-        // TODO should not reload every time
-        viewModel.load(args.projectId)
 
         return binding.root
     }
