@@ -28,10 +28,7 @@ class IssueFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        val args =
-            IssueFragmentArgs.fromBundle(
-                requireArguments()
-            )
+        val args = IssueFragmentArgs.fromBundle(requireArguments())
         viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
         val columnViewModel = mainViewModel.findColumnById(args.columnId)!!
 
@@ -43,6 +40,8 @@ class IssueFragment : Fragment() {
                 //requireActivity().onBackPressed()
             }
         })
+
+        requireActivity().title = viewModel.title
 
         return binding.root
     }
@@ -67,6 +66,9 @@ class IssueViewModel(application: Application) : AndroidViewModel(application) {
 
     private val isNew: Boolean
         get() = number == 0
+
+    val title: String
+        get() = if (isNew) "New Issue" else "Issue $number"
 
     fun load(columnId: Int, owner: String, repo: String, number: Int) {
         this.columnId = columnId

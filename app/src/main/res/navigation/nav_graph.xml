@@ -8,17 +8,14 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="org.cerion.projecthub.HomeFragment"
-        android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/loginFragment"
         android:name="org.cerion.projecthub.LoginFragment"
-        android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
     <fragment
         android:id="@+id/projectListFragment"
-        android:name="org.cerion.projecthub.ui.ProjectListFragment"
-        android:label="ProjectListFragment" >
+        android:name="org.cerion.projecthub.ui.ProjectListFragment">
         <action
             android:id="@+id/action_projectListFragment_to_projectHomeFragment"
             app:destination="@id/projectHomeFragment" />
@@ -26,7 +23,6 @@
     <fragment
         android:id="@+id/projectHomeFragment"
         android:name="org.cerion.projecthub.ui.project.ProjectHomeFragment"
-        android:label="project_home_fragment"
         tools:layout="@layout/fragment_project_home" >
         <argument
             android:name="projectId"
@@ -41,8 +37,7 @@
 
     <dialog
         android:id="@+id/editNoteDialogFragment"
-        android:name="org.cerion.projecthub.ui.dialog.EditNoteDialogFragment"
-        android:label="EditNoteDialogFragment" >
+        android:name="org.cerion.projecthub.ui.dialog.EditNoteDialogFragment">
         <argument
             android:name="columnId"
             app:argType="integer" />
@@ -52,8 +47,7 @@
     </dialog>
     <fragment
         android:id="@+id/issueFragment"
-        android:name="org.cerion.projecthub.ui.project.IssueFragment"
-        android:label="IssueFragment" >
+        android:name="org.cerion.projecthub.ui.project.IssueFragment">
         <argument
             android:name="columnId"
             app:argType="integer" />
