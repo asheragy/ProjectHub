@@ -3,36 +3,51 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <data>
+
+        <import type="android.view.View" />
         <variable name="viewModel" type="org.cerion.projecthub.ui.IssueViewModel" />
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <EditText
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@={viewModel.title}"
-            android:hint="Title"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="top"
-            android:text="@={viewModel.comment}"
-            android:hint="Comment"/>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={viewModel.issue.title}"
+                android:hint="Title"/>
 
-        <Button
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:text="@={viewModel.issue.body}"
+                android:hint="Comment"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:onClick="@{() -> viewModel.submit()}"
+                android:text="Submit"/>
+            
+        </LinearLayout>
+        
+        <ProgressBar
+            android:visibility="@{viewModel.busy ? View.VISIBLE : View.GONE}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:onClick="@{() -> viewModel.submit()}"
-            android:text="Submit"/>
-
-    </LinearLayout>
+            android:layout_gravity="center">
+        </ProgressBar>
+    </FrameLayout>
+    
 
 </layout>
 

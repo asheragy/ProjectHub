@@ -84,12 +84,6 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        // TODO look into how this can get called when using activity scope
-    }
-
     fun findColumnById(id: Int) = _columns.value?.first { it.id == id}
-    private fun findColumnForCard(id: Int) = _columns.value?.first { it.containsCard(id) }
 
 }

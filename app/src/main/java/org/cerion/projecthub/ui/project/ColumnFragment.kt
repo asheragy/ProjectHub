@@ -85,24 +85,22 @@ class ColumnFragment(columnId: Int) : Fragment() {
         findNavController().navigate(action)
     }
 
-    fun onAddIssue() {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(viewModel.id, null, null, 0)
-        findNavController().navigate(action)
-    }
-
     private fun onEditNote(card: NoteCard) {
         val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(viewModel.id, card.id)
         findNavController().navigate(action)
     }
 
+    fun onAddIssue() {
+        navigateToIssue(0)
+    }
+
     private fun onEditIssue(issue: IssueCard) {
-        val action =
-            ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(
-                issue.id,
-                parentViewModel.project.value!!.owner,
-                issue.repository,
-                issue.number
-            )
+        navigateToIssue(issue.number)
+    }
+
+    private fun navigateToIssue(number: Int = 0) {
+        val project = parentViewModel.project.value!!
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(viewModel.id, project.owner, project.repo, number)
         findNavController().navigate(action)
     }
 }

@@ -24,6 +24,7 @@ class ColumnPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     private var fragments = arrayOfNulls<ColumnFragment>(0)
     var currentPosition = -1
 
+    // TODO maybe better way of doing this with fragment manager + tags
     val currentFragment: ColumnFragment
         get() = fragments[currentPosition]!!
 
@@ -55,7 +56,10 @@ fun ViewPager2.setShowSideItems() {
             page.translationX = -offset
         else
             page.translationX = offset
+
+        //Log.d(TAG, "$position ${page.translationX}")
     }
+
 }
 
 

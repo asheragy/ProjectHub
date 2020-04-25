@@ -24,9 +24,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val repo
         get() = _cards
 
     init {
-        viewModelScope.launch {
-            loadCards()
-        }
+        refresh()
     }
 
     @Deprecated("use id version")
@@ -51,6 +49,12 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val repo
         parent.addIssue.value = SingleEvent(column)
     }
      */
+
+    fun refresh() {
+        viewModelScope.launch {
+            loadCards()
+        }
+    }
 
     suspend fun loadCards() {
         _cards.value = repo.getCardsForColumn(column.node_id)

@@ -10,9 +10,7 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.databinding.FragmentIssueBinding
-import org.cerion.projecthub.github.GitHubService
-import org.cerion.projecthub.github.UpdateIssueParams
-import org.cerion.projecthub.github.getService
+import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 
@@ -32,30 +30,15 @@ class IssueFragment : Fragment() {
         binding.lifecycleOwner = this
 
         val args = IssueFragmentArgs.fromBundle(requireArguments())
-        val isNew = args.number == 0
-
-        if (!isNew) {
-            viewModel.load(args.repoOwner!!, args.repo!!, args.number)
-        }
+        viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
+        val columnViewModel = mainViewModel.findColumnById(args.columnId)!!
 
         viewModel.finished.observe(viewLifecycleOwner, Observer {
             if (it!!) {
+                columnViewModel.refresh()
                 // TODO need to handle keyboard
                 findNavController().navigateUp()
                 //requireActivity().onBackPressed()
-            }
-        })
-
-        viewModel.issue.observe(viewLifecycleOwner, Observer {
-            if (isNew) {
-                val columnId = IssueFragmentArgs.fromBundle(requireArguments()).columnId
-                mainViewModel.addIssueForColumn(columnId, it.title, it.body)
-                // TODO need to handle keyboard
-                findNavController().navigateUp()
-
-            }
-            else {
-                viewModel.save()
             }
         })
 
@@ -68,40 +51,70 @@ class IssueViewModel(application: Application) : AndroidViewModel(application) {
     private val context = getApplication<Application>().applicationContext!!
     private var service: GitHubService = getService(context)
 
-    val title = MutableLiveData<String>("")
-    val comment = MutableLiveData<String>("")
-
     val issue = MutableLiveData<IssueCard>()
     val finished = MutableLiveData<Boolean>(false)
 
-    private var owner: String? = null
-    private var repo: String? = null
-    private var number: Int? = null
+    private var owner: String = ""
+    private var repo: String = ""
+    private var number: Int = 0
+    private var columnId: Int = 0
 
-    fun load(owner: String, repo: String, number: Int) {
+    private val _busy = MutableLiveData(false)
+    val busy: LiveData<Boolean>
+        get() = _busy
+
+    private val isNew: Boolean
+        get() = number == 0
+
+    fun load(columnId: Int, owner: String, repo: String, number: Int) {
+        this.columnId = columnId
         this.owner = owner
         this.repo = repo
         this.number = number
 
-        viewModelScope.launch {
-            val issue = service.getIssue(owner, repo, number).await()
-            title.value = issue.title
-            comment.value = issue.body
+        if (isNew) {
+            issue.value = IssueCard(0, "")
         }
-    }
-
-    fun save() {
-        val params = UpdateIssueParams(title.value!!, comment.value!!)
-        viewModelScope.launch {
-            service.updateIssue(owner!!, repo!!, number!!, params).await()
-            finished.value = true
+        else {
+            // TODO should use repository here and get full issue object (not a simplified card)
+            viewModelScope.launch {
+                _busy.value = true
+                service.getIssue(owner, repo, number).await().let {
+                    issue.value = IssueCard(it.id, "").apply {
+                        this.title = it.title
+                        this.body = it.body
+                    }
+                }
+                _busy.value = false
+            }
         }
     }
 
     fun submit() {
-        issue.value = IssueCard(0, "").also {
-            it.title = title.value!!
-            it.body = comment.value!!
+        // TODO check if any changes or blanks if new record
+        // TODO failure to update indicator
+
+        val title = issue.value!!.title
+        val comment = issue.value!!.body
+        _busy.value = true
+
+        viewModelScope.launch {
+            try {
+                if (isNew) {
+                    val params = CreateIssueParams(title, comment)
+                    val issue = service.createIssue(owner, repo, params).await()
+                    service.createCard(columnId, CreateIssueCardParams(issue.id)).await()
+                    finished.value = true
+                }
+                else {
+                    val params = UpdateIssueParams(title, comment)
+                    service.updateIssue(owner, repo, number, params).await()
+                    finished.value = true
+                }
+            }
+            finally {
+                _busy.value = false
+            }
         }
     }
 }
