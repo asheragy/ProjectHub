@@ -10,8 +10,10 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.databinding.FragmentIssueBinding
-import org.cerion.projecthub.github.*
-import org.cerion.projecthub.model.IssueCard
+import org.cerion.projecthub.github.GitHubService
+import org.cerion.projecthub.github.getService
+import org.cerion.projecthub.model.Issue
+import org.cerion.projecthub.repository.IssueRepository
 
 class IssueFragment : Fragment() {
 
@@ -50,13 +52,14 @@ class IssueFragment : Fragment() {
 class IssueViewModel(application: Application) : AndroidViewModel(application) {
 
     private val context = getApplication<Application>().applicationContext!!
-    private var service: GitHubService = getService(context)
+    private val service: GitHubService = getService(context)
+    private val issueRepo = IssueRepository(service)
 
-    val issue = MutableLiveData<IssueCard>()
+    val issue = MutableLiveData<Issue>()
     val finished = MutableLiveData<Boolean>(false)
 
-    private var owner: String = ""
-    private var repo: String = ""
+    private var ownerName: String = ""
+    private var repoName: String = ""
     private var number: Int = 0
     private var columnId: Int = 0
 
@@ -72,24 +75,16 @@ class IssueViewModel(application: Application) : AndroidViewModel(application) {
 
     fun load(columnId: Int, owner: String, repo: String, number: Int) {
         this.columnId = columnId
-        this.owner = owner
-        this.repo = repo
+        this.ownerName = owner
+        this.repoName = repo
         this.number = number
 
         if (isNew) {
-            issue.value = IssueCard(0, "")
+            issue.value = Issue(owner, repo, 0)
         }
         else {
-            // TODO should use repository here and get full issue object (not a simplified card)
-            viewModelScope.launch {
-                _busy.value = true
-                service.getIssue(owner, repo, number).await().let {
-                    issue.value = IssueCard(it.id, "").apply {
-                        this.title = it.title
-                        this.body = it.body
-                    }
-                }
-                _busy.value = false
+            launchBusy {
+                issue.value = issueRepo.getByNumber(owner, repo, number)
             }
         }
     }
@@ -98,23 +93,23 @@ class IssueViewModel(application: Application) : AndroidViewModel(application) {
         // TODO check if any changes or blanks if new record
         // TODO failure to update indicator
 
-        val title = issue.value!!.title
-        val comment = issue.value!!.body
-        _busy.value = true
+        launchBusy {
+            if (isNew) {
+                issueRepo.add(issue.value!!, columnId)
+                finished.value = true
+            }
+            else {
+                issueRepo.update(issue.value!!)
+                finished.value = true
+            }
+        }
+    }
 
+    private fun launchBusy(action: suspend () -> Unit) {
         viewModelScope.launch {
             try {
-                if (isNew) {
-                    val params = CreateIssueParams(title, comment)
-                    val issue = service.createIssue(owner, repo, params).await()
-                    service.createCard(columnId, CreateIssueCardParams(issue.id)).await()
-                    finished.value = true
-                }
-                else {
-                    val params = UpdateIssueParams(title, comment)
-                    service.updateIssue(owner, repo, number, params).await()
-                    finished.value = true
-                }
+                _busy.value = true
+                action()
             }
             finally {
                 _busy.value = false

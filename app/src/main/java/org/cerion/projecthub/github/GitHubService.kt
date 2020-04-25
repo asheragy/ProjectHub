@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 //data class GitHubColumn(val id: Int, val name: String)
 data class GitHubProject(val id: Int, val name: String, val state: String, val updated_at: Date)
-data class GitHubCard(val id: Int, val note: String?, val content_url: String?)
+//data class GitHubCard(val id: Int, val note: String?, val content_url: String?)
 data class GitHubIssue(val id: Int, val title: String, val body: String, val state: String, val url: String, val number: Int)
 
 // position values: top / bottom / after:<card_id>
@@ -38,11 +38,11 @@ interface GitHubService {
     //@GET("projects/{id}/columns")
     //fun getProjectColumns(@Path("id")id: Int): Deferred<List<GitHubColumn>>
 
-    @GET("projects/columns/{id}/cards")
-    fun getCardsForColumn(@Path("id")id: Int): Deferred<List<GitHubCard>>
+    //@GET("projects/columns/{id}/cards")
+    //fun getCardsForColumn(@Path("id")id: Int): Deferred<List<GitHubCard>>
 
-    @GET("repos/{user}/{repo}/issues?state=all&per_page=100")
-    fun getIssuesForRepo(@Path("user") user: String, @Path("repo")repo: String): Deferred<List<GitHubIssue>>
+    //@GET("repos/{user}/{repo}/issues?state=all&per_page=100")
+    //fun getIssuesForRepo(@Path("user") user: String, @Path("repo")repo: String): Deferred<List<GitHubIssue>>
 
     //region Cards
     @POST("projects/columns/cards/{card_id}/moves")
