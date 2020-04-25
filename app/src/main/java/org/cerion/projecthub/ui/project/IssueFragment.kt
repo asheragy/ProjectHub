@@ -1,4 +1,4 @@
-package org.cerion.projecthub.ui
+package org.cerion.projecthub.ui.project
 
 import android.app.Application
 import android.os.Bundle
@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import org.cerion.projecthub.databinding.FragmentIssueBinding
 import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 
 class IssueFragment : Fragment() {
 
@@ -29,7 +28,10 @@ class IssueFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        val args = IssueFragmentArgs.fromBundle(requireArguments())
+        val args =
+            IssueFragmentArgs.fromBundle(
+                requireArguments()
+            )
         viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
         val columnViewModel = mainViewModel.findColumnById(args.columnId)!!
 

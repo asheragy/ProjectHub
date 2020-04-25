@@ -5,7 +5,7 @@
     <data>
 
         <import type="android.view.View" />
-        <variable name="viewModel" type="org.cerion.projecthub.ui.IssueViewModel" />
+        <variable name="viewModel" type="org.cerion.projecthub.ui.project.IssueViewModel" />
     </data>
 
     <FrameLayout

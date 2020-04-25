@@ -13,10 +13,6 @@ import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
-interface CardListener {
-    fun move(card: Card)
-    fun onClick(card: Card)
-}
 
 class ColumnFragment(columnId: Int) : Fragment() {
     companion object {
@@ -66,7 +62,10 @@ class ColumnFragment(columnId: Int) : Fragment() {
                         is NoteCard -> onEditNote(card)
                         is IssueCard -> onEditIssue(card)
                     }
+                }
 
+                override fun onArchive(card: Card) {
+                    viewModel.archiveCard(card, true)
                 }
             })
 

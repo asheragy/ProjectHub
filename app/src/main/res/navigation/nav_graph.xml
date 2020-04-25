@@ -52,7 +52,7 @@
     </dialog>
     <fragment
         android:id="@+id/issueFragment"
-        android:name="org.cerion.projecthub.ui.IssueFragment"
+        android:name="org.cerion.projecthub.ui.project.IssueFragment"
         android:label="IssueFragment" >
         <argument
             android:name="columnId"

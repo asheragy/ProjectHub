@@ -6,10 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.cerion.projecthub.common.SingleEvent
 import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.Card
-import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.repository.CardRepository
 import org.cerion.projecthub.repository.ColumnRepository
 import org.cerion.projecthub.repository.Project
@@ -28,9 +26,6 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
     private val projectRepo = ProjectRepository()
     private val columnRepo = ColumnRepository(service, graphQL)
     private val cardRepo = CardRepository(service, graphQL)
-
-    val addNote = MutableLiveData<SingleEvent<Column>>()
-    val addIssue = MutableLiveData<SingleEvent<Column>>()
 
     private val _columns = MutableLiveData<List<ColumnViewModel>>()
     val columns: LiveData<List<ColumnViewModel>>

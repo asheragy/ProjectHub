@@ -12,6 +12,11 @@ import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
+interface CardListener {
+    fun move(card: Card)
+    fun onArchive(card: Card)
+    fun onClick(card: Card)
+}
 
 class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
@@ -96,6 +101,10 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
             menu?.apply {
                 add(Menu.NONE, view.id, Menu.NONE, "Move").setOnMenuItemClickListener {
                     listener.move(card)
+                    true
+                }
+                add(Menu.NONE, view.id, Menu.NONE, "Archive").setOnMenuItemClickListener {
+                    listener.onArchive(card)
                     true
                 }
             }
