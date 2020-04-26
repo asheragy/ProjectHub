@@ -14,15 +14,17 @@ import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
 
-class ColumnFragment(columnId: Int) : Fragment() {
+class ColumnFragment : Fragment() {
     companion object {
         private const val COLUMN_ID = "columnId"
-    }
 
-    init {
-        val bundle = Bundle()
-        bundle.putInt(COLUMN_ID, columnId)
-        arguments = bundle
+        fun getInstance(columnId: Int): ColumnFragment {
+            val fragment = ColumnFragment()
+            val bundle = Bundle()
+            bundle.putInt(COLUMN_ID, columnId)
+            fragment.arguments = bundle
+            return fragment
+        }
     }
 
     private lateinit var parentViewModel: ProjectHomeViewModel
@@ -76,6 +78,12 @@ class ColumnFragment(columnId: Int) : Fragment() {
             adapter.setItems(it)
         })
 
+        viewModel.eventAddIssue.observe(parentFragment!!.viewLifecycleOwner, Observer {
+            if (it != null && !it.getAndSetHandled()) {
+                navigateToIssue(0)
+            }
+        })
+
         return binding.root
     }
 
@@ -87,10 +95,6 @@ class ColumnFragment(columnId: Int) : Fragment() {
     private fun onEditNote(card: NoteCard) {
         val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(viewModel.id, card.id)
         findNavController().navigate(action)
-    }
-
-    fun onAddIssue() {
-        navigateToIssue(0)
     }
 
     private fun onEditIssue(issue: IssueCard) {

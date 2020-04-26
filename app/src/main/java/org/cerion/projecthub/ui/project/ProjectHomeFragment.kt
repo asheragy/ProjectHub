@@ -19,26 +19,64 @@ import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 
 // TODO https://issuetracker.google.com/issues/111614463
 
-class ColumnPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    private var pages = listOf<Int>()
-    private var fragments = arrayOfNulls<ColumnFragment>(0)
-    var currentPosition = -1
+class ProjectHomeFragment : Fragment() {
 
-    // TODO maybe better way of doing this with fragment manager + tags
-    val currentFragment: ColumnFragment
-        get() = fragments[currentPosition]!!
+    private val args: ProjectHomeFragmentArgs by navArgs()
+    private lateinit var viewModel: ProjectHomeViewModel
+    private lateinit var binding: FragmentProjectHomeBinding
 
-    override fun getItemCount(): Int = pages.size
-    override fun createFragment(position: Int): Fragment {
-        fragments[position] = ColumnFragment(pages[position])
-        return fragments[position]!!
+    private val currentColumn: ColumnViewModel?
+        get() {
+            val index = binding.viewPager.currentItem
+            return viewModel.columns.value?.get(index)
+        }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
+
+        viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
+        viewModel.load(args.projectId)
+
+        //binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+
+        viewModel.project.observe(viewLifecycleOwner, Observer {
+            requireActivity().title = it.name
+        })
+
+        viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
+            val ids = columns?.map { it.id } ?: emptyList()
+            setupPagerWithColumns(ids)
+        })
+
+        binding.fabGroup.add("Note") {
+            //pagerAdapter.currentFragment.onAddNote()
+        }
+
+        binding.fabGroup.add("Issue") {
+            currentColumn?.addIssue()
+        }
+
+        return binding.root
     }
 
-    fun setPages(pages: List<Int>) {
-        this.pages = pages
-        this.fragments = arrayOfNulls(pages.size)
-        this.notifyDataSetChanged()
+    private fun setupPagerWithColumns(ids: List<Int>) {
+        val pagerAdapter = ColumnPagerAdapter(this, ids)
+        binding.viewPager.adapter = pagerAdapter
+        binding.viewPager.setShowSideItems()
+
+        binding.tabLayout.tabGravity = TabLayout.GRAVITY_CENTER;
+        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE;
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = viewModel.columns.value!![position % 3].name
+        }.attach()
     }
+}
+
+
+class ColumnPagerAdapter(fragment: Fragment, private val columnIds: List<Int>) : FragmentStateAdapter(fragment) {
+    override fun getItemCount(): Int = columnIds.size
+    override fun createFragment(position: Int): Fragment = ColumnFragment.getInstance(columnIds[position])
 }
 
 fun ViewPager2.setShowSideItems() {
@@ -59,66 +97,4 @@ fun ViewPager2.setShowSideItems() {
 
         //Log.d(TAG, "$position ${page.translationX}")
     }
-
-}
-
-
-class ProjectHomeFragment : Fragment() {
-
-    private val args: ProjectHomeFragmentArgs by navArgs()
-    private lateinit var viewModel: ProjectHomeViewModel
-    private lateinit var binding: FragmentProjectHomeBinding
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
-
-        viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
-        viewModel.load(args.projectId)
-
-        //binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-
-        val pagerAdapter = ColumnPagerAdapter(this)
-
-        binding.viewPager.adapter = pagerAdapter
-        binding.viewPager.setShowSideItems()
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                pagerAdapter.currentPosition = position
-            }
-        })
-
-        binding.tabLayout.tabGravity = TabLayout.GRAVITY_CENTER;
-        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE;
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            tab.text = viewModel.columns.value!![position % 3].name
-        }.attach()
-
-        viewModel.project.observe(viewLifecycleOwner, Observer {
-            requireActivity().title = it.name
-        })
-
-        viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
-            val ids = columns?.map { it.id } ?: emptyList()
-            pagerAdapter.setPages(ids)
-        })
-
-        /*
-        viewModel.addNote.observe(viewLifecycleOwner, Observer { event ->
-            event.getContentIfNotHandled()?.let { onAddNote(it.id) }
-        })
-
-        viewModel.addIssue.observe(viewLifecycleOwner, Observer { event ->
-            event.getContentIfNotHandled()?.let { onAddIssue(it.id) }
-        })
-         */
-
-        binding.fabGroup.add("Note") { pagerAdapter.currentFragment.onAddNote() }
-        binding.fabGroup.add("Issue") { pagerAdapter.currentFragment.onAddIssue() }
-
-        return binding.root
-    }
-
-
 }

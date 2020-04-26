@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.cerion.projecthub.common.SingleEvent
 import org.cerion.projecthub.github.ArchiveCardParams
 import org.cerion.projecthub.github.CreateCardParams
 import org.cerion.projecthub.github.GitHubService
@@ -19,6 +20,8 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val repo
 
     val id = column.id
     val name = column.name
+
+    val eventAddIssue = MutableLiveData<SingleEvent>()
 
     private val _cards = MutableLiveData<List<Card>>()
     val cards: LiveData<List<Card>>
@@ -59,6 +62,10 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val repo
             service.updateCard(cardId, params).await()
             loadCards()
         }
+    }
+
+    fun addIssue() {
+        eventAddIssue.value = SingleEvent()
     }
 
     fun addNote(note: String) {
