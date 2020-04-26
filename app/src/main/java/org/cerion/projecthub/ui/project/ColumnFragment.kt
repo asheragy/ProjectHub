@@ -61,8 +61,8 @@ class ColumnFragment : Fragment() {
 
                 override fun onClick(card: Card) {
                     when (card) {
-                        is NoteCard -> onEditNote(card)
-                        is IssueCard -> onEditIssue(card)
+                        is NoteCard -> navigateToNote(card.id)
+                        is IssueCard -> navigateToIssue(card.id)
                     }
                 }
 
@@ -78,27 +78,24 @@ class ColumnFragment : Fragment() {
             adapter.setItems(it)
         })
 
-        viewModel.eventAddIssue.observe(parentFragment!!.viewLifecycleOwner, Observer {
+        viewModel.eventAddIssue.observe(viewLifecycleOwner, Observer {
             if (it != null && !it.getAndSetHandled()) {
                 navigateToIssue(0)
+            }
+        })
+
+        viewModel.eventAddNote.observe(viewLifecycleOwner, Observer {
+            if (it?.getAndSetHandled() == false) {
+                navigateToNote(0)
             }
         })
 
         return binding.root
     }
 
-    fun onAddNote() {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(viewModel.id, 0)
+    private fun navigateToNote(cardId: Int) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(viewModel.id, cardId)
         findNavController().navigate(action)
-    }
-
-    private fun onEditNote(card: NoteCard) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(viewModel.id, card.id)
-        findNavController().navigate(action)
-    }
-
-    private fun onEditIssue(issue: IssueCard) {
-        navigateToIssue(issue.number)
     }
 
     private fun navigateToIssue(number: Int = 0) {

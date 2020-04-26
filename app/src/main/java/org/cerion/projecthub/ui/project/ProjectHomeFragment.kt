@@ -50,7 +50,7 @@ class ProjectHomeFragment : Fragment() {
         })
 
         binding.fabGroup.add("Note") {
-            //pagerAdapter.currentFragment.onAddNote()
+            currentColumn?.addNote()
         }
 
         binding.fabGroup.add("Issue") {

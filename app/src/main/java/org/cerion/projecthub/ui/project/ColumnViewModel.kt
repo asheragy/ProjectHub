@@ -22,6 +22,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val repo
     val name = column.name
 
     val eventAddIssue = MutableLiveData<SingleEvent>()
+    val eventAddNote = MutableLiveData<SingleEvent>()
 
     private val _cards = MutableLiveData<List<Card>>()
     val cards: LiveData<List<Card>>
@@ -68,6 +69,11 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val repo
         eventAddIssue.value = SingleEvent()
     }
 
+    fun addNote() {
+        eventAddNote.value = SingleEvent()
+    }
+
+    // TODO add to fragment so its more like issue
     fun addNote(note: String) {
         viewModelScope.launch {
             val params = CreateCardParams(note)
