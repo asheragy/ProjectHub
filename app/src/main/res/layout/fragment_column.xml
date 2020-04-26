@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
         <variable name="viewModel" type="org.cerion.projecthub.ui.project.ColumnViewModel" />
     </data>
 
@@ -45,6 +46,13 @@
             </androidx.recyclerview.widget.RecyclerView>
 
         </LinearLayout>
+
+        <ProgressBar
+            android:visibility="@{viewModel.busy ? View.VISIBLE : View.GONE}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+        </ProgressBar>
 
     </androidx.cardview.widget.CardView>
 

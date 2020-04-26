@@ -9,8 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import org.cerion.projecthub.TAG
+import org.cerion.projecthub.github.CreateCardParams
 import org.cerion.projecthub.github.GitHubIssue
 import org.cerion.projecthub.github.GitHubService
+import org.cerion.projecthub.github.UpdateCardParams
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
@@ -53,8 +55,16 @@ class CardRepository(private val service: GitHubService, private val apolloClien
                     this.creator = it.creator()?.login() ?: ""
                 }
         }
+    }
 
+    suspend fun addNoteForColumn(columnId: Int, note: String) {
+        val params = CreateCardParams(note)
+        service.createCard(columnId, params).await()
+    }
 
+    suspend fun updateNote(id: Int, note: String) {
+        val params = UpdateCardParams(note)
+        service.updateCard(id, params).await()
     }
 
     /*

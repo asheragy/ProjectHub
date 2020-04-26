@@ -3,7 +3,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <data>
-
         <import type="android.view.View" />
         <variable name="viewModel" type="org.cerion.projecthub.ui.project.IssueViewModel" />
     </data>

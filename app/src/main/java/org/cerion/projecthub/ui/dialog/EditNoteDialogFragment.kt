@@ -44,7 +44,7 @@ private class EditNoteDialog(context: Context, private val projectViewModel: Pro
             val newNote = editText.text.toString()
             if (isNew)
                 viewModel.addNote(newNote)
-            else
+            else if(note != newNote)
                 viewModel.updateNote(args.cardId, newNote)
 
             dismiss()
