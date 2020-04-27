@@ -32,10 +32,16 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
         get() = _columns
 
     fun load(projectId: Int) {
+        val existingId = project.value?.id
         // When loading new project clear everything first since delay in load
-        if (project.value != null && project.value!!.id != projectId) {
-            _columns.value = null
-            _project.value = null
+        if (existingId != null) {
+            if (existingId != projectId) {
+                _columns.value = null
+                _project.value = null
+            }
+            else {
+                return // Already have this project loaded
+            }
         }
 
         val vm = this

@@ -62,7 +62,7 @@ class ColumnFragment : Fragment() {
                 override fun onClick(card: Card) {
                     when (card) {
                         is NoteCard -> navigateToNote(card.id)
-                        is IssueCard -> navigateToIssue(card.id)
+                        is IssueCard -> navigateToIssue(card.number)
                     }
                 }
 

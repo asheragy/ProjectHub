@@ -1,6 +1,5 @@
 package org.cerion.projecthub.ui.project
 
-import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +9,9 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.databinding.FragmentIssueBinding
-import org.cerion.projecthub.github.GitHubService
-import org.cerion.projecthub.github.getService
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.repository.IssueRepository
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class IssueFragment : Fragment() {
 
@@ -21,12 +19,12 @@ class IssueFragment : Fragment() {
         ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
     }
 
-    private lateinit var viewModel: IssueViewModel
+    private val viewModel: IssueViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentIssueBinding.inflate(inflater, container, false)
 
-        viewModel = ViewModelProviders.of(this).get(IssueViewModel::class.java)
+        //viewModel = ViewModelProviders.of(this).get(IssueViewModel::class.java)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
@@ -49,11 +47,7 @@ class IssueFragment : Fragment() {
     }
 }
 
-class IssueViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val context = getApplication<Application>().applicationContext!!
-    private val service: GitHubService = getService(context)
-    private val issueRepo = IssueRepository(service)
+class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
 
     val issue = MutableLiveData<Issue>()
     val finished = MutableLiveData<Boolean>(false)
