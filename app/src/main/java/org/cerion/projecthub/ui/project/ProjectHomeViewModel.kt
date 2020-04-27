@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.repository.CardRepository
 import org.cerion.projecthub.repository.ColumnRepository
-import org.cerion.projecthub.repository.Project
 import org.cerion.projecthub.repository.ProjectRepository
 
 

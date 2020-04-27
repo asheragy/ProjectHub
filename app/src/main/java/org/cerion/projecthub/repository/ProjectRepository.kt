@@ -1,23 +1,8 @@
 package org.cerion.projecthub.repository
 
+import org.cerion.projecthub.model.Project
+import org.cerion.projecthub.model.ProjectType
 
-enum class ProjectType {
-    User,
-    Repository,
-    Org
-}
-
-data class Project(val id: Int, val nodeId: String, val type: ProjectType, val owner: String, val repo: String) {
-    var name: String = ""
-    var description: String = ""
-
-    /* TODO to support user/org projects repo is not required
-    init {
-        if (type == ProjectType.Repository && repo.isNullOrEmpty())
-            throw IllegalArgumentException("repository name must be specified")
-    }
-     */
-}
 
 class ProjectRepository {
 

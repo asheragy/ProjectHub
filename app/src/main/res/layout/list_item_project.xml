@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="project" type="org.cerion.projecthub.repository.Project" />
+        <variable name="project" type="org.cerion.projecthub.model.Project" />
     </data>
 
     <LinearLayout

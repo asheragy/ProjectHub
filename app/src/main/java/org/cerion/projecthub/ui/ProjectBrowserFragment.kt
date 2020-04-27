@@ -1,59 +1,42 @@
 package org.cerion.projecthub.ui
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import org.cerion.projecthub.R
-import org.cerion.projecthub.databinding.FragmentProjectListBinding
+import org.cerion.projecthub.databinding.FragmentProjectBrowserBinding
 import org.cerion.projecthub.databinding.ListItemProjectBinding
 import org.cerion.projecthub.model.Project
 
-class ProjectListFragment : Fragment() {
-
-    private val viewModel = ProjectListViewModel()
+class ProjectBrowserFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentProjectListBinding.inflate(inflater, container, false)
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
+        val binding = FragmentProjectBrowserBinding.inflate(inflater, container, false)
 
-        val adapter = ProjectListAdapter { project ->
-            val action = ProjectListFragmentDirections.actionProjectListFragmentToProjectHomeFragment(project.id)
-            findNavController().navigate(action)
+        val adapter = ProjectBrowserListAdapter { project ->
+            Toast.makeText(requireContext(), "Clicked project ${project.name}", Toast.LENGTH_SHORT).show()
         }
 
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-        adapter.setItems(viewModel.projects)
 
-        setHasOptionsMenu(true)
+        val viewModel = ProjectBrowserViewModel()
+        viewModel.projects.observe(viewLifecycleOwner, Observer { items ->
+            adapter.setItems(items)
+        })
 
         return binding.root
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.project_list, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.action_add -> onBrowseProjects()
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun onBrowseProjects() {
-        val action = ProjectListFragmentDirections.actionProjectListFragmentToProjectBrowserFragment()
-        findNavController().navigate(action)
-    }
 }
 
 
-class ProjectListAdapter(val onClick: (project: Project) -> Unit) : RecyclerView.Adapter<ProjectListAdapter.ViewHolder>() {
+class ProjectBrowserListAdapter(val onClick: (project: Project) -> Unit) : RecyclerView.Adapter<ProjectBrowserListAdapter.ViewHolder>() {
 
     private var items = emptyList<Project>()
 

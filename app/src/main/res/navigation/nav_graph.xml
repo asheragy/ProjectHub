@@ -15,10 +15,14 @@
         tools:layout="@layout/fragment_login" />
     <fragment
         android:id="@+id/projectListFragment"
+        android:label="Projects"
         android:name="org.cerion.projecthub.ui.ProjectListFragment">
         <action
             android:id="@+id/action_projectListFragment_to_projectHomeFragment"
             app:destination="@id/projectHomeFragment" />
+        <action
+            android:id="@+id/action_projectListFragment_to_projectBrowserFragment"
+            app:destination="@id/projectBrowserFragment" />
     </fragment>
     <fragment
         android:id="@+id/projectHomeFragment"
@@ -61,4 +65,8 @@
             android:name="number"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/projectBrowserFragment"
+        android:name="org.cerion.projecthub.ui.ProjectBrowserFragment"
+        android:label="ProjectBrowserFragment" />
 </navigation>
