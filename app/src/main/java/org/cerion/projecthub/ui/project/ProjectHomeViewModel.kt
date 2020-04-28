@@ -23,7 +23,7 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
     private val context = getApplication<Application>().applicationContext!!
     private var service: GitHubService = getService(context)
     private val graphQL = getGraphQLClient(context)
-    private val projectRepo = ProjectRepository()
+    private val projectRepo = ProjectRepository(graphQL)
     private val columnRepo = ColumnRepository(service, graphQL)
     private val cardRepo = CardRepository(service, graphQL)
 

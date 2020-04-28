@@ -1,10 +1,13 @@
 package org.cerion.projecthub.repository
 
+import GetRepositoryProjectsByOwnerQuery
+import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.coroutines.toDeferred
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 
-class ProjectRepository {
+class ProjectRepository(private val apolloClient: ApolloClient) {
 
     // TODO store project as combo of type / owner / repo?
     // Org/user projects can have multiple repos
@@ -27,6 +30,22 @@ class ProjectRepository {
 
     fun getById(id: Int): Project? {
         return getAll().firstOrNull { it.id == id }
+    }
+
+    // TODO change this query to only get repo project for current user
+    suspend fun getRepositoryProjectsByOwner(owner: String): List<Project> {
+        val query = GetRepositoryProjectsByOwnerQuery.builder().owner(owner).build()
+        val response = apolloClient.query(query).toDeferred().await()
+
+        val result = mutableListOf<Project>()
+
+        response.data()?.repositoryOwner()?.repositories()?.nodes()?.forEach { repo ->
+            repo.projects().nodes()?.forEach { project ->
+                result.add(Project(project.databaseId()!!, project.id(), ProjectType.Repository, owner, repo.name()))
+            }
+        }
+
+        return result
     }
 
     //GET /repos/:owner/:repo/projects

@@ -3,9 +3,7 @@ package org.cerion.projecthub.ui
 import androidx.lifecycle.ViewModel
 import org.cerion.projecthub.repository.ProjectRepository
 
-class ProjectListViewModel : ViewModel() {
-
-    private val repo = ProjectRepository()
+class ProjectListViewModel(private val repo: ProjectRepository) : ViewModel() {
 
     val projects = repo.getAll()
 
