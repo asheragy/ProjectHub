@@ -27,15 +27,15 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{project.name}"
+                android:text="@{project.owner + '/' + project.repo}"
                 android:textStyle="bold"
-                tools:text="Title"/>
+                tools:text="asheragy/ProjectHub"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{project.description}"
-                tools:text="Description"/>
+                android:text="@{project.name}"
+                tools:text="My Project"/>
         </LinearLayout>
 
     </LinearLayout>

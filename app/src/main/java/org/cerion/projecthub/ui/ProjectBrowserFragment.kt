@@ -11,11 +11,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import org.cerion.projecthub.databinding.FragmentProjectBrowserBinding
 import org.cerion.projecthub.databinding.ListItemProjectBinding
-import org.cerion.projecthub.github.getGraphQLClient
 import org.cerion.projecthub.model.Project
-import org.cerion.projecthub.repository.ProjectRepository
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProjectBrowserFragment : Fragment() {
+
+    private val viewModel: ProjectBrowserViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentProjectBrowserBinding.inflate(inflater, container, false)
@@ -27,8 +28,6 @@ class ProjectBrowserFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
 
-        val graphQL = getGraphQLClient(requireContext())
-        val viewModel = ProjectBrowserViewModel(ProjectRepository(graphQL))
         viewModel.projects.observe(viewLifecycleOwner, Observer { items ->
             adapter.setItems(items)
         })

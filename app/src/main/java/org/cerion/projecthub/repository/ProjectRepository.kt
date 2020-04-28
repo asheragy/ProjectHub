@@ -37,15 +37,13 @@ class ProjectRepository(private val apolloClient: ApolloClient) {
         val query = GetRepositoryProjectsByOwnerQuery.builder().owner(owner).build()
         val response = apolloClient.query(query).toDeferred().await()
 
-        val result = mutableListOf<Project>()
-
-        response.data()?.repositoryOwner()?.repositories()?.nodes()?.forEach { repo ->
-            repo.projects().nodes()?.forEach { project ->
-                result.add(Project(project.databaseId()!!, project.id(), ProjectType.Repository, owner, repo.name()))
+        return response.data()?.repositoryOwner()?.repositories()?.nodes()!!.flatMap { repo ->
+            repo.projects().nodes()!!.map { project ->
+                Project(project.databaseId()!!, project.id(), ProjectType.Repository, owner, repo.name()).apply {
+                    name = project.name()
+                }
             }
         }
-
-        return result
     }
 
     //GET /repos/:owner/:repo/projects

@@ -68,5 +68,5 @@
     <fragment
         android:id="@+id/projectBrowserFragment"
         android:name="org.cerion.projecthub.ui.ProjectBrowserFragment"
-        android:label="ProjectBrowserFragment" />
+        android:label="Project Browser" />
 </navigation>
