@@ -16,7 +16,16 @@ class ProjectBrowserViewModel(val repo: ProjectRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _projects.value = repo.getRepositoryProjectsByOwner("asheragy")
+            val dbProjects = repo.getAll()
+            val ownerProjects = repo.getRepositoryProjectsByOwner("asheragy")
+
+            // should repo do this?
+            ownerProjects.forEach {
+                if (dbProjects.any { dbProject -> it.id == dbProject.id })
+                    it.saved = true
+            }
+
+            _projects.value = ownerProjects
         }
     }
 }

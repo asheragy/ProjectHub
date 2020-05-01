@@ -9,6 +9,7 @@ enum class ProjectType {
 data class Project(val id: Int, val nodeId: String, val type: ProjectType, val owner: String, val repo: String) {
     var name: String = ""
     var description: String = ""
+    var saved = false
 
     /* TODO to support user/org projects repo is not required
     init {

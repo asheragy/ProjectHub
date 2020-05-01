@@ -67,6 +67,7 @@ class ProjectBrowserListAdapter(val onClick: (project: Project) -> Unit) : Recyc
             binding.root.setOnClickListener {
                 onClick(item)
             }
+            binding.saved.visibility = if (item.saved) View.VISIBLE else View.GONE
             binding.executePendingBindings()
         }
     }
