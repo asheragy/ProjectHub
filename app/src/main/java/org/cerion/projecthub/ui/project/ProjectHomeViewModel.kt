@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.cerion.projecthub.database.AppDatabase
 import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Project
@@ -22,8 +23,9 @@ class ProjectHomeViewModel(application: Application) : AndroidViewModel(applicat
 
     private val context = getApplication<Application>().applicationContext!!
     private var service: GitHubService = getService(context)
+    private val db = AppDatabase.getInstance(context)
     private val graphQL = getGraphQLClient(context)
-    private val projectRepo = ProjectRepository(graphQL)
+    private val projectRepo = ProjectRepository(db.projectDao(), graphQL) // TODO use koin
     private val columnRepo = ColumnRepository(service, graphQL)
     private val cardRepo = CardRepository(service, graphQL)
 

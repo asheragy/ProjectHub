@@ -3,11 +3,13 @@ package org.cerion.projecthub.repository
 import GetRepositoryProjectsByOwnerQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.toDeferred
+import org.cerion.projecthub.database.DbProject
+import org.cerion.projecthub.database.ProjectDao
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 
-class ProjectRepository(private val apolloClient: ApolloClient) {
+class ProjectRepository(private val projects: ProjectDao, private val apolloClient: ApolloClient) {
 
     // TODO store project as combo of type / owner / repo?
     // Org/user projects can have multiple repos
@@ -16,16 +18,15 @@ class ProjectRepository(private val apolloClient: ApolloClient) {
     //GET /users/:username/projects
 
     fun getAll(): List<Project> {
-        val p1 = Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", ProjectType.Repository,"PhilJay" , "MPAndroidChart").apply {
+
+        val mpa = Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", ProjectType.Repository,"PhilJay" , "MPAndroidChart").apply {
             name = "Support"
             description = ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"
         }
 
-        val p2 = Project(3436611, "MDc6UHJvamVjdDQwMDUxNjY=", ProjectType.Repository,"asheragy","TestForIssueTracking").apply {
-            name = "Project 3"
-        }
+        val projects = projects.getAll().map { it.toProject() }
 
-        return listOf(p1, p2)
+        return projects.plus(mpa)
     }
 
     fun getById(id: Int): Project? {
@@ -49,4 +50,10 @@ class ProjectRepository(private val apolloClient: ApolloClient) {
     //GET /repos/:owner/:repo/projects
     //GET /orgs/:org/projects
     //GET /users/:username/projects
+}
+
+fun DbProject.toProject(): Project = Project(id, nodeId, ProjectType.values()[type], owner, repo).also {
+    it.name = name
+    it.description = this.description
+    it.saved = true
 }

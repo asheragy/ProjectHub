@@ -1,6 +1,7 @@
 package org.cerion.projecthub
 
 import android.app.Application
+import org.cerion.projecthub.database.AppDatabase
 import org.cerion.projecthub.github.getGraphQLClient
 import org.cerion.projecthub.github.getService
 import org.cerion.projecthub.repository.IssueRepository
@@ -25,6 +26,7 @@ class App : Application() {
 
             modules(listOf(
                 networkModule,
+                databaseModule,
                 repositoryModule,
                 viewModelModule
             ))
@@ -37,9 +39,14 @@ val networkModule = module {
     single { getGraphQLClient(androidContext()) }
 }
 
+val databaseModule = module {
+    // TODO is this correct way to get each one?
+    single { AppDatabase.getInstance(androidContext()).projectDao() }
+}
+
 val repositoryModule = module {
     single { IssueRepository(get()) }
-    single { ProjectRepository(get()) }
+    single { ProjectRepository(get(), get()) }
 }
 
 val viewModelModule = module {

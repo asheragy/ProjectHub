@@ -7,6 +7,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import org.cerion.projecthub.R
+import org.cerion.projecthub.database.AppDatabase
 import org.cerion.projecthub.databinding.FragmentProjectListBinding
 import org.cerion.projecthub.databinding.ListItemProjectBinding
 import org.cerion.projecthub.github.getGraphQLClient
@@ -20,7 +21,9 @@ class ProjectListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentProjectListBinding.inflate(inflater, container, false)
 
-        viewModel = ProjectListViewModel(ProjectRepository(getGraphQLClient(requireContext())))
+        // TODO use koin
+        val dao = AppDatabase.getInstance(requireContext()).projectDao()
+        viewModel = ProjectListViewModel(ProjectRepository(dao, getGraphQLClient(requireContext())))
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
