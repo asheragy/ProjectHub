@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -15,14 +14,14 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
-
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 // TODO https://issuetracker.google.com/issues/111614463
 
 class ProjectHomeFragment : Fragment() {
 
     private val args: ProjectHomeFragmentArgs by navArgs()
-    private lateinit var viewModel: ProjectHomeViewModel
+    private val viewModel: ProjectHomeViewModel by sharedViewModel()
     private lateinit var binding: FragmentProjectHomeBinding
 
     private val currentColumn: ColumnViewModel?
@@ -34,7 +33,6 @@ class ProjectHomeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
 
-        viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
         viewModel.load(args.projectId)
 
         //binding.viewModel = viewModel

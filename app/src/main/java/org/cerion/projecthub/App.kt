@@ -7,7 +7,9 @@ import org.cerion.projecthub.github.getService
 import org.cerion.projecthub.repository.IssueRepository
 import org.cerion.projecthub.repository.ProjectRepository
 import org.cerion.projecthub.ui.ProjectBrowserViewModel
+import org.cerion.projecthub.ui.ProjectListViewModel
 import org.cerion.projecthub.ui.project.IssueViewModel
+import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.viewmodel.dsl.viewModel
@@ -52,4 +54,6 @@ val repositoryModule = module {
 val viewModelModule = module {
     viewModel { IssueViewModel(get()) }
     viewModel { ProjectBrowserViewModel(get()) }
+    viewModel { ProjectListViewModel(get()) }
+    viewModel { ProjectHomeViewModel(androidContext(), get()) }
 }

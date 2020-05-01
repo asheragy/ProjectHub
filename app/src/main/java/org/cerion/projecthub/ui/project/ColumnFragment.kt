@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import org.cerion.projecthub.databinding.FragmentColumnBinding
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 
 class ColumnFragment : Fragment() {
@@ -27,13 +27,12 @@ class ColumnFragment : Fragment() {
         }
     }
 
-    private lateinit var parentViewModel: ProjectHomeViewModel
+    private val parentViewModel: ProjectHomeViewModel by sharedViewModel()
     private lateinit var viewModel: ColumnViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentColumnBinding.inflate(layoutInflater, container, false)
 
-        parentViewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
         val columnId = arguments!!.getInt(COLUMN_ID)
         viewModel = parentViewModel.columns.value!!.first { it.id == columnId }
 
