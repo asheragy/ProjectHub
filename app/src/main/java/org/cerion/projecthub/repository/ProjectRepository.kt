@@ -1,6 +1,6 @@
 package org.cerion.projecthub.repository
 
-import GetRepositoryProjectsByOwnerQuery
+import GetRepositoryProjectsQuery
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
@@ -32,7 +32,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
 
     val ownerRepositoryProjects: LiveData<List<Project>> = liveData {
         val db = dao.getAllAsync()
-        val remoteProjects = getRepositoryProjectsByOwner("asheragy")
+        val remoteProjects = getRepositoryProjects()
 
         // Database values are the only ones that will change
         val merged: LiveData<List<Project>> = db.map { dbProjects ->
@@ -51,14 +51,14 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
 
     fun getById(id: Int): Project? = getAll().firstOrNull { it.id == id }
 
-    // TODO change this query to only get repo project for current user
-    private suspend fun getRepositoryProjectsByOwner(owner: String): List<Project> {
-        val query = GetRepositoryProjectsByOwnerQuery.builder().owner(owner).build()
+    private suspend fun getRepositoryProjects(): List<Project> {
+        val query = GetRepositoryProjectsQuery.builder().build()
         val response = apolloClient.query(query).toDeferred().await()
+        val viewer=  response.data()?.viewer()
 
-        return response.data()?.repositoryOwner()?.repositories()?.nodes()!!.flatMap { repo ->
+        return viewer?.repositories()?.nodes()!!.flatMap { repo ->
             repo.projects().nodes()!!.map { project ->
-                Project(project.databaseId()!!, project.id(), ProjectType.Repository, owner, repo.name()).apply {
+                Project(project.databaseId()!!, project.id(), ProjectType.Repository, viewer.login(), repo.name()).apply {
                     name = project.name()
                 }
             }

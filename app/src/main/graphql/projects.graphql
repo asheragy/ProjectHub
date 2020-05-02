@@ -1,4 +1,22 @@
 
+query getRepositoryProjects { 
+  viewer { 
+	login
+    repositories(first: 100) {
+      nodes {
+        name
+        projects(first:10) {
+          nodes {
+            id
+            databaseId
+            name
+          }
+        }
+      }
+    }
+  }
+}
+
 query getRepositoryProjectsByOwner($owner: String!) { 
   repositoryOwner(login: $owner) { 
     repositories(first: 100) {
