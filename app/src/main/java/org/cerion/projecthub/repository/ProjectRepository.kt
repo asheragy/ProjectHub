@@ -51,6 +51,10 @@ class ProjectRepository(private val projects: ProjectDao, private val apolloClie
         projects.insert(project.toDbProject())
     }
 
+    suspend fun delete(project: Project) {
+        projects.delete(project.toDbProject())
+    }
+
     //GET /repos/:owner/:repo/projects
     //GET /orgs/:org/projects
     //GET /users/:username/projects

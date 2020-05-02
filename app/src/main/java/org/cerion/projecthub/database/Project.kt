@@ -20,4 +20,7 @@ interface ProjectDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(project: DbProject)
+
+    @Delete
+    suspend fun delete(project: DbProject)
 }
