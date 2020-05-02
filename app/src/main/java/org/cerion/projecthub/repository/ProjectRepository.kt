@@ -1,6 +1,7 @@
 package org.cerion.projecthub.repository
 
 import GetRepositoryProjectsByOwnerQuery
+import androidx.lifecycle.map
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.toDeferred
 import org.cerion.projecthub.database.DbProject
@@ -9,7 +10,7 @@ import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 
-class ProjectRepository(private val projects: ProjectDao, private val apolloClient: ApolloClient) {
+class ProjectRepository(private val repo: ProjectDao, private val apolloClient: ApolloClient) {
 
     // TODO store project as combo of type / owner / repo?
     // Org/user projects can have multiple repos
@@ -17,21 +18,19 @@ class ProjectRepository(private val projects: ProjectDao, private val apolloClie
     //GET /orgs/:org/projects
     //GET /users/:username/projects
 
-    fun getAll(): List<Project> {
-
+    val projects = repo.getAllAsync().map { projects ->
+        // Temp for testing extra project
         val mpa = Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", ProjectType.Repository,"PhilJay" , "MPAndroidChart").apply {
             name = "Support"
             description = ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"
         }
 
-        val projects = projects.getAll().map { it.toProject() }
-
-        return projects.plus(mpa)
+        projects.map { it.toProject() }.plus(mpa)
     }
 
-    fun getById(id: Int): Project? {
-        return getAll().firstOrNull { it.id == id }
-    }
+    fun getAll(): List<Project> = repo.getAll().map { it.toProject() }
+
+    fun getById(id: Int): Project? = getAll().firstOrNull { it.id == id }
 
     // TODO change this query to only get repo project for current user
     suspend fun getRepositoryProjectsByOwner(owner: String): List<Project> {
@@ -48,11 +47,11 @@ class ProjectRepository(private val projects: ProjectDao, private val apolloClie
     }
 
     suspend fun add(project: Project) {
-        projects.insert(project.toDbProject())
+        repo.insert(project.toDbProject())
     }
 
     suspend fun delete(project: Project) {
-        projects.delete(project.toDbProject())
+        repo.delete(project.toDbProject())
     }
 
     //GET /repos/:owner/:repo/projects

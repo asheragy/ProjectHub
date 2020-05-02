@@ -20,7 +20,7 @@ class ProjectBrowserViewModel(val repo: ProjectRepository) : ViewModel() {
         }
     }
 
-    suspend fun loadProjects() {
+    private suspend fun loadProjects() {
         val dbProjects = repo.getAll()
         val ownerProjects = repo.getRepositoryProjectsByOwner("asheragy")
 
@@ -37,6 +37,7 @@ class ProjectBrowserViewModel(val repo: ProjectRepository) : ViewModel() {
         viewModelScope.launch {
             if (!project.saved) {
                 repo.add(project)
+                // TODO use mediatorlivedata to combine 2 sources, db version updates 1+ times and web only once.
                 loadProjects()
             }
         }

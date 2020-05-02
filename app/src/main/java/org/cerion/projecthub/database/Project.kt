@@ -1,5 +1,6 @@
 package org.cerion.projecthub.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Entity(tableName = "projects")
@@ -17,6 +18,9 @@ data class DbProject(
 interface ProjectDao {
     @Query("SELECT * FROM projects")
     fun getAll(): List<DbProject>
+
+    @Query("SELECT * FROM projects")
+    fun getAllAsync(): LiveData<List<DbProject>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(project: DbProject)
