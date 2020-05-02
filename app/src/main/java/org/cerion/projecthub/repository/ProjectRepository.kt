@@ -1,6 +1,8 @@
 package org.cerion.projecthub.repository
 
 import GetRepositoryProjectsByOwnerQuery
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.toDeferred
@@ -10,7 +12,7 @@ import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 
-class ProjectRepository(private val repo: ProjectDao, private val apolloClient: ApolloClient) {
+class ProjectRepository(private val dao: ProjectDao, private val apolloClient: ApolloClient) {
 
     // TODO store project as combo of type / owner / repo?
     // Org/user projects can have multiple repos
@@ -18,7 +20,7 @@ class ProjectRepository(private val repo: ProjectDao, private val apolloClient: 
     //GET /orgs/:org/projects
     //GET /users/:username/projects
 
-    val projects = repo.getAllAsync().map { projects ->
+    val projects = dao.getAllAsync().map { projects ->
         // Temp for testing extra project
         val mpa = Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", ProjectType.Repository,"PhilJay" , "MPAndroidChart").apply {
             name = "Support"
@@ -28,12 +30,29 @@ class ProjectRepository(private val repo: ProjectDao, private val apolloClient: 
         projects.map { it.toProject() }.plus(mpa)
     }
 
-    fun getAll(): List<Project> = repo.getAll().map { it.toProject() }
+    val ownerRepositoryProjects: LiveData<List<Project>> = liveData {
+        val db = dao.getAllAsync()
+        val remoteProjects = getRepositoryProjectsByOwner("asheragy")
+
+        // Database values are the only ones that will change
+        val merged: LiveData<List<Project>> = db.map { dbProjects ->
+            remoteProjects.forEach {
+                it.saved = dbProjects.any { dbProject -> it.id == dbProject.id }
+            }
+
+            remoteProjects
+        }
+
+        emitSource(merged)
+    }
+
+    // TODO remove and add single function to get by id
+    private fun getAll(): List<Project> = dao.getAll().map { it.toProject() }
 
     fun getById(id: Int): Project? = getAll().firstOrNull { it.id == id }
 
     // TODO change this query to only get repo project for current user
-    suspend fun getRepositoryProjectsByOwner(owner: String): List<Project> {
+    private suspend fun getRepositoryProjectsByOwner(owner: String): List<Project> {
         val query = GetRepositoryProjectsByOwnerQuery.builder().owner(owner).build()
         val response = apolloClient.query(query).toDeferred().await()
 
@@ -47,11 +66,11 @@ class ProjectRepository(private val repo: ProjectDao, private val apolloClient: 
     }
 
     suspend fun add(project: Project) {
-        repo.insert(project.toDbProject())
+        dao.insert(project.toDbProject())
     }
 
     suspend fun delete(project: Project) {
-        repo.delete(project.toDbProject())
+        dao.delete(project.toDbProject())
     }
 
     //GET /repos/:owner/:repo/projects

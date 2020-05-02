@@ -28,7 +28,10 @@ class ProjectBrowserFragment : Fragment() {
         binding.recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
 
         viewModel.projects.observe(viewLifecycleOwner, Observer { items ->
-            adapter.setItems(items)
+            if (items != null)
+                adapter.setItems(items)
+            else
+                adapter.setItems(emptyList())
         })
 
         return binding.root
