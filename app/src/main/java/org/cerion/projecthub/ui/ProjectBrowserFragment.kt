@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -22,7 +21,7 @@ class ProjectBrowserFragment : Fragment() {
         val binding = FragmentProjectBrowserBinding.inflate(inflater, container, false)
 
         val adapter = ProjectBrowserListAdapter { project ->
-            Toast.makeText(requireContext(), "Clicked project ${project.name}", Toast.LENGTH_SHORT).show()
+            viewModel.addProject(project)
         }
 
         binding.recyclerView.adapter = adapter

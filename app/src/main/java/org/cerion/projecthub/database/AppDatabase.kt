@@ -1,25 +1,11 @@
 package org.cerion.projecthub.database
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.Room
+import androidx.room.RoomDatabase
 
 
-@Entity(tableName = "projects")
-data class DbProject(
-    @PrimaryKey val id: Int,
-    val nodeId: String,
-    val type: Int,
-    val owner: String,
-    val repo: String,
-    val name: String,
-    val description: String
-)
 
-@Dao
-interface ProjectDao {
-    @Query("SELECT * FROM projects")
-    fun getAll(): List<DbProject>
-}
 
 @androidx.room.Database(entities = [DbProject::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {

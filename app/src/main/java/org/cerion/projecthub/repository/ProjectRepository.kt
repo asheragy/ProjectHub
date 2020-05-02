@@ -47,6 +47,10 @@ class ProjectRepository(private val projects: ProjectDao, private val apolloClie
         }
     }
 
+    suspend fun add(project: Project) {
+        projects.insert(project.toDbProject())
+    }
+
     //GET /repos/:owner/:repo/projects
     //GET /orgs/:org/projects
     //GET /users/:username/projects
@@ -57,3 +61,5 @@ fun DbProject.toProject(): Project = Project(id, nodeId, ProjectType.values()[ty
     it.description = this.description
     it.saved = true
 }
+
+fun Project.toDbProject(): DbProject = DbProject(id, nodeId, type.ordinal, owner, repo, name, description)

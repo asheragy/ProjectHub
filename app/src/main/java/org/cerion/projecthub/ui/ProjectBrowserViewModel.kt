@@ -16,16 +16,29 @@ class ProjectBrowserViewModel(val repo: ProjectRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            val dbProjects = repo.getAll()
-            val ownerProjects = repo.getRepositoryProjectsByOwner("asheragy")
+            loadProjects()
+        }
+    }
 
-            // should repo do this?
-            ownerProjects.forEach {
-                if (dbProjects.any { dbProject -> it.id == dbProject.id })
-                    it.saved = true
+    suspend fun loadProjects() {
+        val dbProjects = repo.getAll()
+        val ownerProjects = repo.getRepositoryProjectsByOwner("asheragy")
+
+        // should repo do this?
+        ownerProjects.forEach {
+            if (dbProjects.any { dbProject -> it.id == dbProject.id })
+                it.saved = true
+        }
+
+        _projects.value = ownerProjects
+    }
+
+    fun addProject(project: Project) {
+        viewModelScope.launch {
+            if (!project.saved) {
+                repo.add(project)
+                loadProjects()
             }
-
-            _projects.value = ownerProjects
         }
     }
 }
