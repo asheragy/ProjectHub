@@ -22,6 +22,32 @@
                 android:text="@={viewModel.issue.title}"
                 android:hint="Title"/>
 
+            <LinearLayout
+                android:id="@+id/label_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="Labels:">
+                </TextView>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/label_chip_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- For designer only -->
+                    <include layout="@layout/label_chip"/>
+
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

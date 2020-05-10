@@ -1,11 +1,13 @@
 package org.cerion.projecthub.repository
 
+import android.graphics.Color
 import org.cerion.projecthub.github.CreateIssueCardParams
 import org.cerion.projecthub.github.CreateIssueParams
 import org.cerion.projecthub.github.GitHubService
 import org.cerion.projecthub.github.UpdateIssueParams
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueState
+import org.cerion.projecthub.model.Label
 
 class IssueRepository(private val service: GitHubService) {
 
@@ -13,9 +15,12 @@ class IssueRepository(private val service: GitHubService) {
         val issue = service.getIssue(owner, repo, number).await()
 
         return Issue(owner, repo, number).apply {
-            this.state = if(issue.state == "open") IssueState.Open else IssueState.Closed
-            this.body = issue.body
-            this.title = issue.title
+            state = if(issue.state == "open") IssueState.Open else IssueState.Closed
+            body = issue.body
+            title = issue.title
+            labels.addAll(issue.labels.map {
+                Label(it.name, Color.parseColor("#" + it.color))
+            })
         }
     }
 

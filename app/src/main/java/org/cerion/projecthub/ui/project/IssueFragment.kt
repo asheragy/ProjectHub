@@ -1,5 +1,6 @@
 package org.cerion.projecthub.ui.project
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
+import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentIssueBinding
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.repository.IssueRepository
@@ -38,6 +41,16 @@ class IssueFragment : Fragment() {
                 // TODO need to handle keyboard
                 findNavController().navigateUp()
                 //requireActivity().onBackPressed()
+            }
+        })
+
+        viewModel.issue.observe(viewLifecycleOwner, Observer {
+            binding.labelChipGroup.removeAllViews()
+            it.labels.forEach {
+                val chip = LayoutInflater.from(binding.root.context).inflate(R.layout.label_chip, binding.labelChipGroup, false) as Chip
+                chip.text = it.name
+                chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
+                binding.labelChipGroup.addView(chip)
             }
         })
 
