@@ -38,11 +38,9 @@ class LabelsDialogFragment : DialogFragment() {
 
         val listView = view.findViewById(R.id.listView) as ListView
 
-        // TODO labels should be observed, may not be loaded yet...
-        val adapter = LabelListAdapter(requireContext(), viewModel.labels.value!!)
+        // TODO labels should be observed, may not be loaded yet although to get to this screen they probably are
+        val adapter = LabelListAdapter(requireContext(), viewModel.labels.value!!, viewModel.currentLabels, viewModel)
         listView.adapter = adapter
-        //listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
-        //listView.setDivider(null)
 
         return builder.create()
     }
@@ -51,18 +49,24 @@ class LabelsDialogFragment : DialogFragment() {
 class LabelsViewModel(private val labelRepo: LabelRepository) : ViewModel() {
 
     val labels = MutableLiveData<List<Label>>()
+    val currentLabels = mutableListOf<Label>()
 
+    // TODO get initial list from project viewmodel this will only be used for view screen checkbox changes
     fun initialize(owner: String, repo: String) {
         viewModelScope.launch {
 
             labels.value = labelRepo.getAll(owner, repo)
         }
         labels.value = listOf(Label("Blue", Color.BLUE), Label("Red", Color.RED).apply { description = "Bugs" })
+    }
 
+    fun setLabels(labels: List<Label>) {
+        currentLabels.clear()
+        currentLabels.addAll(labels)
     }
 }
 
-private class LabelListAdapter(context: Context, private val items: List<Label>) : ArrayAdapter<Label>(context, 0, items) {
+private class LabelListAdapter(context: Context, private val items: List<Label>, private val checked: List<Label>, private val viewModel: LabelsViewModel) : ArrayAdapter<Label>(context, 0, items) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
 
@@ -76,6 +80,13 @@ private class LabelListAdapter(context: Context, private val items: List<Label>)
         binding.name.text = item.name
         binding.description.text = item.description
         binding.color.setBackgroundColor(item.color)
+        binding.checkbox.isChecked = checked.any { it.name == item.name }
+        binding.checkbox.setOnCheckedChangeListener { compoundButton, b ->
+            if (!b)
+                viewModel.currentLabels.remove(item)
+            else
+                viewModel.currentLabels.add(item)
+        }
 
         return binding.root
     }

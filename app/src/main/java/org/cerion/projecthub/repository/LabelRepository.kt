@@ -17,4 +17,6 @@ class LabelRepository(private val service: GitHubService) {
 
 }
 
-fun GitHubLabel.toLabel(): Label = Label(name, Color.parseColor("#$color"))
+fun GitHubLabel.toLabel(): Label = Label(name, Color.parseColor("#$color")).also {
+    it.description = description ?: ""
+}
