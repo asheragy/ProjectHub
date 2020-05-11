@@ -1,13 +1,11 @@
 package org.cerion.projecthub.repository
 
-import android.graphics.Color
 import org.cerion.projecthub.github.CreateIssueCardParams
 import org.cerion.projecthub.github.CreateIssueParams
 import org.cerion.projecthub.github.GitHubService
 import org.cerion.projecthub.github.UpdateIssueParams
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueState
-import org.cerion.projecthub.model.Label
 
 class IssueRepository(private val service: GitHubService) {
 
@@ -19,7 +17,7 @@ class IssueRepository(private val service: GitHubService) {
             body = issue.body
             title = issue.title
             labels.addAll(issue.labels.map {
-                Label(it.name, Color.parseColor("#" + it.color))
+                it.toLabel()
             })
         }
     }

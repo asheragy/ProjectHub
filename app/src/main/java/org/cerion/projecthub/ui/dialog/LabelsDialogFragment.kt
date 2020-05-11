@@ -11,30 +11,54 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.ListItemLabelBinding
 import org.cerion.projecthub.model.Label
-
+import org.cerion.projecthub.repository.LabelRepository
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class LabelsDialogFragment : DialogFragment() {
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val labels = listOf(Label("Blue", Color.BLUE), Label("Red", Color.RED).apply { description = "Bugs" })
 
+    private val viewModel: LabelsViewModel by sharedViewModel()
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val li = LayoutInflater.from(requireActivity())
         val view = li.inflate(R.layout.dialog_labels, null)
 
         val builder = AlertDialog.Builder(activity)
             .setView(view)
-            .setTitle("Title here")
-        //.setMultiChoiceItems(items, null) { _, i, _ -> Toast.makeText(activity, "item clicked at $i", Toast.LENGTH_SHORT).show() }
+            .setTitle("Labels")
+            .setPositiveButton("Save", { _, _ ->
+
+            })
 
         val listView = view.findViewById(R.id.listView) as ListView
-        val adapter = LabelListAdapter(requireContext(), labels)
-        listView.setAdapter(adapter)
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE)
+
+        // TODO labels should be observed, may not be loaded yet...
+        val adapter = LabelListAdapter(requireContext(), viewModel.labels.value!!)
+        listView.adapter = adapter
+        //listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
         //listView.setDivider(null)
 
         return builder.create()
+    }
+}
+
+class LabelsViewModel(private val labelRepo: LabelRepository) : ViewModel() {
+
+    val labels = MutableLiveData<List<Label>>()
+
+    fun initialize(owner: String, repo: String) {
+        viewModelScope.launch {
+
+            labels.value = labelRepo.getAll(owner, repo)
+        }
+        labels.value = listOf(Label("Blue", Color.BLUE), Label("Red", Color.RED).apply { description = "Bugs" })
+
     }
 }
 

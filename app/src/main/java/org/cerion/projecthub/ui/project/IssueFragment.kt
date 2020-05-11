@@ -14,6 +14,7 @@ import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentIssueBinding
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.repository.IssueRepository
+import org.cerion.projecthub.ui.dialog.LabelsDialogFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class IssueFragment : Fragment() {
@@ -53,6 +54,12 @@ class IssueFragment : Fragment() {
                 binding.labelChipGroup.addView(chip)
             }
         })
+
+        binding.labelLayout.setOnClickListener {
+            // TODO use navigation
+            val dialog = LabelsDialogFragment()
+            dialog.show(parentFragmentManager, "dialog")
+        }
 
         requireActivity().title = viewModel.title
 

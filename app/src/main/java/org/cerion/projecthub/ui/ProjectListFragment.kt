@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectListBinding
 import org.cerion.projecthub.model.Project
-import org.cerion.projecthub.ui.dialog.LabelsDialogFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -62,10 +61,4 @@ class ProjectListFragment : Fragment() {
         val action = ProjectListFragmentDirections.actionProjectListFragmentToProjectBrowserFragment()
         findNavController().navigate(action)
     }
-
-    private fun test() {
-        val dialog = LabelsDialogFragment()
-        dialog.show(parentFragmentManager, "dialog")
-    }
-
 }
