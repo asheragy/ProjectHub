@@ -3,7 +3,6 @@ package org.cerion.projecthub.ui.dialog
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,19 +10,19 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.ListItemLabelBinding
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.repository.LabelRepository
+import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class LabelsDialogFragment : DialogFragment() {
 
     private val viewModel: LabelsViewModel by sharedViewModel()
+    private val projectViewModel: ProjectHomeViewModel by sharedViewModel()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val li = LayoutInflater.from(requireActivity())
@@ -38,27 +37,19 @@ class LabelsDialogFragment : DialogFragment() {
 
         val listView = view.findViewById(R.id.listView) as ListView
 
-        // TODO labels should be observed, may not be loaded yet although to get to this screen they probably are
-        val adapter = LabelListAdapter(requireContext(), viewModel.labels.value!!, viewModel.currentLabels, viewModel)
-        listView.adapter = adapter
+        projectViewModel.labels.observe(this, Observer {
+            val adapter = LabelListAdapter(requireContext(), projectViewModel.labels.value!!, viewModel.currentLabels, viewModel)
+            listView.adapter = adapter
+        })
 
         return builder.create()
     }
 }
 
+
 class LabelsViewModel(private val labelRepo: LabelRepository) : ViewModel() {
 
-    val labels = MutableLiveData<List<Label>>()
     val currentLabels = mutableListOf<Label>()
-
-    // TODO get initial list from project viewmodel this will only be used for view screen checkbox changes
-    fun initialize(owner: String, repo: String) {
-        viewModelScope.launch {
-
-            labels.value = labelRepo.getAll(owner, repo)
-        }
-        labels.value = listOf(Label("Blue", Color.BLUE), Label("Red", Color.RED).apply { description = "Bugs" })
-    }
 
     fun setLabels(labels: List<Label>) {
         currentLabels.clear()

@@ -58,6 +58,6 @@ val viewModelModule = module {
     viewModel { IssueViewModel(get()) }
     viewModel { ProjectBrowserViewModel(get()) }
     viewModel { ProjectListViewModel(get()) }
-    viewModel { ProjectHomeViewModel(androidContext(), get()) }
+    viewModel { ProjectHomeViewModel(androidContext(), get(), get()) }
     viewModel { LabelsViewModel(get()) }
 }

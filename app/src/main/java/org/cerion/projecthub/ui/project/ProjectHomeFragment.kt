@@ -14,7 +14,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
-import org.cerion.projecthub.ui.dialog.LabelsViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 // TODO https://issuetracker.google.com/issues/111614463
@@ -23,7 +22,6 @@ class ProjectHomeFragment : Fragment() {
 
     private val args: ProjectHomeFragmentArgs by navArgs()
     private val viewModel: ProjectHomeViewModel by sharedViewModel()
-    private val labelsViewModel: LabelsViewModel by sharedViewModel()
 
     private lateinit var binding: FragmentProjectHomeBinding
 
@@ -43,7 +41,6 @@ class ProjectHomeFragment : Fragment() {
 
         viewModel.project.observe(viewLifecycleOwner, Observer {
             requireActivity().title = it.name
-            labelsViewModel.initialize(it.owner, it.repo)
         })
 
         viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->

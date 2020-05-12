@@ -8,13 +8,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.repository.CardRepository
 import org.cerion.projecthub.repository.ColumnRepository
+import org.cerion.projecthub.repository.LabelRepository
 import org.cerion.projecthub.repository.ProjectRepository
 
 // TODO pass in all objects that use context
-class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRepository) : ViewModel() {
+class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRepository, private val labelsRepo: LabelRepository) : ViewModel() {
 
     private val _project = MutableLiveData<Project>()
     val project: LiveData<Project>
@@ -28,6 +30,10 @@ class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRep
     private val _columns = MutableLiveData<List<ColumnViewModel>>()
     val columns: LiveData<List<ColumnViewModel>>
         get() = _columns
+
+    private val _labels = MutableLiveData<List<Label>>()
+    val labels: LiveData<List<Label>>
+        get() = _labels
 
     fun load(projectId: Int) {
         val existingId = project.value?.id
@@ -49,6 +55,9 @@ class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRep
             _columns.value = cols.map {
                 ColumnViewModel(vm, cardRepo, service, it)
             }
+
+            // TODO see if this can be lazy loaded somehow, but need to handle various cases of that
+            _labels.value = labelsRepo.getAll(_project.value!!.owner, _project.value!!.repo)
         }
     }
 

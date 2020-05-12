@@ -64,9 +64,20 @@
         <argument
             android:name="number"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_issueFragment_to_labelsDialogFragment"
+            app:destination="@id/labelsDialogFragment" />
     </fragment>
     <fragment
         android:id="@+id/projectBrowserFragment"
         android:name="org.cerion.projecthub.ui.ProjectBrowserFragment"
         android:label="Project Browser" />
+    <dialog
+        android:id="@+id/labelsDialogFragment"
+        android:name="org.cerion.projecthub.ui.dialog.LabelsDialogFragment"
+        android:label="LabelsDialogFragment" >
+        <argument
+            android:name="currentLabels"
+            app:argType="string[]" />
+    </dialog>
 </navigation>

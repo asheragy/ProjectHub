@@ -14,7 +14,6 @@ import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentIssueBinding
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.repository.IssueRepository
-import org.cerion.projecthub.ui.dialog.LabelsDialogFragment
 import org.cerion.projecthub.ui.dialog.LabelsViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -61,15 +60,20 @@ class IssueFragment : Fragment() {
         })
 
         binding.labelLayout.setOnClickListener {
-            // TODO use navigation
-            val dialog = LabelsDialogFragment()
-            dialog.show(parentFragmentManager, "dialog")
+            editLabels()
         }
 
         requireActivity().title = viewModel.title
 
         return binding.root
     }
+
+    private fun editLabels() {
+        val labels = viewModel.issue.value!!.labels.map { it.name }
+        val action = IssueFragmentDirections.actionIssueFragmentToLabelsDialogFragment(labels.toTypedArray())
+        findNavController().navigate(action)
+    }
+
 }
 
 class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
