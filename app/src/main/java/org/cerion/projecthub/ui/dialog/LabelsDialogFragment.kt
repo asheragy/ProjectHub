@@ -11,34 +11,42 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.ListItemLabelBinding
 import org.cerion.projecthub.model.Label
-import org.cerion.projecthub.repository.LabelRepository
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class LabelsDialogFragment : DialogFragment() {
 
-    private val viewModel: LabelsViewModel by sharedViewModel()
     private val projectViewModel: ProjectHomeViewModel by sharedViewModel()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val li = LayoutInflater.from(requireActivity())
         val view = li.inflate(R.layout.dialog_labels, null)
 
+        val labels = mutableListOf<Label>()
+        val listView = view.findViewById(R.id.listView) as ListView
+        val currentLabels = LabelsDialogFragmentArgs.fromBundle(requireArguments()).currentLabels.toList()
+
         val builder = AlertDialog.Builder(activity)
             .setView(view)
             .setTitle("Labels")
-            .setPositiveButton("Save", { _, _ ->
+            .setPositiveButton("Save") { _, _ ->
 
-            })
+                // TODO pass back to sending fragment
+                labels.filter { it.included }.forEach {
+                    println(it)
+                }
+            }
 
-        val listView = view.findViewById(R.id.listView) as ListView
+        projectViewModel.labels.observe(this, Observer { it ->
+            labels.addAll(it)
+            labels.forEach { label ->
+                label.included = (currentLabels.any { it == label.name })
+            }
 
-        projectViewModel.labels.observe(this, Observer {
-            val adapter = LabelListAdapter(requireContext(), projectViewModel.labels.value!!, viewModel.currentLabels, viewModel)
+            val adapter = LabelListAdapter(requireContext(), labels)
             listView.adapter = adapter
         })
 
@@ -46,21 +54,9 @@ class LabelsDialogFragment : DialogFragment() {
     }
 }
 
-
-class LabelsViewModel(private val labelRepo: LabelRepository) : ViewModel() {
-
-    val currentLabels = mutableListOf<Label>()
-
-    fun setLabels(labels: List<Label>) {
-        currentLabels.clear()
-        currentLabels.addAll(labels)
-    }
-}
-
-private class LabelListAdapter(context: Context, private val items: List<Label>, private val checked: List<Label>, private val viewModel: LabelsViewModel) : ArrayAdapter<Label>(context, 0, items) {
+private class LabelListAdapter(context: Context, private val items: List<Label>) : ArrayAdapter<Label>(context, 0, items) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-
         val binding =
             if (convertView?.tag != null)
                 convertView.tag as ListItemLabelBinding
@@ -68,16 +64,9 @@ private class LabelListAdapter(context: Context, private val items: List<Label>,
                 ListItemLabelBinding.inflate(LayoutInflater.from(context), parent, false)
 
         val item = items[position]
-        binding.name.text = item.name
-        binding.description.text = item.description
+        binding.label = item
         binding.color.setBackgroundColor(item.color)
-        binding.checkbox.isChecked = checked.any { it.name == item.name }
-        binding.checkbox.setOnCheckedChangeListener { compoundButton, b ->
-            if (!b)
-                viewModel.currentLabels.remove(item)
-            else
-                viewModel.currentLabels.add(item)
-        }
+        binding.executePendingBindings()
 
         return binding.root
     }

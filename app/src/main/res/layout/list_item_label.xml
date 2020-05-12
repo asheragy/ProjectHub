@@ -2,6 +2,10 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable name="label" type="org.cerion.projecthub.model.Label" />
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -9,7 +13,8 @@
         <CheckBox
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:checked="@={label.included}">
         </CheckBox>
 
         <LinearLayout
@@ -35,7 +40,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="Text"/>
+                    android:text="@{label.name}"
+                    tools:text="Text"/>
             </LinearLayout>
 
 
@@ -43,6 +49,7 @@
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{label.description}"
                 tools:text="Description" />
 
         </LinearLayout>

@@ -14,8 +14,6 @@ import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentIssueBinding
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.repository.IssueRepository
-import org.cerion.projecthub.ui.dialog.LabelsViewModel
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class IssueFragment : Fragment() {
@@ -25,7 +23,6 @@ class IssueFragment : Fragment() {
     }
 
     private val viewModel: IssueViewModel by viewModel()
-    private val labelsViewModel: LabelsViewModel by sharedViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentIssueBinding.inflate(inflater, container, false)
@@ -55,8 +52,6 @@ class IssueFragment : Fragment() {
                 chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
                 binding.labelChipGroup.addView(chip)
             }
-
-            labelsViewModel.setLabels(it.labels)
         })
 
         binding.labelLayout.setOnClickListener {
