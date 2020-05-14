@@ -66,6 +66,11 @@ private class LabelListAdapter(context: Context, private val items: List<Label>)
         val item = items[position]
         binding.label = item
         binding.color.setBackgroundColor(item.color)
+        binding.root.setOnClickListener {
+            item.included = !item.included
+            binding.invalidateAll()
+        }
+
         binding.executePendingBindings()
 
         return binding.root
