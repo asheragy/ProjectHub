@@ -75,9 +75,5 @@
     <dialog
         android:id="@+id/labelsDialogFragment"
         android:name="org.cerion.projecthub.ui.dialog.LabelsDialogFragment"
-        android:label="LabelsDialogFragment" >
-        <argument
-            android:name="currentLabels"
-            app:argType="string[]" />
-    </dialog>
+        android:label="LabelsDialogFragment" />
 </navigation>

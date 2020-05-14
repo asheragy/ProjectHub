@@ -9,6 +9,7 @@ import org.cerion.projecthub.repository.LabelRepository
 import org.cerion.projecthub.repository.ProjectRepository
 import org.cerion.projecthub.ui.ProjectBrowserViewModel
 import org.cerion.projecthub.ui.ProjectListViewModel
+import org.cerion.projecthub.ui.dialog.LabelsViewModel
 import org.cerion.projecthub.ui.project.IssueViewModel
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.android.ext.koin.androidContext
@@ -58,4 +59,5 @@ val viewModelModule = module {
     viewModel { ProjectBrowserViewModel(get()) }
     viewModel { ProjectListViewModel(get()) }
     viewModel { ProjectHomeViewModel(androidContext(), get(), get()) }
+    viewModel { LabelsViewModel() }
 }

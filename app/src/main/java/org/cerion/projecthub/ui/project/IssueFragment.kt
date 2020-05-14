@@ -13,7 +13,10 @@ import kotlinx.coroutines.launch
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentIssueBinding
 import org.cerion.projecthub.model.Issue
+import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.repository.IssueRepository
+import org.cerion.projecthub.ui.dialog.LabelsViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class IssueFragment : Fragment() {
@@ -23,6 +26,7 @@ class IssueFragment : Fragment() {
     }
 
     private val viewModel: IssueViewModel by viewModel()
+    private val labelsViewModel: LabelsViewModel by sharedViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentIssueBinding.inflate(inflater, container, false)
@@ -54,6 +58,12 @@ class IssueFragment : Fragment() {
             }
         })
 
+        labelsViewModel.result.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                viewModel.setLabels(it)
+            }
+        })
+
         binding.labelLayout.setOnClickListener {
             editLabels()
         }
@@ -64,11 +74,10 @@ class IssueFragment : Fragment() {
     }
 
     private fun editLabels() {
-        val labels = viewModel.issue.value!!.labels.map { it.name }
-        val action = IssueFragmentDirections.actionIssueFragmentToLabelsDialogFragment(labels.toTypedArray())
+        labelsViewModel.setLabels(viewModel.issue.value!!.labels.map { it.name })
+        val action = IssueFragmentDirections.actionIssueFragmentToLabelsDialogFragment()
         findNavController().navigate(action)
     }
-
 }
 
 class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
@@ -105,6 +114,16 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
                 issue.value = issueRepo.getByNumber(owner, repo, number)
             }
         }
+    }
+
+    fun setLabels(labels: List<Label>) {
+        issue.value!!.labels.apply {
+            clear()
+            addAll(labels)
+        }
+
+        // TODO different way of doing this?  Need to let things know this was updated
+        issue.postValue(issue.value)
     }
 
     fun submit() {
