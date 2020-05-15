@@ -71,6 +71,10 @@ class LabelsViewModel : ViewModel() {
     fun setResult(labels: List<Label>) {
         _result.value = labels
     }
+
+    fun onRecieveResult() {
+        _result.value = null
+    }
 }
 
 private class LabelListAdapter(context: Context, private val items: List<Label>) : ArrayAdapter<Label>(context, 0, items) {

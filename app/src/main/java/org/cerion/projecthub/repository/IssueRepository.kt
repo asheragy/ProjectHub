@@ -31,7 +31,15 @@ class IssueRepository(private val service: GitHubService) {
     }
 
     suspend fun update(issue: Issue) {
-        val params = UpdateIssueParams(issue.title, issue.body)
-        service.updateIssue(issue.owner, issue.repo, issue.number, params).await()
+        issue.run {
+            if (labelsModified) {
+                service.updateIssueLabels(owner, repo, number, labels.map { it.name }).await()
+            }
+
+            // TODO only update if modified
+            val params = UpdateIssueParams(issue.title, issue.body)
+            service.updateIssue(issue.owner, issue.repo, issue.number, params).await()
+        }
+
     }
 }

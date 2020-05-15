@@ -74,6 +74,9 @@ interface GitHubService {
     @PATCH("repos/{owner}/{repo}/issues/{number}")
     fun updateIssue(@Path("owner")owner: String, @Path("repo")repo: String, @Path("number")number: Int, @Body params: UpdateIssueParams): Deferred<GitHubIssue>
 
+    @PUT("repos/{owner}/{repo}/issues/{number}/labels")
+    fun updateIssueLabels(@Path("owner")owner: String, @Path("repo")repo: String, @Path("number")number: Int, @Body labels: List<String>): Deferred<ResponseBody>
+
     //endregion
 
     @GET("repos/{owner}/{repo}/labels")
