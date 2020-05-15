@@ -12,7 +12,7 @@ class IssueRepository(private val service: GitHubService) {
     suspend fun getByNumber(owner: String, repo: String, number: Int): Issue {
         val issue = service.getIssue(owner, repo, number).await()
 
-        return Issue(owner, repo, number).apply {
+        return Issue(owner, repo, number).init {
             state = if(issue.state == "open") IssueState.Open else IssueState.Closed
             body = issue.body
             title = issue.title

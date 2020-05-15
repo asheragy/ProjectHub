@@ -118,8 +118,10 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
 
     fun setLabels(labels: List<Label>) {
         issue.value!!.labels.apply {
-            clear()
-            addAll(labels)
+            if (this != labels) {
+                clear()
+                addAll(labels)
+            }
         }
 
         // TODO different way of doing this?  Need to let things know this was updated
