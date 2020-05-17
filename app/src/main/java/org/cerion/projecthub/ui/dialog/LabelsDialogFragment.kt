@@ -25,6 +25,7 @@ class LabelsDialogFragment : DialogFragment() {
     private val projectViewModel: ProjectHomeViewModel by sharedViewModel()
     private val viewModel: LabelsViewModel by sharedViewModel()
 
+    // TODO copy format used for edit note dialog that uses onCreateView
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val li = LayoutInflater.from(requireActivity())
         val view = li.inflate(R.layout.dialog_labels, null)

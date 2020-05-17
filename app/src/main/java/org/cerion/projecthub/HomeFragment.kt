@@ -13,14 +13,15 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.cerion.projecthub.databinding.FragmentHomeBinding
 
 
 class HomeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        val binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
 
-        view.findViewById<Button>(R.id.test).setOnClickListener {
+        binding.test.setOnClickListener {
             val token = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString("access_token", null)
             if (token == null) {
                 Toast.makeText(requireContext(), "Not logged in", Toast.LENGTH_SHORT).show()
@@ -33,11 +34,11 @@ class HomeFragment : Fragment() {
             }
         }
 
-        view.findViewById<Button>(R.id.logout).setOnClickListener {
+        binding.logout.setOnClickListener {
             logout()
         }
 
-        return view
+        return binding.root
     }
 
     private suspend fun testApi(accessToken: String) {

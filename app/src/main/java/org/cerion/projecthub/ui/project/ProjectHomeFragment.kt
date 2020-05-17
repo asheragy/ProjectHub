@@ -37,7 +37,7 @@ class ProjectHomeFragment : Fragment() {
         viewModel.load(args.projectId)
 
         //binding.viewModel = viewModel
-        binding.lifecycleOwner = this
+        //binding.lifecycleOwner = this
 
         viewModel.project.observe(viewLifecycleOwner, Observer {
             requireActivity().title = it.name

@@ -1,50 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        tools:context=".ui.project.ProjectHomeFragment">
 
-        <LinearLayout
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:orientation="vertical"
-            tools:context=".ui.project.ProjectHomeFragment">
+            android:layout_height="wrap_content" />
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tab_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+        </androidx.viewpager2.widget.ViewPager2>
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/view_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" >
-            </androidx.viewpager2.widget.ViewPager2>
+        <!--
+        <androidx.recyclerview.widget.RecyclerView
+            android:visibility="gone"
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <!--
-            <androidx.recyclerview.widget.RecyclerView
-                android:visibility="gone"
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+        </androidx.recyclerview.widget.RecyclerView>
+        -->
 
-            </androidx.recyclerview.widget.RecyclerView>
-            -->
+    </LinearLayout>
 
-        </LinearLayout>
+    <org.cerion.projecthub.common.FloatingActionButtonGroup
+        android:id="@+id/fab_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-        <org.cerion.projecthub.common.FloatingActionButtonGroup
-            android:id="@+id/fab_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+    </org.cerion.projecthub.common.FloatingActionButtonGroup>
 
-        </org.cerion.projecthub.common.FloatingActionButtonGroup>
-
-    </FrameLayout>
-
-</layout>
+</FrameLayout>

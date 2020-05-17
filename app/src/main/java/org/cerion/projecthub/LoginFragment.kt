@@ -20,21 +20,22 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import org.cerion.projecthub.databinding.FragmentLoginBinding
 import java.net.HttpURLConnection
 
 
 class LoginFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_login, container, false)
+        val binding = FragmentLoginBinding.inflate(layoutInflater, container, false)
 
-        view.findViewById<Button>(R.id.login).setOnClickListener {
+        binding.login.setOnClickListener {
             val url = "https://github.com/login/oauth/authorize?client_id=${BuildConfig.CLIENT_ID}&redirect_uri=${BuildConfig.CALLBACK_URL}&scope=repo"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
         }
 
-        return view
+        return binding.root
     }
 
     override fun onResume() {
