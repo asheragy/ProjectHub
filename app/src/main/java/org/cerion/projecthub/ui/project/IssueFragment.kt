@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -31,6 +32,7 @@ class IssueFragment : Fragment() {
         viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
         val columnViewModel = projectViewModel.findColumnById(args.columnId)!!
 
+
         viewModel.finished.observe(viewLifecycleOwner, Observer {
             if (it!!) {
                 columnViewModel.refresh()
@@ -48,6 +50,12 @@ class IssueFragment : Fragment() {
                 chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
                 chip.isCheckable = false
                 binding.labelChipGroup.addView(chip)
+            }
+        })
+
+        viewModel.message.observe(viewLifecycleOwner, Observer {
+            it?.getContentIfNotHandled()?.run {
+                Toast.makeText(requireContext(), this, Toast.LENGTH_SHORT).show()
             }
         })
 

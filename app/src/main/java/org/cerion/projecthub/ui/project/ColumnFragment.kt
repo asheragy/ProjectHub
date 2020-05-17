@@ -66,6 +66,14 @@ class ColumnFragment : Fragment() {
                 override fun onArchive(card: Card) {
                     viewModel.archiveCard(card, true)
                 }
+
+                override fun onDelete(note: NoteCard) {
+                    viewModel.deleteCard(note)
+                }
+
+                override fun onCloseOrOpen(issue: IssueCard) {
+                    viewModel.toggleIssueState(issue)
+                }
             })
 
         binding.recyclerView.adapter = adapter

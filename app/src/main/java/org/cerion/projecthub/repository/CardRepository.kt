@@ -9,14 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import org.cerion.projecthub.TAG
-import org.cerion.projecthub.github.CreateCardParams
-import org.cerion.projecthub.github.GitHubIssue
-import org.cerion.projecthub.github.GitHubService
-import org.cerion.projecthub.github.UpdateCardParams
-import org.cerion.projecthub.model.Card
-import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.model.Label
-import org.cerion.projecthub.model.NoteCard
+import org.cerion.projecthub.github.*
+import org.cerion.projecthub.model.*
 
 
 class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
@@ -65,6 +59,17 @@ class CardRepository(private val service: GitHubService, private val apolloClien
     suspend fun updateNote(id: Int, note: String) {
         val params = UpdateCardParams(note)
         service.updateCard(id, params).await()
+    }
+
+    suspend fun deleteCard(id: Int) {
+        withContext(Dispatchers.IO) {
+            service.deleteCard(id).execute() // For some reason the deferred/await was throwing exception
+        }
+    }
+
+    suspend fun setIssueState(issue: Issue, closed: Boolean) {
+        val state = UpdateIssueState(if(closed) "closed" else "open")
+        service.updateIssueState(issue.owner, issue.repo, issue.number, state).await()
     }
 
     /*

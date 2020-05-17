@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.cerion.projecthub.common.SingleEventData
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.repository.IssueRepository
@@ -14,6 +15,7 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
 
     val issue = MutableLiveData<Issue>()
     val finished = MutableLiveData<Boolean>(false)
+    val message = MutableLiveData<SingleEventData<String>>()
 
     private var ownerName: String = ""
     private var repoName: String = ""
@@ -59,19 +61,28 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
     }
 
     fun submit() {
-        // TODO check if any changes or blanks if new record
         // TODO failure to update indicator
 
-        launchBusy {
-            if (isNew) {
-                issueRepo.add(issue.value!!, columnId)
-                finished.value = true
+        issue.value?.let {
+
+            if (it.title.isEmpty()) {
+                message.value = SingleEventData("Title must not be blank")
+                return
             }
-            else {
-                issueRepo.update(issue.value!!)
-                finished.value = true
+
+            launchBusy {
+                if (isNew) {
+                    issueRepo.add(it, columnId)
+                    finished.value = true
+                }
+                else {
+                    issueRepo.update(it)
+                    finished.value = true
+                }
             }
         }
+
+
     }
 
     private fun launchBusy(action: suspend () -> Unit) {

@@ -16,6 +16,8 @@ interface CardListener {
     fun move(card: Card)
     fun onArchive(card: Card)
     fun onClick(card: Card)
+    fun onDelete(note: NoteCard)
+    fun onCloseOrOpen(issue: IssueCard)
 }
 
 class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -90,6 +92,10 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
                     true
                 }
                  */
+                add(Menu.NONE, view.id, Menu.NONE, "Delete").setOnMenuItemClickListener {
+                    listener.onDelete(card)
+                    true
+                }
             }
         }
     }
@@ -123,6 +129,10 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
                 }
                 add(Menu.NONE, view.id, Menu.NONE, "Archive").setOnMenuItemClickListener {
                     listener.onArchive(card)
+                    true
+                }
+                add(Menu.NONE, view.id, Menu.NONE, if(card.closed) "Open" else "Close").setOnMenuItemClickListener {
+                    listener.onCloseOrOpen(card)
                     true
                 }
             }

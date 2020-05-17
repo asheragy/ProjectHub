@@ -10,6 +10,7 @@ import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okio.Buffer
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
@@ -31,6 +32,7 @@ data class CreateCardParams(val note: String)
 data class CreateIssueCardParams(val content_id: Int, val content_type: String = "Issue")
 data class CreateIssueParams(val title: String, val body: String)
 data class UpdateIssueParams(val title: String, val body: String)
+data class UpdateIssueState(val state: String)
 
 interface GitHubService {
     @GET("users/asheragy/projects")
@@ -61,6 +63,9 @@ interface GitHubService {
     @POST("projects/columns/{column_id}/cards")
     fun createCard(@Path("column_id")columnId: Int, @Body params: CreateIssueCardParams): Deferred<ResponseBody>
 
+    @DELETE("projects/columns/cards/{card_id}")
+    fun deleteCard(@Path("card_id")id: Int): Call<ResponseBody>
+
     //endregion
 
     //region Issues
@@ -76,6 +81,9 @@ interface GitHubService {
 
     @PUT("repos/{owner}/{repo}/issues/{number}/labels")
     fun updateIssueLabels(@Path("owner")owner: String, @Path("repo")repo: String, @Path("number")number: Int, @Body labels: List<String>): Deferred<ResponseBody>
+
+    @PATCH("repos/{owner}/{repo}/issues/{number}")
+    fun updateIssueState(@Path("owner")owner: String, @Path("repo")repo: String, @Path("number")number: Int, @Body state: UpdateIssueState): Deferred<GitHubIssue>
 
     //endregion
 

@@ -10,6 +10,8 @@ import org.cerion.projecthub.github.ArchiveCardParams
 import org.cerion.projecthub.github.GitHubService
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
+import org.cerion.projecthub.model.Issue
+import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.repository.CardRepository
 
 
@@ -82,6 +84,21 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     fun archiveCard(card: Card, archived: Boolean) {
         launchBusy {
             service.archiveCard(card.id, ArchiveCardParams(archived)).await()
+            loadCards()
+        }
+    }
+
+    fun deleteCard(card: Card) {
+        launchBusy {
+            cardRepository.deleteCard(card.id)
+            loadCards()
+        }
+    }
+
+    fun toggleIssueState(card: IssueCard) {
+        launchBusy {
+            val issue = Issue(parent.project.value!!.owner, card.repository, card.number)
+            cardRepository.setIssueState(issue, !card.closed)
             loadCards()
         }
     }

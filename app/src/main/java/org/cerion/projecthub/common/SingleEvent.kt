@@ -1,8 +1,7 @@
 package org.cerion.projecthub.common
 
 
-/*
-open class SingleEvent<out T>(private val content: T) {
+open class SingleEventData<out T>(private val content: T) {
     var handled = false
         private set
 
@@ -15,7 +14,6 @@ open class SingleEvent<out T>(private val content: T) {
         }
     }
 }
- */
 
 open class SingleEvent {
     var handled = false

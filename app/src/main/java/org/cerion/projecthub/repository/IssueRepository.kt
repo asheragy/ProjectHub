@@ -23,11 +23,16 @@ class IssueRepository(private val service: GitHubService) {
     }
 
     suspend fun add(issue: Issue, columnId: Int): Int {
-        val params = CreateIssueParams(issue.title, issue.body)
-        val result = service.createIssue(issue.owner, issue.repo, params).await()
+        issue.run {
+            val params = CreateIssueParams(title, body)
+            val result = service.createIssue(owner, repo, params).await()
+            if (labels.size > 0)
+                service.updateIssueLabels(owner, repo, result.number, labels.map { it.name }).await()
 
-        service.createCard(columnId, CreateIssueCardParams(result.id)).await()
-        return result.id
+            service.createCard(columnId, CreateIssueCardParams(result.id)).await()
+
+            return result.id
+        }
     }
 
     suspend fun update(issue: Issue) {
@@ -41,6 +46,5 @@ class IssueRepository(private val service: GitHubService) {
                 service.updateIssue(issue.owner, issue.repo, issue.number, params).await()
             }
         }
-
     }
 }
