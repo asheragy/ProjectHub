@@ -1,5 +1,6 @@
 package org.cerion.projecthub.ui.project
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -43,19 +44,16 @@ class ColumnFragment : Fragment() {
             ColumnCardListAdapter(object :
                 CardListener {
                 override fun move(card: Card) {
-                    /*
-                    val items = viewModel.columns.value!!.map { it.name }.toTypedArray()
 
+                    val items = parentViewModel.columns.value!!.map { it.name }.toTypedArray()
                     val builder = AlertDialog.Builder(requireContext())
                     builder.setTitle("Move to")
                     builder.setItems(items) { _, which ->
-                        val column = viewModel.columns.value!!.firstOrNull { it.name == items[which] }!!
-                        viewModel.moveCard(card, column.id)
+                        val column = parentViewModel.columns.value!!.firstOrNull { it.name == items[which] }!!
+                        parentViewModel.moveCard(card, column.id)
                     }
 
                     builder.show()
-
-                     */
                 }
 
                 override fun onClick(card: Card) {

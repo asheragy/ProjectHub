@@ -51,8 +51,13 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
             (holder as IssueViewHolder).bind(item as IssueCard)
     }
 
-    abstract inner class BaseViewHolder(binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
-        override fun onClick(p0: View?) {
+    abstract inner class BaseViewHolder(binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnCreateContextMenuListener {
+
+        init {
+            binding.root.setOnCreateContextMenuListener(this)
+        }
+
+        override fun onClick(view: View) {
             onClick()
         }
 
@@ -70,17 +75,30 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
         override fun onClick() {
             listener.onClick(binding.card!!)
         }
+
+        override fun onCreateContextMenu(menu: ContextMenu?, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+            val card = binding.card!!
+
+            menu?.apply {
+                add(Menu.NONE, view.id, Menu.NONE, "Move").setOnMenuItemClickListener {
+                    listener.move(card)
+                    true
+                }
+                /* TODO not sure if this works yet
+                add(Menu.NONE, view.id, Menu.NONE, "Archive").setOnMenuItemClickListener {
+                    listener.onArchive(card)
+                    true
+                }
+                 */
+            }
+        }
     }
 
-    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : BaseViewHolder(binding), View.OnCreateContextMenuListener {
-
-        init {
-            binding.root.setOnCreateContextMenuListener(this)
-        }
+    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : BaseViewHolder(binding) {
 
         fun bind(item: IssueCard) {
             binding.card = item
-            // TODO add repository if this is a multi repo project (associated to user/org)
+            // FEATURE add repository if this is a multi repo project (associated to user/org)
             binding.openedBy.text = "#${item.number} opened by ${item.author}"
 
             binding.labels.removeAllViews()

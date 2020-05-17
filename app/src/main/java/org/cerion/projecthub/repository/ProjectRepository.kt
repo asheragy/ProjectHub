@@ -14,7 +14,7 @@ import org.cerion.projecthub.model.ProjectType
 
 class ProjectRepository(private val dao: ProjectDao, private val apolloClient: ApolloClient) {
 
-    // TODO store project as combo of type / owner / repo?
+    // FEATURE store project as combo of type / owner / repo?
     // Org/user projects can have multiple repos
     //GET /repos/:owner/:repo/projects
     //GET /orgs/:org/projects
