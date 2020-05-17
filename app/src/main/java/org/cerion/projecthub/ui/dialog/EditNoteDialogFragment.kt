@@ -1,34 +1,29 @@
 package org.cerion.projecthub.ui.dialog
 
-import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
 import org.cerion.projecthub.R
+import org.cerion.projecthub.databinding.DialogEditNoteBinding
 import org.cerion.projecthub.model.NoteCard
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class EditNoteDialogFragment : DialogFragment() {
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        // TODO see if we can get viewmodel directly from column Fragment, then columnId doesnt need to be passed
-        val args = EditNoteDialogFragmentArgs.fromBundle(requireArguments())
-        val viewModel = ViewModelProviders.of(requireActivity()).get(ProjectHomeViewModel::class.java)
 
-        return EditNoteDialog(requireContext(), viewModel, args)
-    }
-}
+    private val projectViewModel: ProjectHomeViewModel by sharedViewModel()
 
-private class EditNoteDialog(context: Context, private val projectViewModel: ProjectHomeViewModel, private val args: EditNoteDialogFragmentArgs) : Dialog(context) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_FRAME, android.R.style.ThemeOverlay_Material_Dialog)
+    }
 
-        setContentView(R.layout.dialog_edit_note)
-        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val binding = DialogEditNoteBinding.inflate(layoutInflater, container, false)
 
+        val args = EditNoteDialogFragmentArgs.fromBundle(requireArguments())
         val viewModel = projectViewModel.findColumnById(args.columnId)!!
 
         val isNew = args.cardId == 0
@@ -37,11 +32,9 @@ private class EditNoteDialog(context: Context, private val projectViewModel: Pro
             card.note
         }
 
-        val editText = findViewById<EditText>(R.id.text)
-        editText.setText(note)
-
-        findViewById<Button>(R.id.save).setOnClickListener {
-            val newNote = editText.text.toString()
+        binding.text.setText(note)
+        binding.save.setOnClickListener {
+            val newNote = binding.text.text.toString()
             if (isNew)
                 viewModel.addNote(newNote)
             else if(note != newNote)
@@ -49,5 +42,18 @@ private class EditNoteDialog(context: Context, private val projectViewModel: Pro
 
             dismiss()
         }
+
+        binding.toolbar.inflateMenu(R.menu.edit_note)
+        binding.toolbar.menu.getItem(0).setOnMenuItemClickListener {
+            dismiss()
+            true
+        }
+
+        return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 }
