@@ -4,9 +4,7 @@ import android.app.Application
 import org.cerion.projecthub.database.AppDatabase
 import org.cerion.projecthub.github.getGraphQLClient
 import org.cerion.projecthub.github.getService
-import org.cerion.projecthub.repository.IssueRepository
-import org.cerion.projecthub.repository.LabelRepository
-import org.cerion.projecthub.repository.ProjectRepository
+import org.cerion.projecthub.repository.*
 import org.cerion.projecthub.ui.ProjectBrowserViewModel
 import org.cerion.projecthub.ui.ProjectListViewModel
 import org.cerion.projecthub.ui.dialog.LabelsViewModel
@@ -52,12 +50,14 @@ val repositoryModule = module {
     single { IssueRepository(get()) }
     single { ProjectRepository(get(), get()) }
     single { LabelRepository(get()) }
+    single { CardRepository(get(), get()) }
+    single { ColumnRepository(get(), get()) }
 }
 
 val viewModelModule = module {
     viewModel { IssueViewModel(get()) }
     viewModel { ProjectBrowserViewModel(get()) }
     viewModel { ProjectListViewModel(get()) }
-    viewModel { ProjectHomeViewModel(androidContext(), get(), get()) }
+    viewModel { ProjectHomeViewModel(get(), get(), get(), get()) }
     viewModel { LabelsViewModel() }
 }

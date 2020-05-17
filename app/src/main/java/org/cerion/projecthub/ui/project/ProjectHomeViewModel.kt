@@ -1,12 +1,10 @@
 package org.cerion.projecthub.ui.project
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
@@ -15,17 +13,11 @@ import org.cerion.projecthub.repository.ColumnRepository
 import org.cerion.projecthub.repository.LabelRepository
 import org.cerion.projecthub.repository.ProjectRepository
 
-// TODO pass in all objects that use context
-class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRepository, private val labelsRepo: LabelRepository) : ViewModel() {
+class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private val labelsRepo: LabelRepository, private val cardRepo: CardRepository, private val columnRepo: ColumnRepository) : ViewModel() {
 
     private val _project = MutableLiveData<Project>()
     val project: LiveData<Project>
         get() = _project
-
-    private var service: GitHubService = getService(context)
-    private val graphQL = getGraphQLClient(context)
-    private val columnRepo = ColumnRepository(service, graphQL)
-    private val cardRepo = CardRepository(service, graphQL)
 
     private val _columns = MutableLiveData<List<ColumnViewModel>>()
     val columns: LiveData<List<ColumnViewModel>>
@@ -53,7 +45,7 @@ class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRep
             _project.value = projectRepo.getById(projectId)
             val cols = columnRepo.getColumnsForProject(_project.value!!.nodeId)
             _columns.value = cols.map {
-                ColumnViewModel(vm, cardRepo, service, it)
+                ColumnViewModel(vm, cardRepo, it)
             }
 
             // TODO see if this can be lazy loaded somehow, but need to handle various cases of that
@@ -68,7 +60,7 @@ class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRep
         viewModelScope.launch {
             try {
                 oldColumn.removeCard(card)
-                service.moveCard(card.id, MoveCardParams(columnId)).await()
+                cardRepo.moveCard(card.id, columnId)
                 newColumn.addCard(card)
             }
             catch(e: Exception) {
@@ -81,6 +73,7 @@ class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRep
         }
     }
 
+    /*
     fun addIssueForColumn(columnId: Int, title: String, body: String) {
         viewModelScope.launch {
             val params = CreateIssueParams(title, body)
@@ -91,6 +84,7 @@ class ProjectHomeViewModel(context: Context, private val projectRepo: ProjectRep
             findColumnById(columnId)?.loadCards()
         }
     }
+     */
 
     fun findColumnById(id: Int) = _columns.value?.first { it.id == id}
 

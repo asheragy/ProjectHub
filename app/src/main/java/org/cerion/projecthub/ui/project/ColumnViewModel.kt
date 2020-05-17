@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.common.SingleEvent
-import org.cerion.projecthub.github.ArchiveCardParams
-import org.cerion.projecthub.github.GitHubService
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.Issue
@@ -16,7 +14,7 @@ import org.cerion.projecthub.repository.CardRepository
 
 
 // TODO verify this gets destroyed + onCleared is called
-class ColumnViewModel(private val parent: ProjectHomeViewModel, private val cardRepository: CardRepository, private val service: GitHubService, private val column: Column) : ViewModel() {
+class ColumnViewModel(private val parent: ProjectHomeViewModel, private val cardRepository: CardRepository, private val column: Column) : ViewModel() {
 
     val id = column.id
     val name = column.name
@@ -83,7 +81,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
 
     fun archiveCard(card: Card, archived: Boolean) {
         launchBusy {
-            service.archiveCard(card.id, ArchiveCardParams(archived)).await()
+            cardRepository.archiveCard(card.id, archived)
             loadCards()
         }
     }

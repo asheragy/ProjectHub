@@ -67,6 +67,14 @@ class CardRepository(private val service: GitHubService, private val apolloClien
         }
     }
 
+    suspend fun moveCard(id: Int, columnId: Int) {
+        service.moveCard(id, MoveCardParams(columnId)).await()
+    }
+
+    suspend fun archiveCard(id: Int, archived: Boolean) {
+        service.archiveCard(id, ArchiveCardParams(archived)).await()
+    }
+
     suspend fun setIssueState(issue: Issue, closed: Boolean) {
         val state = UpdateIssueState(if(closed) "closed" else "open")
         service.updateIssueState(issue.owner, issue.repo, issue.number, state).await()
