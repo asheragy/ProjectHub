@@ -6,13 +6,13 @@
     app:startDestination="@id/projectListFragment">
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="org.cerion.projecthub.HomeFragment"
-        tools:layout="@layout/fragment_home" />
-    <fragment
         android:id="@+id/loginFragment"
         android:name="org.cerion.projecthub.LoginFragment"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_projectListFragment"
+            app:destination="@id/projectListFragment" />
+    </fragment>
     <fragment
         android:id="@+id/projectListFragment"
         android:label="Projects"

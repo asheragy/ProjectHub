@@ -60,7 +60,8 @@ class LoginFragment : Fragment() {
                     Log.e(TAG, "token = $token")
                     PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putString("access_token", token).apply()
                     // TODO need to restart backstack
-                    findNavController().navigate(R.id.homeFragment)
+                    val action = LoginFragmentDirections.actionLoginFragmentToProjectListFragment()
+                    findNavController().navigate(action)
                 }
             }
 

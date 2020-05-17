@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectListBinding
+import org.cerion.projecthub.logout
 import org.cerion.projecthub.model.Project
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -52,6 +53,7 @@ class ProjectListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.action_add -> onBrowseProjects()
+            R.id.action_logout -> logout()
         }
 
         return super.onOptionsItemSelected(item)
