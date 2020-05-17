@@ -36,9 +36,10 @@ class IssueRepository(private val service: GitHubService) {
                 service.updateIssueLabels(owner, repo, number, labels.map { it.name }).await()
             }
 
-            // TODO only update if modified
-            val params = UpdateIssueParams(issue.title, issue.body)
-            service.updateIssue(issue.owner, issue.repo, issue.number, params).await()
+            if (fieldsModified) {
+                val params = UpdateIssueParams(issue.title, issue.body)
+                service.updateIssue(issue.owner, issue.repo, issue.number, params).await()
+            }
         }
 
     }
