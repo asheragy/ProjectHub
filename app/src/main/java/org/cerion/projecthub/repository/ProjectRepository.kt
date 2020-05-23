@@ -12,6 +12,12 @@ import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 
+// Temp for testing larger project than my own
+val mpAndroidChart = Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", ProjectType.Repository,"PhilJay" , "MPAndroidChart").apply {
+    name = "Support"
+    description = ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"
+}
+
 class ProjectRepository(private val dao: ProjectDao, private val apolloClient: ApolloClient) {
 
     // FEATURE store project as combo of type / owner / repo?
@@ -21,13 +27,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
     //GET /users/:username/projects
 
     val projects = dao.getAllAsync().map { projects ->
-        // Temp for testing extra project
-        val mpa = Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", ProjectType.Repository,"PhilJay" , "MPAndroidChart").apply {
-            name = "Support"
-            description = ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"
-        }
-
-        projects.map { it.toProject() }.plus(mpa)
+        projects.map { it.toProject() }.plus(mpAndroidChart)
     }
 
     val ownerRepositoryProjects: LiveData<List<Project>> = liveData {
@@ -47,7 +47,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
     }
 
     // TODO remove and add single function to get by id
-    private fun getAll(): List<Project> = dao.getAll().map { it.toProject() }
+    private fun getAll(): List<Project> = dao.getAll().map { it.toProject() }.plus(mpAndroidChart)
 
     fun getById(id: Int): Project? = getAll().firstOrNull { it.id == id }
 

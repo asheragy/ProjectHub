@@ -1,14 +1,17 @@
 package org.cerion.projecthub.ui.project
 
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
+import androidx.core.view.marginLeft
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -78,17 +81,34 @@ class ColumnPagerAdapter(fragment: Fragment, private val columnIds: List<Int>) :
     override fun createFragment(position: Int): Fragment = ColumnFragment.getInstance(columnIds[position])
 }
 
-fun ViewPager2.setShowSideItems() {
-    clipToPadding = false
-    clipChildren = false
-    offscreenPageLimit = 3
 
+fun Int.dpToPx(displayMetrics: DisplayMetrics): Int = (this * displayMetrics.density).toInt()
+fun Int.pxToDp(displayMetrics: DisplayMetrics): Int = (this / displayMetrics.density).toInt()
+
+fun ViewPager2.setShowSideItems() {
+    clipToPadding = false   // allow full width shown with padding
+    clipChildren = false    // allow left/right item is not clipped
+    offscreenPageLimit = 2  // make sure left/right item is rendered
+
+    // TODO this seems to work in place of custom page transformer but need first/last page to behave differently
+    //val offsetPx = 50.dpToPx(resources.displayMetrics)
+    //setPadding(offsetPx, 0, offsetPx, 0)
+
+    //val pageMarginPx =  0.dpToPx(resources.displayMetrics)
+    //val marginTransformer = MarginPageTransformer(pageMarginPx)
+    //setPageTransformer(marginTransformer)
+
+    /*
     val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.pageMargin)
     val offsetPx = resources.getDimensionPixelOffset(R.dimen.pagerOffset)
 
     setPageTransformer { page, position ->
         val viewPager = page.parent.parent as ViewPager2
-        val offset = position * -(2 * offsetPx + pageMarginPx)
+        val offset = if (position > 1)
+                position * -(2 * pageMarginPx)
+            else
+                position * -(2 * offsetPx + pageMarginPx)
+
         if (ViewCompat.getLayoutDirection(viewPager) == ViewCompat.LAYOUT_DIRECTION_RTL)
             page.translationX = -offset
         else
@@ -96,4 +116,6 @@ fun ViewPager2.setShowSideItems() {
 
         //Log.d(TAG, "$position ${page.translationX}")
     }
+
+     */
 }

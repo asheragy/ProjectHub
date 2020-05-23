@@ -16,6 +16,8 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
+const val USE_MOCK_DATA = true
+
 class App : Application() {
 
     override fun onCreate() {
@@ -51,7 +53,7 @@ val repositoryModule = module {
     single { ProjectRepository(get(), get()) }
     single { LabelRepository(get()) }
     single { CardRepository(get(), get()) }
-    single { ColumnRepository(get(), get()) }
+    single { ColumnRepository(get()) }
 }
 
 val viewModelModule = module {
