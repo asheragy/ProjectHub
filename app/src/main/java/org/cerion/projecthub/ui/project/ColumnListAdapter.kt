@@ -56,7 +56,8 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
     abstract inner class BaseViewHolder(binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnCreateContextMenuListener {
 
         init {
-            binding.root.setOnCreateContextMenuListener(this)
+            // TODO need to replace context menu stuff if using touch listener to move
+            //binding.root.setOnCreateContextMenuListener(this)
         }
 
         override fun onClick(view: View) {

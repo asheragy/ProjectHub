@@ -12,6 +12,11 @@ import org.cerion.projecthub.USE_MOCK_DATA
 import org.cerion.projecthub.github.*
 import org.cerion.projecthub.model.*
 
+enum class CardPosition {
+    TOP,
+    BOTTOM,
+    AFTER
+}
 
 class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
 
@@ -70,8 +75,22 @@ class CardRepository(private val service: GitHubService, private val apolloClien
         }
     }
 
-    suspend fun moveCard(id: Int, columnId: Int) {
-        service.moveCard(id, MoveCardParams(columnId)).await()
+    /**
+     * @param card              Card to move
+     * @param columnId          New or existing column to move card to
+     * @param position          New position
+     * @param relativeCardId    Card id that this card goes AFTER
+     */
+    suspend fun move(card: Card, columnId: Int, position: CardPosition, relativeCardId: Int = 0) {
+        val pos =
+            when (position) {
+                CardPosition.TOP -> "top"
+                CardPosition.BOTTOM -> "bottom"
+                CardPosition.AFTER -> "after:$relativeCardId"
+            }
+
+        val params = MoveCardParams(columnId, pos)
+        service.moveCard(card.id, params).await()
     }
 
     suspend fun archiveCard(id: Int, archived: Boolean) {

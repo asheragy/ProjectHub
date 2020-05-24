@@ -10,6 +10,7 @@ import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueCard
+import org.cerion.projecthub.repository.CardPosition
 import org.cerion.projecthub.repository.CardRepository
 
 
@@ -98,6 +99,35 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
             val issue = Issue(parent.project.value!!.owner, card.repository, card.number)
             cardRepository.setIssueState(issue, !card.closed)
             loadCards()
+        }
+    }
+
+    fun move(oldPosition: Int, newPosition: Int) {
+        println("move($oldPosition, $newPosition)")
+        // Just in-case this ever happens
+        if (oldPosition == newPosition)
+            return
+
+        val cards = cards.value!!
+        var relativeCardId = 0
+        val position =
+            when (newPosition) {
+                0 -> CardPosition.TOP
+                cards.size - 1 -> CardPosition.BOTTOM
+                else -> CardPosition.AFTER
+            }
+
+        if (position == CardPosition.AFTER) {
+            relativeCardId = if (newPosition > oldPosition)
+                cards[newPosition].id // existing card moves UP and new card goes after it
+            else
+                cards[newPosition - 1].id
+        }
+
+        launchBusy {
+            cardRepository.move(cards[oldPosition], column.id, position, relativeCardId)
+            // TODO manually update list
+            refresh()
         }
     }
 
