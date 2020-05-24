@@ -31,38 +31,6 @@ class ColumnFragment : Fragment() {
         }
     }
 
-    private val itemTouchHelperCallback = ItemTouchHelper(
-        object : ItemTouchHelper.Callback() {
-
-            private var from = -1
-            private var to = -1
-
-            override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-                val dragFlags = UP or DOWN or START or END
-                return makeMovementFlags(dragFlags, 0)
-            }
-
-            override fun isLongPressDragEnabled() = true
-
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-                from = viewHolder.adapterPosition
-                to = target.adapterPosition
-
-                // TODO update adapter here even though its not finalized
-                return true
-            }
-
-            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-                super.clearView(recyclerView, viewHolder)
-
-                viewModel.move(from, to)
-                from = -1
-                to = -1
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-        })
-
     private val parentViewModel: ProjectHomeViewModel by sharedViewModel()
     private lateinit var viewModel: ColumnViewModel
 
@@ -144,5 +112,40 @@ class ColumnFragment : Fragment() {
         val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(viewModel.id, project.owner, project.repo, number)
         findNavController().navigate(action)
     }
+
+    private val itemTouchHelperCallback = ItemTouchHelper(
+        object : ItemTouchHelper.Callback() {
+
+            private var from = -1
+            private var to = -1
+
+            override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                val dragFlags = UP or DOWN or START or END
+                return makeMovementFlags(dragFlags, 0)
+            }
+
+            override fun isLongPressDragEnabled() = true
+
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                val adapter = recyclerView.adapter as ColumnCardListAdapter
+
+                if (from == -1)
+                    from = viewHolder.adapterPosition
+                to = target.adapterPosition
+
+                adapter.moveItem(viewHolder.adapterPosition, to)
+                return true
+            }
+
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+
+                viewModel.move(from, to)
+                from = -1
+                to = -1
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+        })
 }
 

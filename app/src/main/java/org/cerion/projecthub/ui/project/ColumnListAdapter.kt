@@ -26,10 +26,10 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
         private const val TypeIssue = 1
     }
 
-    private var items = emptyList<Card>()
+    private var items = mutableListOf<Card>()
 
     fun setItems(items: List<Card>) {
-        this.items = items
+        this.items = items.toMutableList() // Mutable so re-ordering works
         notifyDataSetChanged()
     }
 
@@ -53,6 +53,13 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
             (holder as IssueViewHolder).bind(item as IssueCard)
     }
 
+    fun moveItem(from: Int, to: Int) {
+        // This might be wrong if the jump is more than 1 item (which is hard to reproduce), VM will fix on final move though
+        items[from] = items[to].also { items[to] = items[from] }
+        notifyItemMoved(from, to)
+    }
+
+    // TODO remove base class its not that useful anymore
     abstract inner class BaseViewHolder(binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnCreateContextMenuListener {
 
         init {

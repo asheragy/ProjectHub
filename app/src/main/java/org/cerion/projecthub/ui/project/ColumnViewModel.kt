@@ -10,7 +10,7 @@ import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.repository.CardPosition
+import org.cerion.projecthub.repository.CardPosition.*
 import org.cerion.projecthub.repository.CardRepository
 
 
@@ -103,31 +103,47 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     }
 
     fun move(oldPosition: Int, newPosition: Int) {
-        println("move($oldPosition, $newPosition)")
-        // Just in-case this ever happens
         if (oldPosition == newPosition)
             return
 
-        val cards = cards.value!!
+        val cards = cards.value!!.toMutableList()
         var relativeCardId = 0
+        val movedCard = cards[oldPosition]
+
+        // Get position AND Update internal list order, adapter will get updates but should already have the new order
         val position =
             when (newPosition) {
-                0 -> CardPosition.TOP
-                cards.size - 1 -> CardPosition.BOTTOM
-                else -> CardPosition.AFTER
+                0 -> {
+                    cards.removeAt(oldPosition)
+                    cards.add(0, movedCard)
+                    TOP
+                }
+                cards.size - 1 -> {
+                    cards.removeAt(oldPosition)
+                    cards.add(movedCard)
+                    BOTTOM
+                }
+                else -> AFTER
             }
 
-        if (position == CardPosition.AFTER) {
-            relativeCardId = if (newPosition > oldPosition)
+        if (position == AFTER) {
+            relativeCardId = if (newPosition > oldPosition) {
+                cards.add(movedCard)
+                cards.removeAt(oldPosition)
                 cards[newPosition].id // existing card moves UP and new card goes after it
-            else
+            }
+            else {
+                cards.removeAt(oldPosition)
+                cards.add(newPosition, movedCard)
                 cards[newPosition - 1].id
+            }
         }
 
-        launchBusy {
-            cardRepository.move(cards[oldPosition], column.id, position, relativeCardId)
-            // TODO manually update list
-            refresh()
+        _cards.value = cards
+
+        viewModelScope.launch {
+            // If move fails it won't have any major side effects and get refreshed on load or other operations
+            cardRepository.move(movedCard, column.id, position, relativeCardId)
         }
     }
 
