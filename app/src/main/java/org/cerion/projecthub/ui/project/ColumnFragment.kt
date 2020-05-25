@@ -2,6 +2,7 @@ package org.cerion.projecthub.ui.project
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -80,7 +81,8 @@ class ColumnFragment : Fragment() {
             })
 
         binding.recyclerView.adapter = adapter
-        itemTouchHelperCallback.attachToRecyclerView(binding.recyclerView)
+        //itemTouchHelperCallback.attachToRecyclerView(binding.recyclerView)
+        binding.recyclerView.setOnDragListener(DragListener())
         //binding.recyclerView.addItemDecoration(DividerItemDecoration(parent.context, DividerItemDecoration.VERTICAL))
 
         viewModel.cards.observe(viewLifecycleOwner, Observer {
@@ -147,5 +149,43 @@ class ColumnFragment : Fragment() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         })
+
+    private inner class DragListener : View.OnDragListener {
+
+        private fun RecyclerView.getViewHolderForEvent(event: DragEvent): RecyclerView.ViewHolder? {
+            val item = findChildViewUnder(event.x, event.y)
+            return if (item != null) findContainingViewHolder(item) else null
+        }
+
+        override fun onDrag(view: View, event: DragEvent): Boolean {
+
+            val rv = view as RecyclerView
+            val adapter = rv.adapter as ColumnCardListAdapter
+            val draggedItemViewHolder = rv.findContainingViewHolder(event.localState as View)
+
+            when (event.action) {
+
+                DragEvent.ACTION_DRAG_STARTED -> (event.localState as View).visibility = View.INVISIBLE
+                DragEvent.ACTION_DRAG_ENDED -> (event.localState as View).visibility = View.VISIBLE
+
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                    val viewHolder = rv.getViewHolderForEvent(event)
+                    if (viewHolder != null && draggedItemViewHolder != viewHolder) {
+                        adapter.moveItem(draggedItemViewHolder!!.layoutPosition, viewHolder!!.layoutPosition)
+                    }
+                }
+                DragEvent.ACTION_DROP -> {
+                    val viewHolder = rv.getViewHolderForEvent(event)
+                    val oldPosition = draggedItemViewHolder!!.itemView.tag as Int
+
+                    if (viewHolder != null)
+                        viewModel.move(oldPosition, viewHolder.position)
+                }
+            }
+
+            return true
+        }
+    }
+
 }
 

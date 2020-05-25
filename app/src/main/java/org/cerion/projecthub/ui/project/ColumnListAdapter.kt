@@ -1,7 +1,11 @@
 package org.cerion.projecthub.ui.project
 
+import android.content.ClipData
 import android.content.res.ColorStateList
+import android.graphics.Point
 import android.view.*
+import android.view.View.DragShadowBuilder
+import android.view.View.OnLongClickListener
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
@@ -51,6 +55,8 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
             (holder as NoteViewHolder).bind(item)
         else
             (holder as IssueViewHolder).bind(item as IssueCard)
+
+        holder.itemView.tag = position // to get original item position for DragListener
     }
 
     fun moveItem(from: Int, to: Int) {
@@ -59,12 +65,20 @@ class ColumnCardListAdapter(private val listener: CardListener) : RecyclerView.A
         notifyItemMoved(from, to)
     }
 
+    private val onLongClickListener = OnLongClickListener { view ->
+        val data = ClipData.newPlainText("", "")
+        val shadowBuilder = DragShadowBuilder(view)
+        view.startDragAndDrop(data, shadowBuilder, view, 0)
+        true
+    }
+
     // TODO remove base class its not that useful anymore
     abstract inner class BaseViewHolder(binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnCreateContextMenuListener {
 
         init {
             // TODO need to replace context menu stuff if using touch listener to move
             //binding.root.setOnCreateContextMenuListener(this)
+            binding.root.setOnLongClickListener(onLongClickListener)
         }
 
         override fun onClick(view: View) {

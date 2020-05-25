@@ -128,9 +128,9 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
 
         if (position == AFTER) {
             relativeCardId = if (newPosition > oldPosition) {
-                cards.add(movedCard)
                 cards.removeAt(oldPosition)
-                cards[newPosition].id // existing card moves UP and new card goes after it
+                cards.add(newPosition, movedCard)
+                cards[newPosition - 1].id // existing card moves UP and new card goes after it
             }
             else {
                 cards.removeAt(oldPosition)
@@ -139,7 +139,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
             }
         }
 
-        _cards.value = cards
+        //_cards.value = cards
 
         viewModelScope.launch {
             // If move fails it won't have any major side effects and get refreshed on load or other operations
