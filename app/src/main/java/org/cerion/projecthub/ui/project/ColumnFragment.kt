@@ -150,11 +150,32 @@ class ColumnFragment : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         })
 
+
     private inner class DragListener : View.OnDragListener {
 
-        private fun RecyclerView.getViewHolderForEvent(event: DragEvent): RecyclerView.ViewHolder? {
-            val item = findChildViewUnder(event.x, event.y)
-            return if (item != null) findContainingViewHolder(item) else null
+        private fun RecyclerView.getViewHolderToSwap(event: DragEvent, currentItem: RecyclerView.ViewHolder): RecyclerView.ViewHolder? {
+            val top = event.y - (currentItem.itemView.height / 2)
+            val bottom = event.y + (currentItem.itemView.height / 2)
+
+            val viewToSwap = findChildViewUnder(event.x, event.y) ?: return null
+            val holderToSwap = findContainingViewHolder(viewToSwap)!!
+
+            // No change if same item
+            if (currentItem == holderToSwap)
+                return null
+
+            // Trigger change when top of view hits empty area above current position / or bottom when moving downwards
+            if (findChildViewUnder(event.x, top) == null) {
+                if (currentItem.layoutPosition > holderToSwap.layoutPosition) // new position above
+                    return holderToSwap
+            }
+
+            if (findChildViewUnder(event.x, bottom) == null) {
+                if (currentItem.layoutPosition < holderToSwap.layoutPosition) // new position below
+                    return holderToSwap
+            }
+
+            return null
         }
 
         override fun onDrag(view: View, event: DragEvent): Boolean {
@@ -169,17 +190,17 @@ class ColumnFragment : Fragment() {
                 DragEvent.ACTION_DRAG_ENDED -> (event.localState as View).visibility = View.VISIBLE
 
                 DragEvent.ACTION_DRAG_LOCATION -> {
-                    val viewHolder = rv.getViewHolderForEvent(event)
-                    if (viewHolder != null && draggedItemViewHolder != viewHolder) {
-                        adapter.moveItem(draggedItemViewHolder!!.layoutPosition, viewHolder!!.layoutPosition)
+                    val viewHolder = rv.getViewHolderToSwap(event, draggedItemViewHolder!!)
+                    if (viewHolder != null) {
+                        adapter.moveItem(draggedItemViewHolder.layoutPosition, viewHolder.layoutPosition)
                     }
                 }
                 DragEvent.ACTION_DROP -> {
-                    val viewHolder = rv.getViewHolderForEvent(event)
-                    val oldPosition = draggedItemViewHolder!!.itemView.tag as Int
-
-                    if (viewHolder != null)
-                        viewModel.move(oldPosition, viewHolder.position)
+                    draggedItemViewHolder?.let {
+                        val oldPosition = it.itemView.tag as Int
+                        val newPosition = it.layoutPosition
+                        viewModel.move(oldPosition, newPosition)
+                    }
                 }
             }
 

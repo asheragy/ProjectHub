@@ -139,7 +139,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
             }
         }
 
-        //_cards.value = cards
+        _cards.value = cards
 
         viewModelScope.launch {
             // If move fails it won't have any major side effects and get refreshed on load or other operations
