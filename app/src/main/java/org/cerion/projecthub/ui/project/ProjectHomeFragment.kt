@@ -1,23 +1,31 @@
 package org.cerion.projecthub.ui.project
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.core.view.marginLeft
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.woxthebox.draglistview.BoardView
+import com.woxthebox.draglistview.BoardView.BoardCallback
+import com.woxthebox.draglistview.BoardView.BoardListener
+import com.woxthebox.draglistview.ColumnProperties
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import java.util.*
+
 
 // TODO https://issuetracker.google.com/issues/111614463
 
@@ -49,6 +57,10 @@ class ProjectHomeFragment : Fragment() {
         viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
             val ids = columns?.map { it.id } ?: emptyList()
             setupPagerWithColumns(ids)
+
+            columns.forEach {
+                addColumn(it)
+            }
         })
 
         binding.fabGroup.add("Note") {
@@ -59,7 +71,99 @@ class ProjectHomeFragment : Fragment() {
             currentColumn?.addIssue()
         }
 
+        initBoard()
+
         return binding.root
+    }
+
+    private fun initBoard() {
+
+        binding.board.apply {
+            setSnapToColumnsWhenScrolling(true)
+            setSnapToColumnWhenDragging(true)
+            setSnapDragItemToTouch(true)
+            setSnapToColumnInLandscape(false)
+            setColumnSnapPosition(BoardView.ColumnSnapPosition.CENTER)
+
+            setBoardListener(object : BoardListener {
+                override fun onItemDragStarted(column: Int, row: Int) {
+                    //Toast.makeText(activity, "Start - column: $column row: $row", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onItemDragEnded(fromColumn: Int, fromRow: Int, toColumn: Int, toRow: Int) {
+                    //if (fromColumn != toColumn || fromRow != toRow)
+                    //    Toast.makeText(activity, "End - column: $toColumn row: $toRow", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onItemChangedPosition(oldColumn: Int, oldRow: Int, newColumn: Int, newRow: Int) {
+                    Toast.makeText(context, "Position changed - column: $newColumn row: $newRow", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onItemChangedColumn(oldColumn: Int, newColumn: Int) {
+                    //getHeaderView(oldColumn).findViewById(R.id.item_count).text = "" + getAdapter(oldColumn).getItemCount()
+                    //getHeaderView(newColumn).findViewById(R.id.item_count).text = "" + getAdapter(newColumn).getItemCount()
+                }
+
+                override fun onFocusedColumnChanged(oldColumn: Int, newColumn: Int) {
+                    Toast.makeText(context, "Focused column changed from $oldColumn to $newColumn", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onColumnDragStarted(position: Int) {
+                    Toast.makeText(context, "Column drag started from $position", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onColumnDragChangedPosition(oldPosition: Int, newPosition: Int) {
+                    Toast.makeText(context, "Column changed from $oldPosition to $newPosition", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onColumnDragEnded(position: Int) {
+                    Toast.makeText(context, "Column drag ended at $position", Toast.LENGTH_SHORT).show()
+                }
+            })
+
+            setBoardCallback(object : BoardCallback {
+                override fun canDragItemAtPosition(column: Int, dragPosition: Int): Boolean {
+                    // Add logic here to prevent an item to be dragged
+                    return true
+                }
+
+                override fun canDropItemAtPosition(oldColumn: Int, oldRow: Int, newColumn: Int, newRow: Int): Boolean {
+                    // Add logic here to prevent an item to be dropped
+                    return true
+                }
+            })
+        }
+    }
+
+    private fun addColumn(column: ColumnViewModel) {
+        /*
+        val mItemArray = ArrayList<Pair<Long, String>>()
+        val addItems = 15
+        for (i in 0 until addItems) {
+            val id: Long = i.toLong()
+            mItemArray.add(Pair(id, "Item $id"))
+        }
+         */
+
+        val view = ColumnHeaderView(requireContext(), column)
+
+        /*
+        val listAdapter = ItemAdapter(mItemArray, R.layout.list_item_card_issue, R.id.root, true)
+        val layoutManager = LinearLayoutManager(context)
+        //val backgroundColor = ContextCompat.getColor(context, R.color.column_background)
+
+        val columnProperties: ColumnProperties = ColumnProperties.Builder.newBuilder(listAdapter)
+            .setLayoutManager(layoutManager)
+            .setHasFixedItemSize(false)
+            .setColumnBackgroundColor(Color.TRANSPARENT)
+            //.setItemsSectionBackgroundColor(backgroundColor)
+            .setHeader(header)
+            .setColumnDragView(header)
+            .build()
+
+         */
+
+        binding.board.addColumn(view.getColumnProperties())
     }
 
     private fun setupPagerWithColumns(ids: List<Int>) {

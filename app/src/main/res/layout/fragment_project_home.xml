@@ -12,6 +12,11 @@
         android:orientation="vertical"
         tools:context=".ui.project.ProjectHomeFragment">
 
+        <com.woxthebox.draglistview.BoardView
+            android:id="@+id/board"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"/>
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
