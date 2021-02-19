@@ -18,7 +18,6 @@ import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-
 class ColumnFragment : Fragment() {
     companion object {
         private const val COLUMN_ID = "columnId"

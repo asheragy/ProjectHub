@@ -3,17 +3,20 @@ package org.cerion.projecthub.ui.project
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.woxthebox.draglistview.ColumnProperties
 import org.cerion.projecthub.R
+import org.cerion.projecthub.databinding.ColumnFooterBinding
 import org.cerion.projecthub.databinding.ColumnHeaderBinding
 
 
-class ColumnHeaderView(context: Context, private val viewModel: ColumnViewModel) : LinearLayout(context) {
+class ColumnHeaderView(context: Context, viewModel: ColumnViewModel) : LinearLayout(context) {
 
     private lateinit var binding: ColumnHeaderBinding
-    private lateinit var adapter: ItemAdapter
+    private val adapter = ItemAdapter()
+    private lateinit var footer: View // TODO this is wrong to define here but need to move column stuff first
 
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -25,10 +28,10 @@ class ColumnHeaderView(context: Context, private val viewModel: ColumnViewModel)
             adapter.itemList = it
         }
 
+        footer = ColumnFooterView(context, viewModel)
     }
 
     fun getColumnProperties(): ColumnProperties {
-        adapter = ItemAdapter()
         val layoutManager = LinearLayoutManager(context)
         //val backgroundColor = ContextCompat.getColor(context, R.color.column_background)
 
@@ -38,6 +41,7 @@ class ColumnHeaderView(context: Context, private val viewModel: ColumnViewModel)
             .setColumnBackgroundColor(Color.TRANSPARENT)
             //.setItemsSectionBackgroundColor(backgroundColor)
             .setHeader(this)
+            .setFooter(footer)
             //.setColumnDragView(header)
             .build()
     }

@@ -1,30 +1,19 @@
 package org.cerion.projecthub.ui.project
 
-import android.graphics.Color
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
-import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import com.woxthebox.draglistview.BoardView
 import com.woxthebox.draglistview.BoardView.BoardCallback
 import com.woxthebox.draglistview.BoardView.BoardListener
-import com.woxthebox.draglistview.ColumnProperties
-import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import java.util.*
 
 
 // TODO https://issuetracker.google.com/issues/111614463
@@ -33,16 +22,9 @@ class ProjectHomeFragment : Fragment() {
 
     private val args: ProjectHomeFragmentArgs by navArgs()
     private val viewModel: ProjectHomeViewModel by sharedViewModel()
-
     private lateinit var binding: FragmentProjectHomeBinding
 
-    private val currentColumn: ColumnViewModel?
-        get() {
-            val index = binding.viewPager.currentItem
-            return viewModel.columns.value?.get(index)
-        }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
 
         viewModel.load(args.projectId)
@@ -55,25 +37,37 @@ class ProjectHomeFragment : Fragment() {
         })
 
         viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
-            val ids = columns?.map { it.id } ?: emptyList()
-            setupPagerWithColumns(ids)
+            columns.forEach { columnViewModel ->
+                val view = ColumnHeaderView(requireContext(), columnViewModel)
+                binding.board.addColumn(view.getColumnProperties())
 
-            columns.forEach {
-                addColumn(it)
+                // Observe fields
+                columnViewModel.eventAddIssue.observe(viewLifecycleOwner, Observer {
+                    if (it != null && !it.getAndSetHandled())
+                        navigateToIssue(columnViewModel.id)
+                })
+
+                columnViewModel.eventAddNote.observe(viewLifecycleOwner, Observer {
+                    if (it?.getAndSetHandled() == false)
+                        navigateToNote(columnViewModel.id)
+                })
             }
         })
-
-        binding.fabGroup.add("Note") {
-            currentColumn?.addNote()
-        }
-
-        binding.fabGroup.add("Issue") {
-            currentColumn?.addIssue()
-        }
 
         initBoard()
 
         return binding.root
+    }
+
+    private fun navigateToNote(columnId: Int, cardId: Int = 0) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(columnId, cardId)
+        findNavController().navigate(action)
+    }
+
+    private fun navigateToIssue(columnId: Int, number: Int = 0) {
+        val project = viewModel.project.value!!
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(columnId, project.owner, project.repo, number)
+        findNavController().navigate(action)
     }
 
     private fun initBoard() {
@@ -134,92 +128,4 @@ class ProjectHomeFragment : Fragment() {
             })
         }
     }
-
-    private fun addColumn(column: ColumnViewModel) {
-        /*
-        val mItemArray = ArrayList<Pair<Long, String>>()
-        val addItems = 15
-        for (i in 0 until addItems) {
-            val id: Long = i.toLong()
-            mItemArray.add(Pair(id, "Item $id"))
-        }
-         */
-
-        val view = ColumnHeaderView(requireContext(), column)
-
-        /*
-        val listAdapter = ItemAdapter(mItemArray, R.layout.list_item_card_issue, R.id.root, true)
-        val layoutManager = LinearLayoutManager(context)
-        //val backgroundColor = ContextCompat.getColor(context, R.color.column_background)
-
-        val columnProperties: ColumnProperties = ColumnProperties.Builder.newBuilder(listAdapter)
-            .setLayoutManager(layoutManager)
-            .setHasFixedItemSize(false)
-            .setColumnBackgroundColor(Color.TRANSPARENT)
-            //.setItemsSectionBackgroundColor(backgroundColor)
-            .setHeader(header)
-            .setColumnDragView(header)
-            .build()
-
-         */
-
-        binding.board.addColumn(view.getColumnProperties())
-    }
-
-    private fun setupPagerWithColumns(ids: List<Int>) {
-        val pagerAdapter = ColumnPagerAdapter(this, ids)
-        binding.viewPager.adapter = pagerAdapter
-        binding.viewPager.setShowSideItems()
-
-        binding.tabLayout.tabGravity = TabLayout.GRAVITY_CENTER;
-        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE;
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            tab.text = viewModel.columns.value!![position % 3].name
-        }.attach()
-    }
-}
-
-
-class ColumnPagerAdapter(fragment: Fragment, private val columnIds: List<Int>) : FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int = columnIds.size
-    override fun createFragment(position: Int): Fragment = ColumnFragment.getInstance(columnIds[position])
-}
-
-
-fun Int.dpToPx(displayMetrics: DisplayMetrics): Int = (this * displayMetrics.density).toInt()
-fun Int.pxToDp(displayMetrics: DisplayMetrics): Int = (this / displayMetrics.density).toInt()
-
-fun ViewPager2.setShowSideItems() {
-    clipToPadding = false   // allow full width shown with padding
-    clipChildren = false    // allow left/right item is not clipped
-    offscreenPageLimit = 2  // make sure left/right item is rendered
-
-    // TODO this seems to work in place of custom page transformer but need first/last page to behave differently
-    //val offsetPx = 50.dpToPx(resources.displayMetrics)
-    //setPadding(offsetPx, 0, offsetPx, 0)
-
-    //val pageMarginPx =  0.dpToPx(resources.displayMetrics)
-    //val marginTransformer = MarginPageTransformer(pageMarginPx)
-    //setPageTransformer(marginTransformer)
-
-    /*
-    val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.pageMargin)
-    val offsetPx = resources.getDimensionPixelOffset(R.dimen.pagerOffset)
-
-    setPageTransformer { page, position ->
-        val viewPager = page.parent.parent as ViewPager2
-        val offset = if (position > 1)
-                position * -(2 * pageMarginPx)
-            else
-                position * -(2 * offsetPx + pageMarginPx)
-
-        if (ViewCompat.getLayoutDirection(viewPager) == ViewCompat.LAYOUT_DIRECTION_RTL)
-            page.translationX = -offset
-        else
-            page.translationX = offset
-
-        //Log.d(TAG, "$position ${page.translationX}")
-    }
-
-     */
 }
