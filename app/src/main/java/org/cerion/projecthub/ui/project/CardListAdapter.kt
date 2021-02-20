@@ -14,7 +14,14 @@ import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
 
-internal class ItemAdapter(private val listener: CardListener) : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>() {
+interface CardListener {
+    fun onArchive(card: Card)
+    fun onClick(card: Card)
+    fun onDelete(note: NoteCard)
+    fun onCloseOrOpen(issue: IssueCard)
+}
+
+internal class CardListAdapter(private val listener: CardListener) : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>() {
 
     private val mGrabHandleId = R.id.root
 
@@ -35,47 +42,13 @@ internal class ItemAdapter(private val listener: CardListener) : DragItemAdapter
 
         when (val item = itemList[position]) {
             is NoteCard -> (holder as NoteViewHolder).bind(item)
-            is IssueCard -> (holder as IssueViewHolder).bind(item as IssueCard)
+            is IssueCard -> (holder as IssueViewHolder).bind(item)
         }
     }
 
     override fun getUniqueItemId(position: Int): Long {
         return mItemList[position]!!.id.toLong()
     }
-
-    /*
-    internal inner class NoteViewHolder(itemView: View) : DragItemAdapter.ViewHolder(itemView, mGrabHandleId, false) {
-        //var mText: TextView
-
-        init {
-            //mText = itemView.findViewById<View>(R.id.text) as TextView
-        }
-        override fun onItemClicked(view: View) {
-            Toast.makeText(view.context, "Item clicked", Toast.LENGTH_SHORT).show()
-        }
-
-        override fun onItemLongClicked(view: View): Boolean {
-            Toast.makeText(view.context, "Item long clicked", Toast.LENGTH_SHORT).show()
-            return true
-        }
-    }
-
-    internal inner class IssueViewHolder(itemView: View) : DragItemAdapter.ViewHolder(itemView, mGrabHandleId, false) {
-        //var mText: TextView
-
-        init {
-            //mText = itemView.findViewById<View>(R.id.text) as TextView
-        }
-        override fun onItemClicked(view: View) {
-            Toast.makeText(view.context, "Item clicked", Toast.LENGTH_SHORT).show()
-        }
-
-        override fun onItemLongClicked(view: View): Boolean {
-            Toast.makeText(view.context, "Item long clicked", Toast.LENGTH_SHORT).show()
-            return true
-        }
-    }
-     */
 
     inner class NoteViewHolder(val binding: ListItemCardNoteBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true) {
 

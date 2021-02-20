@@ -1,5 +1,6 @@
 package org.cerion.projecthub.ui.project
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,9 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.woxthebox.draglistview.BoardView
 import com.woxthebox.draglistview.BoardView.BoardCallback
 import com.woxthebox.draglistview.BoardView.BoardListener
+import com.woxthebox.draglistview.ColumnProperties
+import org.cerion.projecthub.databinding.ColumnFooterBinding
+import org.cerion.projecthub.databinding.ColumnHeaderBinding
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
@@ -37,27 +42,47 @@ class ProjectHomeFragment : Fragment() {
             requireActivity().title = it.name
         })
 
-        viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
-            columns.forEach { columnViewModel ->
-                val view = ColumnHeaderView(requireContext(), columnViewModel, getListenerForColumn(columnViewModel))
-                binding.board.addColumn(view.getColumnProperties())
-
-                // Observe fields
-                columnViewModel.eventAddIssue.observe(viewLifecycleOwner, Observer {
-                    if (it != null && !it.getAndSetHandled())
-                        navigateToIssue(columnViewModel.id)
-                })
-
-                columnViewModel.eventAddNote.observe(viewLifecycleOwner, Observer {
-                    if (it?.getAndSetHandled() == false)
-                        navigateToNote(columnViewModel.id)
-                })
-            }
+        viewModel.columns.observe(viewLifecycleOwner, Observer {
+                columns -> columns.forEach { addColumn(it, inflater) }
         })
 
         initBoard()
 
         return binding.root
+    }
+
+    private fun addColumn(columnViewModel: ColumnViewModel, inflater: LayoutInflater) {
+        val adapter = CardListAdapter(getListenerForColumn(columnViewModel))
+        val header = ColumnHeaderBinding.inflate(inflater).apply { viewModel = columnViewModel }
+        val footer = ColumnFooterBinding.inflate(inflater).apply { viewModel = columnViewModel }
+
+        //val backgroundColor = ContextCompat.getColor(context, R.color.column_background)
+        val columnProperties = ColumnProperties.Builder.newBuilder(adapter)
+            .setLayoutManager(LinearLayoutManager(context))
+            .setHasFixedItemSize(false)
+            .setColumnBackgroundColor(Color.TRANSPARENT)
+            //.setItemsSectionBackgroundColor(backgroundColor)
+            .setHeader(header.root)
+            .setFooter(footer.root)
+            //.setColumnDragView(header)
+            .build()
+
+        binding.board.addColumn(columnProperties)
+
+        // Observe fields
+        columnViewModel.cards.observe(viewLifecycleOwner, Observer {
+            adapter.itemList = it
+        })
+
+        columnViewModel.eventAddIssue.observe(viewLifecycleOwner, Observer {
+            if (it != null && !it.getAndSetHandled())
+                navigateToIssue(columnViewModel.id)
+        })
+
+        columnViewModel.eventAddNote.observe(viewLifecycleOwner, Observer {
+            if (it?.getAndSetHandled() == false)
+                navigateToNote(columnViewModel.id)
+        })
     }
 
     private fun navigateToNote(columnId: Int, cardId: Int = 0) {
