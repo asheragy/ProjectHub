@@ -12,10 +12,10 @@ import org.cerion.projecthub.databinding.ColumnFooterBinding
 import org.cerion.projecthub.databinding.ColumnHeaderBinding
 
 
-class ColumnHeaderView(context: Context, viewModel: ColumnViewModel) : LinearLayout(context) {
+class ColumnHeaderView(context: Context, viewModel: ColumnViewModel, listener: CardListener) : LinearLayout(context) {
 
     private lateinit var binding: ColumnHeaderBinding
-    private val adapter = ItemAdapter()
+    private val adapter = ItemAdapter(listener)
     private lateinit var footer: View // TODO this is wrong to define here but need to move column stuff first
 
     init {

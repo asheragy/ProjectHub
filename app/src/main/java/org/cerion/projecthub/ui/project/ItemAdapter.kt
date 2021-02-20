@@ -4,7 +4,6 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.google.android.material.chip.Chip
 import com.woxthebox.draglistview.DragItemAdapter
 import org.cerion.projecthub.R
@@ -14,7 +13,8 @@ import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
-internal class ItemAdapter : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>() {
+
+internal class ItemAdapter(private val listener: CardListener) : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>() {
 
     private val mGrabHandleId = R.id.root
 
@@ -86,35 +86,8 @@ internal class ItemAdapter : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>(
         }
 
         override fun onItemClicked(view: View) {
-            Toast.makeText(view.context, "Item clicked", Toast.LENGTH_SHORT).show()
-        }
-
-        /*
-        override fun onClick() {
             listener.onClick(binding.card!!)
         }
-
-        override fun onCreateContextMenu(menu: ContextMenu?, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
-            val card = binding.card!!
-
-            menu?.apply {
-                add(Menu.NONE, view.id, Menu.NONE, "Move").setOnMenuItemClickListener {
-                    listener.move(card)
-                    true
-                }
-                /* TODO not sure if this works yet
-                add(Menu.NONE, view.id, Menu.NONE, "Archive").setOnMenuItemClickListener {
-                    listener.onArchive(card)
-                    true
-                }
-                 */
-                add(Menu.NONE, view.id, Menu.NONE, "Delete").setOnMenuItemClickListener {
-                    listener.onDelete(card)
-                    true
-                }
-            }
-        }
-         */
     }
 
     inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true) {
@@ -141,7 +114,7 @@ internal class ItemAdapter : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>(
         }
 
         override fun onItemClicked(view: View) {
-            Toast.makeText(view.context, "Item clicked", Toast.LENGTH_SHORT).show()
+            listener.onClick(binding.card!!)
         }
 
         /*
@@ -162,10 +135,6 @@ internal class ItemAdapter : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>(
                     true
                 }
             }
-        }
-
-        override fun onClick() {
-            listener.onClick(binding.card!!)
         }
          */
     }

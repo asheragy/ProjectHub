@@ -13,6 +13,9 @@ import com.woxthebox.draglistview.BoardView
 import com.woxthebox.draglistview.BoardView.BoardCallback
 import com.woxthebox.draglistview.BoardView.BoardListener
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
+import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.IssueCard
+import org.cerion.projecthub.model.NoteCard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 
@@ -26,9 +29,7 @@ class ProjectHomeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentProjectHomeBinding.inflate(inflater, container, false)
-
         viewModel.load(args.projectId)
-
         //binding.viewModel = viewModel
         //binding.lifecycleOwner = this
 
@@ -38,7 +39,7 @@ class ProjectHomeFragment : Fragment() {
 
         viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
             columns.forEach { columnViewModel ->
-                val view = ColumnHeaderView(requireContext(), columnViewModel)
+                val view = ColumnHeaderView(requireContext(), columnViewModel, getListenerForColumn(columnViewModel))
                 binding.board.addColumn(view.getColumnProperties())
 
                 // Observe fields
@@ -71,7 +72,6 @@ class ProjectHomeFragment : Fragment() {
     }
 
     private fun initBoard() {
-
         binding.board.apply {
             setSnapToColumnsWhenScrolling(true)
             setSnapToColumnWhenDragging(true)
@@ -126,6 +126,29 @@ class ProjectHomeFragment : Fragment() {
                     return true
                 }
             })
+        }
+    }
+
+    private fun getListenerForColumn(viewModel: ColumnViewModel): CardListener {
+        return object : CardListener {
+            override fun onClick(card: Card) {
+                when (card) {
+                    is NoteCard -> navigateToNote(viewModel.id, card.id)
+                    is IssueCard -> navigateToIssue(viewModel.id, card.number)
+                }
+            }
+
+            override fun onArchive(card: Card) {
+                viewModel.archiveCard(card, true)
+            }
+
+            override fun onDelete(note: NoteCard) {
+                viewModel.deleteCard(note)
+            }
+
+            override fun onCloseOrOpen(issue: IssueCard) {
+                viewModel.toggleIssueState(issue)
+            }
         }
     }
 }
