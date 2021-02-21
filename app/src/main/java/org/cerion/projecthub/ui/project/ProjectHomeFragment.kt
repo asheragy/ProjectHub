@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -105,51 +104,26 @@ class ProjectHomeFragment : Fragment() {
             setColumnSnapPosition(BoardView.ColumnSnapPosition.CENTER)
 
             setBoardListener(object : BoardListener {
-                override fun onItemDragStarted(column: Int, row: Int) {
-                    //Toast.makeText(activity, "Start - column: $column row: $row", Toast.LENGTH_SHORT).show()
-                }
+                override fun onItemDragStarted(column: Int, row: Int) {}
 
                 override fun onItemDragEnded(fromColumn: Int, fromRow: Int, toColumn: Int, toRow: Int) {
-                    //if (fromColumn != toColumn || fromRow != toRow)
-                    //    Toast.makeText(activity, "End - column: $toColumn row: $toRow", Toast.LENGTH_SHORT).show()
+                    if (fromColumn != toColumn)
+                        viewModel.moveCard(toColumn, toRow)
+                    else if (fromRow != toRow)
+                        viewModel.columns.value!![fromColumn].move(fromRow, toRow)
                 }
 
-                override fun onItemChangedPosition(oldColumn: Int, oldRow: Int, newColumn: Int, newRow: Int) {
-                    Toast.makeText(context, "Position changed - column: $newColumn row: $newRow", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onItemChangedColumn(oldColumn: Int, newColumn: Int) {
-                    //getHeaderView(oldColumn).findViewById(R.id.item_count).text = "" + getAdapter(oldColumn).getItemCount()
-                    //getHeaderView(newColumn).findViewById(R.id.item_count).text = "" + getAdapter(newColumn).getItemCount()
-                }
-
-                override fun onFocusedColumnChanged(oldColumn: Int, newColumn: Int) {
-                    Toast.makeText(context, "Focused column changed from $oldColumn to $newColumn", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onColumnDragStarted(position: Int) {
-                    Toast.makeText(context, "Column drag started from $position", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onColumnDragChangedPosition(oldPosition: Int, newPosition: Int) {
-                    Toast.makeText(context, "Column changed from $oldPosition to $newPosition", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onColumnDragEnded(position: Int) {
-                    Toast.makeText(context, "Column drag ended at $position", Toast.LENGTH_SHORT).show()
-                }
+                override fun onItemChangedPosition(oldColumn: Int, oldRow: Int, newColumn: Int, newRow: Int) {}
+                override fun onItemChangedColumn(oldColumn: Int, newColumn: Int) {}
+                override fun onFocusedColumnChanged(oldColumn: Int, newColumn: Int) {}
+                override fun onColumnDragStarted(position: Int) {}
+                override fun onColumnDragChangedPosition(oldPosition: Int, newPosition: Int) {}
+                override fun onColumnDragEnded(position: Int) {}
             })
 
             setBoardCallback(object : BoardCallback {
-                override fun canDragItemAtPosition(column: Int, dragPosition: Int): Boolean {
-                    // Add logic here to prevent an item to be dragged
-                    return true
-                }
-
-                override fun canDropItemAtPosition(oldColumn: Int, oldRow: Int, newColumn: Int, newRow: Int): Boolean {
-                    // Add logic here to prevent an item to be dropped
-                    return true
-                }
+                override fun canDragItemAtPosition(column: Int, dragPosition: Int): Boolean = true
+                override fun canDropItemAtPosition(oldColumn: Int, oldRow: Int, newColumn: Int, newRow: Int): Boolean = true
             })
         }
     }

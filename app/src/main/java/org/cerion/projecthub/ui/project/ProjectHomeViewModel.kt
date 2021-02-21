@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.repository.*
@@ -50,39 +49,30 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
         }
     }
 
-    fun moveCard(card: Card, columnId: Int) {
-        val oldColumn = _columns.value!!.first { it.containsCard(card) }
-        val newColumn = _columns.value!!.first { it.id == columnId}
+    fun moveCard(newColumnPosition: Int, newRowPosition: Int) {
+        val column = _columns.value!![newColumnPosition]
+        val card = column.cards.value!![newRowPosition]
 
         viewModelScope.launch {
             try {
-                oldColumn.removeCard(card)
-                cardRepo.move(card, columnId, CardPosition.BOTTOM)
-                newColumn.addCard(card)
+                val position = when(newRowPosition) {
+                    0 -> CardPosition.TOP
+                    column.cards.value!!.size - 1 -> CardPosition.BOTTOM
+                    else -> CardPosition.AFTER
+                }
+
+                val relativeCardId = if (position == CardPosition.AFTER) column.cards.value!![newRowPosition - 1].id else 0
+                cardRepo.move(card, column.id, position, relativeCardId)
             }
             catch(e: Exception) {
                 e.printStackTrace()
 
                 // TODO may fail because no internet, can undo operation by moving back
-                oldColumn.loadCards()
-                newColumn.loadCards()
+                //oldColumn.loadCards()
+                //newColumn.loadCards()
             }
         }
     }
 
-    /*
-    fun addIssueForColumn(columnId: Int, title: String, body: String) {
-        viewModelScope.launch {
-            val params = CreateIssueParams(title, body)
-            val project = _project.value!!
-            val issue = service.createIssue(project.owner, project.repo, params).await()
-            service.createCard(columnId, CreateIssueCardParams(issue.id)).await()
-
-            findColumnById(columnId)?.loadCards()
-        }
-    }
-     */
-
     fun findColumnById(id: Int) = _columns.value?.first { it.id == id}
-
 }

@@ -107,37 +107,25 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
             return
 
         val cards = cards.value!!.toMutableList()
-        var relativeCardId = 0
-        val movedCard = cards[oldPosition]
+        val movedCard = cards[newPosition]
 
         // Get position AND Update internal list order, adapter will get updates but should already have the new order
         val position =
             when (newPosition) {
                 0 -> {
-                    cards.removeAt(oldPosition)
-                    cards.add(0, movedCard)
+                    //cards.removeAt(oldPosition)
+                    //cards.add(0, movedCard)
                     TOP
                 }
                 cards.size - 1 -> {
-                    cards.removeAt(oldPosition)
-                    cards.add(movedCard)
+                    //cards.removeAt(oldPosition)
+                    //cards.add(movedCard)
                     BOTTOM
                 }
                 else -> AFTER
             }
 
-        if (position == AFTER) {
-            relativeCardId = if (newPosition > oldPosition) {
-                cards.removeAt(oldPosition)
-                cards.add(newPosition, movedCard)
-                cards[newPosition - 1].id // existing card moves UP and new card goes after it
-            }
-            else {
-                cards.removeAt(oldPosition)
-                cards.add(newPosition, movedCard)
-                cards[newPosition - 1].id
-            }
-        }
+        val relativeCardId = if (position == AFTER) cards[newPosition - 1].id else 0
 
         _cards.value = cards
 
