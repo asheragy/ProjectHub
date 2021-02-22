@@ -2,10 +2,9 @@ package org.cerion.projecthub.ui.project
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -15,6 +14,7 @@ import com.woxthebox.draglistview.BoardView
 import com.woxthebox.draglistview.BoardView.BoardCallback
 import com.woxthebox.draglistview.BoardView.BoardListener
 import com.woxthebox.draglistview.ColumnProperties
+import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.ColumnFooterBinding
 import org.cerion.projecthub.databinding.ColumnHeaderBinding
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
@@ -39,16 +39,33 @@ class ProjectHomeFragment : Fragment() {
         //binding.lifecycleOwner = this
 
         viewModel.project.observe(viewLifecycleOwner, Observer {
-            requireActivity().title = it.name
+            (requireActivity() as AppCompatActivity).supportActionBar?.title = it?.name ?: ""
         })
 
-        viewModel.columns.observe(viewLifecycleOwner, Observer {
-                columns -> columns.forEach { addColumn(it, inflater) }
+        viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
+            binding.board.clearBoard()
+            columns.forEach { addColumn(it, inflater) }
         })
 
+        setHasOptionsMenu(true)
         initBoard()
 
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.project_home, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_refresh -> {
+                viewModel.refresh()
+                return true
+            }
+        }
+
+        return false
     }
 
     private fun addColumn(columnViewModel: ColumnViewModel, inflater: LayoutInflater) {

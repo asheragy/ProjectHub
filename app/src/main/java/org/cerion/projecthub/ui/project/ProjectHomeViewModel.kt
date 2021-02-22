@@ -49,6 +49,12 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
         }
     }
 
+    fun refresh() {
+        val id = project.value!!.id
+        _project.value = null
+        load(id)
+    }
+
     fun moveCard(newColumnPosition: Int, newRowPosition: Int) {
         val column = _columns.value!![newColumnPosition]
         val card = column.cards.value!![newRowPosition]
