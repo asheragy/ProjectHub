@@ -1,9 +1,7 @@
 package org.cerion.projecthub.ui.project
 
 import android.content.res.ColorStateList
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.google.android.material.chip.Chip
 import com.woxthebox.draglistview.DragItemAdapter
 import org.cerion.projecthub.R
@@ -15,10 +13,18 @@ import org.cerion.projecthub.model.NoteCard
 
 
 interface CardListener {
-    fun onArchive(card: Card)
+    // All types
     fun onClick(card: Card)
-    fun onDelete(note: NoteCard)
+    fun onArchive(card: Card)
+    fun onDelete(card: Card)
+
+    // Issues
     fun onCloseOrOpen(issue: IssueCard)
+    // onRemoveFromProject
+    // onChangeLabels
+
+    // Notes
+    fun onConvertToIssue(note: NoteCard)
 }
 
 internal class CardListAdapter(private val listener: CardListener) : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>() {
@@ -50,20 +56,44 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
         return mItemList[position]!!.id.toLong()
     }
 
-    inner class NoteViewHolder(val binding: ListItemCardNoteBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true) {
+    inner class NoteViewHolder(val binding: ListItemCardNoteBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
 
         fun bind(item: NoteCard) {
             binding.card = item
             binding.createdBy.text = "Added by ${item.creator}"
+            binding.root.setOnCreateContextMenuListener(this)
+            binding.menu.setOnClickListener {
+                it.showContextMenu()
+            }
             binding.executePendingBindings()
         }
 
         override fun onItemClicked(view: View) {
             listener.onClick(binding.card!!)
         }
+
+
+        override fun onCreateContextMenu(menu: ContextMenu?, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+            val card = binding.card!!
+
+            menu?.apply {
+                add(Menu.NONE, view.id, Menu.NONE, "Archive").setOnMenuItemClickListener {
+                    listener.onArchive(card)
+                    true
+                }
+                add(Menu.NONE, view.id, Menu.NONE, "Convert to issue").setOnMenuItemClickListener {
+                    listener.onConvertToIssue(card)
+                    true
+                }
+                add(Menu.NONE, view.id, Menu.NONE, "Delete").setOnMenuItemClickListener {
+                    listener.onDelete(card)
+                    true
+                }
+            }
+        }
     }
 
-    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true) {
+    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
 
         fun bind(item: IssueCard) {
             binding.card = item
@@ -72,17 +102,16 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
 
             binding.labels.removeAllViews()
             item.labels.forEach {
-                val chip = LayoutInflater.from(binding.root.context).inflate(
-                    R.layout.label_chip,
-                    binding.labels,
-                    false
-                ) as Chip
+                val chip = LayoutInflater.from(binding.root.context).inflate(R.layout.label_chip, binding.labels, false) as Chip
                 chip.text = it.name
                 chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
                 binding.labels.addView(chip)
             }
 
-            //binding.root.setOnClickListener(this)
+            binding.root.setOnCreateContextMenuListener(this)
+            binding.menu.setOnClickListener {
+                it.showContextMenu()
+            }
             binding.executePendingBindings()
         }
 
@@ -90,15 +119,10 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
             listener.onClick(binding.card!!)
         }
 
-        /*
         override fun onCreateContextMenu(menu: ContextMenu?, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
             val card = binding.card!!
 
             menu?.apply {
-                add(Menu.NONE, view.id, Menu.NONE, "Move").setOnMenuItemClickListener {
-                    listener.move(card)
-                    true
-                }
                 add(Menu.NONE, view.id, Menu.NONE, "Archive").setOnMenuItemClickListener {
                     listener.onArchive(card)
                     true
@@ -107,9 +131,12 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
                     listener.onCloseOrOpen(card)
                     true
                 }
+                add(Menu.NONE, view.id, Menu.NONE, "Delete").setOnMenuItemClickListener {
+                    listener.onDelete(card)
+                    true
+                }
             }
         }
-         */
     }
 
     companion object {

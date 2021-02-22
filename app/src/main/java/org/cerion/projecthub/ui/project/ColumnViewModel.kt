@@ -88,6 +88,9 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     }
 
     fun deleteCard(card: Card) {
+        if (card is IssueCard)
+            throw NotImplementedError() // TODO deleting issue is different than deleting note
+
         launchBusy {
             cardRepository.deleteCard(card.id)
             loadCards()

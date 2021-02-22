@@ -10,5 +10,5 @@
         tools:text="bug"
         tools:chipBackgroundColor="#ff0000"
         app:chipCornerRadius="8.0dp"
-        style="@style/Widget.MaterialComponents.Chip.Filter"/>
+        style="@style/Widget.MaterialComponents.Chip.Action"/>
 </layout>
