@@ -10,6 +10,8 @@ import org.cerion.projecthub.databinding.ListItemCardNoteBinding
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
+import org.cerion.projecthub.ui.setCardImage
+import org.cerion.projecthub.ui.setFormattedText
 
 
 interface CardListener {
@@ -58,23 +60,24 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
 
     inner class NoteViewHolder(val binding: ListItemCardNoteBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
 
+        private var note: NoteCard? = null
+
         fun bind(item: NoteCard) {
-            binding.card = item
+            note = item
             binding.createdBy.text = "Added by ${item.creator}"
+            setFormattedText(binding.title, item.note)
             binding.root.setOnCreateContextMenuListener(this)
             binding.menu.setOnClickListener {
                 it.showContextMenu()
             }
-            binding.executePendingBindings()
         }
 
         override fun onItemClicked(view: View) {
-            listener.onClick(binding.card!!)
+            listener.onClick(note!!)
         }
 
-
         override fun onCreateContextMenu(menu: ContextMenu?, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
-            val card = binding.card!!
+            val card = note!!
 
             menu?.apply {
                 add(Menu.NONE, view.id, Menu.NONE, "Archive").setOnMenuItemClickListener {
@@ -94,11 +97,13 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
     }
 
     inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
+        private var issue: IssueCard? = null
 
         fun bind(item: IssueCard) {
-            binding.card = item
+            issue = item
             // FEATURE add repository if this is a multi repo project (associated to user/org)
             binding.openedBy.text = "#${item.number} opened by ${item.author}"
+            binding.icon.setCardImage(item)
 
             binding.labels.removeAllViews()
             item.labels.forEach {
@@ -112,15 +117,14 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
             binding.menu.setOnClickListener {
                 it.showContextMenu()
             }
-            binding.executePendingBindings()
         }
 
         override fun onItemClicked(view: View) {
-            listener.onClick(binding.card!!)
+            listener.onClick(issue!!)
         }
 
         override fun onCreateContextMenu(menu: ContextMenu?, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
-            val card = binding.card!!
+            val card = issue!!
 
             menu?.apply {
                 add(Menu.NONE, view.id, Menu.NONE, "Archive").setOnMenuItemClickListener {

@@ -6,14 +6,12 @@ import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.databinding.BindingAdapter
 import org.cerion.projecthub.R
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.NoteCard
 
 
-@BindingAdapter("cardImage")
 fun ImageView.setCardImage(card: Card) {
     val id = when (card) {
         is NoteCard -> R.drawable.card_type_note
@@ -29,9 +27,7 @@ fun ImageView.setCardImage(card: Card) {
     setImageDrawable(context.getDrawable(id))
 }
 
-
-@BindingAdapter("formattedText")
-fun formattedText(textView: TextView, text: String) {
+fun setFormattedText(textView: TextView, text: String) {
     // Replace markdown emojis
     val sb = SpannableStringBuilder(replaceMarkdown(text))
     var start = 0
