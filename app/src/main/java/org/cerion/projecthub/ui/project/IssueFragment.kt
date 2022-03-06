@@ -25,13 +25,9 @@ class IssueFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentIssueBinding.inflate(inflater, container, false)
 
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-
         val args = IssueFragmentArgs.fromBundle(requireArguments())
         viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
         val columnViewModel = projectViewModel.findColumnById(args.columnId)!!
-
 
         viewModel.finished.observe(viewLifecycleOwner, Observer {
             if (it!!) {
@@ -43,6 +39,8 @@ class IssueFragment : Fragment() {
         })
 
         viewModel.issue.observe(viewLifecycleOwner, Observer { issue ->
+            binding.body.setText(issue.body)
+            binding.title.setText(issue.title)
             binding.labelChipGroup.removeAllViews()
             issue.labels.forEach {
                 val chip = LayoutInflater.from(binding.root.context).inflate(R.layout.label_chip, binding.labelChipGroup, false) as Chip
@@ -59,6 +57,10 @@ class IssueFragment : Fragment() {
             }
         })
 
+        viewModel.busy.observe(viewLifecycleOwner, Observer { busy ->
+            binding.busy.visibility = if (busy == true) View.VISIBLE else View.GONE
+        })
+
         labelsViewModel.result.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 viewModel.setLabels(it)
@@ -69,6 +71,14 @@ class IssueFragment : Fragment() {
         binding.labelLayout.setOnClickListener {
             editLabels()
         }
+        binding.submit.setOnClickListener {
+            viewModel.issue.value?.apply {
+                body = binding.body.text.toString()
+                title = binding.title.text.toString()
+            }
+            viewModel.submit()
+        }
+
 
         requireActivity().title = viewModel.title
 

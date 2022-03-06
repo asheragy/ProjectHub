@@ -88,14 +88,14 @@ private class LabelListAdapter(context: Context, private val items: List<Label>)
                 ListItemLabelBinding.inflate(LayoutInflater.from(context), parent, false)
 
         val item = items[position]
-        binding.label = item
+        binding.name.text = item.name
+        binding.description.text = item.description
+        binding.checked.visibility = if(item.included) View.VISIBLE else View.INVISIBLE
         binding.color.setBackgroundColor(item.color)
         binding.root.setOnClickListener {
             item.included = !item.included
-            binding.invalidateAll()
+            binding.checked.visibility = if(item.included) View.VISIBLE else View.INVISIBLE
         }
-
-        binding.executePendingBindings()
 
         return binding.root
     }

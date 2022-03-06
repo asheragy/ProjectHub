@@ -1,63 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <data>
-        <variable name="label" type="org.cerion.projecthub.model.Label" />
-        <import type="android.view.View" />
-    </data>
+    <ImageView
+        android:id="@+id/checked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/checkbox_black"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="8dp">
+
+    </ImageView>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/checkbox_black"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="8dp"
-            android:visibility="@{label.included ? View.VISIBLE : View.INVISIBLE}">
-
-        </ImageView>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_gravity="center_vertical">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical">
-
-                <FrameLayout
-                    android:id="@+id/color"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:background="@android:color/holo_red_dark"
-                    android:layout_gravity="center_vertical"
-                    android:layout_margin="4dp"/>
-
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@{label.name}"
-                    tools:text="Text"/>
-            </LinearLayout>
-
+            <FrameLayout
+                android:id="@+id/color"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@android:color/holo_red_dark"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="4dp"/>
 
             <TextView
-                android:id="@+id/description"
+                android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{label.description}"
-                tools:text="Description" />
-
+                android:layout_gravity="center_vertical"
+                tools:text="Text"/>
         </LinearLayout>
 
-    </LinearLayout>
-</layout>
 
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Description" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -16,6 +16,7 @@
         <entry key="app/src/main/res/layout/label_chip.xml" value="0.14356884057971014" />
         <entry key="app/src/main/res/layout/list_item_card_issue.xml" value="0.1" />
         <entry key="app/src/main/res/layout/list_item_card_note.xml" value="0.13779128672745694" />
+        <entry key="app/src/main/res/layout/list_item_label.xml" value="0.13541666666666666" />
         <entry key="app/src/main/res/layout/list_item_project.xml" value="0.10099637681159421" />
       </map>
     </option>
