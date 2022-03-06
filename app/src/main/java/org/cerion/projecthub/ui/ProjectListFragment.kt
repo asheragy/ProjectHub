@@ -20,9 +20,6 @@ class ProjectListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentProjectListBinding.inflate(inflater, container, false)
 
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-
         val adapter = ProjectListAdapter(object : ProjectListener {
             override fun onDelete(project: Project) {
                 viewModel.deleteProject(project)

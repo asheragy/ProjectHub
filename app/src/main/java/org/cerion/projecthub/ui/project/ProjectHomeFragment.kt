@@ -70,8 +70,8 @@ class ProjectHomeFragment : Fragment() {
 
     private fun addColumn(columnViewModel: ColumnViewModel, inflater: LayoutInflater) {
         val adapter = CardListAdapter(getListenerForColumn(columnViewModel))
-        val header = ColumnHeaderBinding.inflate(inflater).apply { viewModel = columnViewModel }
-        val footer = ColumnFooterBinding.inflate(inflater).apply { viewModel = columnViewModel }
+        val header = ColumnHeaderBinding.inflate(inflater)
+        val footer = ColumnFooterBinding.inflate(inflater)
 
         //val backgroundColor = ContextCompat.getColor(context, R.color.column_background)
         val columnProperties = ColumnProperties.Builder.newBuilder(adapter)
@@ -100,6 +100,10 @@ class ProjectHomeFragment : Fragment() {
             if (it?.getAndSetHandled() == false)
                 navigateToNote(columnViewModel.id)
         })
+
+        header.name.text = columnViewModel.name
+        footer.addIssue.setOnClickListener { columnViewModel.addIssue() }
+        footer.addNote.setOnClickListener { columnViewModel.addNote() }
     }
 
     private fun navigateToNote(columnId: Int, cardId: Int = 0) {

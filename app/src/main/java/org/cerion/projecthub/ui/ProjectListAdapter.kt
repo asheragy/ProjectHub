@@ -35,21 +35,19 @@ class ProjectListAdapter(private val listener: ProjectListener) : RecyclerView.A
 
     inner class ViewHolder(private val binding: ListItemProjectBinding) : RecyclerView.ViewHolder(binding.root), View.OnCreateContextMenuListener {
         fun bind(item: Project) {
-            binding.project = item
+            binding.repo.text = item.owner + '/' + item.repo
+            binding.name.text = item.name
             binding.type.text = item.type.toString()
             binding.root.setOnClickListener {
                 listener.onClick(item)
             }
             binding.root.setOnCreateContextMenuListener(this)
-            binding.executePendingBindings()
         }
 
         override fun onCreateContextMenu(menu: ContextMenu?, view: View, contextMenuInfo: ContextMenu.ContextMenuInfo?) {
-            val project = binding.project!!
-
             menu?.apply {
-                add(Menu.NONE, view.id, Menu.NONE, "Delete").setOnMenuItemClickListener {
-                    listener.onDelete(project)
+                add(Menu.NONE, view.id, adapterPosition, "Delete").setOnMenuItemClickListener {
+                    listener.onDelete(items[it.order])
                     true
                 }
             }

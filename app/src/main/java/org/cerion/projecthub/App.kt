@@ -16,7 +16,7 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
-const val USE_MOCK_DATA = true
+const val USE_MOCK_DATA = false
 
 class App : Application() {
 

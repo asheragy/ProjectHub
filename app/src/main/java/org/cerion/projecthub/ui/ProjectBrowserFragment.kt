@@ -64,13 +64,13 @@ class ProjectBrowserListAdapter(val onClick: (project: Project) -> Unit) : Recyc
 
     inner class ViewHolder(private val binding: ListItemProjectBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Project) {
-            binding.project = item
+            binding.repo.text = item.owner + '/' + item.repo
+            binding.name.text = item.name
             binding.type.text = item.type.toString()
             binding.root.setOnClickListener {
                 onClick(item)
             }
             binding.saved.visibility = if (item.saved) View.VISIBLE else View.GONE
-            binding.executePendingBindings()
         }
     }
 }
