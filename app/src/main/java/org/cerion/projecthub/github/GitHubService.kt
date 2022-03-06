@@ -17,11 +17,12 @@ import retrofit2.http.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+// TODO all ids might be longs
 //data class GitHubColumn(val id: Int, val name: String)
 data class GitHubProject(val id: Int, val name: String, val state: String, val updated_at: Date)
 //data class GitHubCard(val id: Int, val note: String?, val content_url: String?)
 data class GitHubIssue(val id: Int, val title: String, val body: String, val state: String, val url: String, val number: Int, val labels: List<GitHubLabel>)
-data class GitHubLabel(val id: Int, val name: String, val description: String?, val color: String)
+data class GitHubLabel(val id: Long, val name: String, val description: String?, val color: String)
 
 // position values: top / bottom / after:<card_id>
 data class MoveCardParams(val column_id: Int, val position: String = "bottom")
