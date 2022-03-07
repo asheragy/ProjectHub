@@ -12,8 +12,9 @@ import org.cerion.projecthub.ui.project.IssueViewModel
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 import org.koin.dsl.module
 
 const val USE_MOCK_DATA = false
@@ -24,7 +25,7 @@ class App : Application() {
         super.onCreate()
 
         startKoin {
-            androidLogger()
+            androidLogger(Level.ERROR)
             androidContext(this@App)
 
             modules(listOf(
