@@ -24,10 +24,6 @@ android {
         buildConfigField("String", "CALLBACK_URL", apikeyProperties['callback_url'])
     }
 
-    dataBinding {
-        enabled = true
-    }
-
     viewBinding {
         enabled = true
     }
@@ -90,18 +86,4 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-
-    // Add missing dependencies for JDK 9+
-    if (JavaVersion.current().ordinal() >= JavaVersion.VERSION_1_9.ordinal()) {
-        // Add both if you're using both Kotlin and Java
-
-        // If you're using Kotlin
-        kapt "com.sun.xml.bind:jaxb-core:2.3.0.1"
-        kapt "javax.xml.bind:jaxb-api:2.3.1"
-        kapt "com.sun.xml.bind:jaxb-impl:2.3.2"
-
-        // If you're using Java
-        annotationProcessor "com.sun.xml.bind:jaxb-core:2.3.0.1"
-        annotationProcessor "javax.xml.bind:jaxb-api:2.3.1"
-    }
 }

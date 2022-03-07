@@ -1,9 +1,5 @@
 package org.cerion.projecthub.model
 
-import androidx.databinding.ObservableArrayList
-import androidx.databinding.ObservableField
-import androidx.databinding.ObservableList
-
 
 enum class IssueState {
     Open,
@@ -12,79 +8,37 @@ enum class IssueState {
 
 data class Issue(val owner: String, val repo: String, val number: Int) {
 
-    private val _title = ObservableField<String>("")
-    var title: String
-        get() = _title.get()!!
-        set(value) {
-            if (value != _title.get()) { // TODO data binding is setting this to existing value, check if viewbinding is different or anyway to prevent it
-                _title.set(value)
-                _fieldsModified = true
-            }
-        }
+    private lateinit var _originalTitle: String
+    lateinit var title: String
 
-    private val _body = ObservableField("")
-    var body: String
-        get() = _body.get()!!
-        set(value) {
-            if (value != _body.get()) {
-                _body.set(value)
-                _fieldsModified = true
-            }
-        }
+    private lateinit var _originalBody: String
+    lateinit var body: String
 
-    private var _state = ObservableField(IssueState.Open)
-    var state: IssueState
-        get() = _state.get()!!
-        set(value) {
-            if (value != _state.get()) {
-                _state.set(value)
-                _fieldsModified = true
-            }
-        }
+    private lateinit var _originalState: IssueState
+    lateinit var state: IssueState
 
-    private val _labels = ObservableArrayList<Label>()
-    val labels: MutableList<Label>
-        get() = _labels
+    private lateinit var _originalLabels: List<Label>
+    lateinit var labels: MutableList<Label>
 
-    private var _fieldsModified = false
     val fieldsModified: Boolean
-        get() = _fieldsModified
+        get() = _originalTitle != title || _originalBody != body || _originalState != state
 
-    private var _labelsModified = false
     val labelsModified: Boolean
-        get() = _labelsModified
+        get() = _originalLabels != labels
 
-    fun init(block: Issue.() -> Unit): Issue {
+    fun init(title: String, body: String, state: IssueState, labels: List<Label>): Issue {
         return this.apply {
-            block()
-            _labelsModified = false
-            _fieldsModified = false
+            this._originalTitle = title
+            this.title = title
+
+            this._originalBody = body
+            this.body = body
+
+            this._originalState = state
+            this.state = state
+
+            this._originalLabels = labels
+            this.labels = labels.toMutableList()
         }
     }
-
-    init {
-        _labels.addOnListChangedCallback(object : ObservableList.OnListChangedCallback<ObservableArrayList<Label>>() {
-            override fun onChanged(sender: ObservableArrayList<Label>?) {
-                _labelsModified = true
-            }
-
-            override fun onItemRangeRemoved(sender: ObservableArrayList<Label>?, positionStart: Int, itemCount: Int) {
-                _labelsModified = true
-            }
-
-            override fun onItemRangeMoved(sender: ObservableArrayList<Label>?, fromPosition: Int, toPosition: Int, itemCount: Int) {
-                _labelsModified = true
-            }
-
-            override fun onItemRangeInserted(sender: ObservableArrayList<Label>?, positionStart: Int, itemCount: Int) {
-                _labelsModified = true
-            }
-
-            override fun onItemRangeChanged(sender: ObservableArrayList<Label>?, positionStart: Int, itemCount: Int) {
-                _labelsModified = true
-            }
-        })
-    }
-
-
 }

@@ -11,15 +11,11 @@ class IssueRepository(private val service: GitHubService) {
 
     suspend fun getByNumber(owner: String, repo: String, number: Int): Issue {
         val issue = service.getIssue(owner, repo, number).await()
+        val state = if(issue.state == "open") IssueState.Open else IssueState.Closed
+        val labels = issue.labels.map { it.toLabel() }
 
-        return Issue(owner, repo, number).init {
-            state = if(issue.state == "open") IssueState.Open else IssueState.Closed
-            body = issue.body
-            title = issue.title
-            labels.addAll(issue.labels.map {
-                it.toLabel()
-            })
-        }
+        return Issue(owner, repo, number)
+            .init(issue.title, issue.body, state, labels)
     }
 
     suspend fun add(issue: Issue, columnId: Int): Int {
