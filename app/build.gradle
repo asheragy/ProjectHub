@@ -19,9 +19,9 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "CLIENT_ID", apikeyProperties['client_id'])
+        buildConfigField("String", "CLIENT_ID", "\"89dfb4e58ae225c742fa\"")
         buildConfigField("String", "CLIENT_SECRET", apikeyProperties['client_secret'])
-        buildConfigField("String", "CALLBACK_URL", apikeyProperties['callback_url'])
+        buildConfigField("String", "CALLBACK_URL", "\"projecthub://callback\"")
     }
 
     viewBinding {
