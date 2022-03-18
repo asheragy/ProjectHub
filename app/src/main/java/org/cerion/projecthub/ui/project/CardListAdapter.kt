@@ -102,6 +102,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
         fun bind(item: IssueCard) {
             issue = item
             // FEATURE add repository if this is a multi repo project (associated to user/org)
+            binding.title.text = item.title
             binding.openedBy.text = "#${item.number} opened by ${item.author}"
             binding.icon.setCardImage(item)
 
@@ -109,7 +110,10 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
             item.labels.forEach {
                 val chip = LayoutInflater.from(binding.root.context).inflate(R.layout.label_chip, binding.labels, false) as Chip
                 chip.text = it.name
-                chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
+                val color = ColorStateList.valueOf(it.color)
+                // TODO some reversing is done here if color is too dark for dark theme
+                chip.setTextColor(color)
+                chip.chipBackgroundColor = color.withAlpha(64) // 25% transparent seems to match close enough
                 binding.labels.addView(chip)
             }
 
