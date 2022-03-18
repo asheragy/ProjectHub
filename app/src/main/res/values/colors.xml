@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
+    <!-- Secondary/Dialog background-->
     <color name="cardBackground">#161b22</color>
 </resources>

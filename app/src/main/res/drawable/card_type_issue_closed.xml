@@ -3,9 +3,11 @@
     android:height="16dp"
     android:viewportWidth="16"
     android:viewportHeight="16">
-
-    <path
-        android:fillColor="#cb2431"
-        android:fillType="evenOdd"
-        android:pathData="M7 10h2v2H7v-2zm2-6H7v5h2V4zm1.5 1.5l-1 1L12 9l4-4.5-1-1L12 7l-1.5-1.5zM8 13.7A5.71 5.71 0 012.3 8 5.7 -5.7c0-3.14 2.56-5.7 5.7-5.7 1.83 0 3.45.88 4.5 2.2l.92-.92A6.947 6.947 0 008 1 5.7 0C4.14 1 1 4.14 1 8s3.14 7 7 7 7-3.14 7-7l-1.52 1.52c-.66 2.41-2.86 4.19-5.48 4.19v-.01z" />
+  <path
+      android:fillColor="#5d468d"
+      android:pathData="M11.28,6.78a0.75,0.75 0,0 0,-1.06 -1.06L7.25,8.69 5.78,7.22a0.75,0.75 0,0 0,-1.06 1.06l2,2a0.75,0.75 0,0 0,1.06 0l3.5,-3.5z"/>
+  <path
+      android:fillColor="#5d468d"
+      android:pathData="M16,8A8,8 0,1 1,0 8a8,8 0,0 1,16 0zM14.5,8a6.5,6.5 0,1 1,-13 0,6.5 6.5,0 0,1 13,0z"
+      android:fillType="evenOdd"/>
 </vector>
