@@ -22,7 +22,7 @@ jobs:
 
     - name: Set API key
       env:
-        CLIENT_SECRET: ${{ default.CLIENT_SECRET }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: echo client_secret=\"$CLIENT_SECRET\" > ./apikey.properties
 
     - name: Grant execute permission for gradlew
