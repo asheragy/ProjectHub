@@ -4,9 +4,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,14 +38,14 @@ class ProjectHomeFragment : Fragment() {
         //binding.viewModel = viewModel
         //binding.lifecycleOwner = this
 
-        viewModel.project.observe(viewLifecycleOwner, Observer {
+        viewModel.project.observe(viewLifecycleOwner) {
             (requireActivity() as AppCompatActivity).supportActionBar?.title = it?.name ?: ""
-        })
+        }
 
-        viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
+        viewModel.columns.observe(viewLifecycleOwner) { columns ->
             binding.board.clearBoard()
             columns?.forEach { addColumn(it, inflater) }
-        })
+        }
 
         setHasOptionsMenu(true)
         initBoard()
@@ -87,19 +87,19 @@ class ProjectHomeFragment : Fragment() {
         binding.board.addColumn(columnProperties)
 
         // Observe fields
-        columnViewModel.cards.observe(viewLifecycleOwner, Observer {
+        columnViewModel.cards.observe(viewLifecycleOwner) {
             adapter.itemList = it
-        })
+        }
 
-        columnViewModel.eventAddIssue.observe(viewLifecycleOwner, Observer {
+        columnViewModel.eventAddIssue.observe(viewLifecycleOwner) {
             if (it != null && !it.getAndSetHandled())
                 navigateToIssue(columnViewModel.id)
-        })
+        }
 
-        columnViewModel.eventAddNote.observe(viewLifecycleOwner, Observer {
+        columnViewModel.eventAddNote.observe(viewLifecycleOwner) {
             if (it?.getAndSetHandled() == false)
                 navigateToNote(columnViewModel.id)
-        })
+        }
 
         header.name.text = columnViewModel.name
         footer.addIssue.setOnClickListener { columnViewModel.addIssue() }
@@ -164,10 +164,22 @@ class ProjectHomeFragment : Fragment() {
             }
 
             override fun onDelete(card: Card) {
-                if (card is IssueCard)
-                    Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show() // TODO
-                else
-                    viewModel.deleteCard(card)
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Delete")
+                    .setMessage("Are you sure?")
+                    .setPositiveButton("YES") { dialog, _ ->
+                        if (card is IssueCard)
+                            Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show() // TODO
+                        else
+                            viewModel.deleteCard(card)
+
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("NO") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
             }
 
             override fun onConvertToIssue(note: NoteCard) {
