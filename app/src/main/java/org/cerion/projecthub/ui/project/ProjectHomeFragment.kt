@@ -44,7 +44,7 @@ class ProjectHomeFragment : Fragment() {
 
         viewModel.columns.observe(viewLifecycleOwner, Observer { columns ->
             binding.board.clearBoard()
-            columns.forEach { addColumn(it, inflater) }
+            columns?.forEach { addColumn(it, inflater) }
         })
 
         setHasOptionsMenu(true)
