@@ -8,17 +8,17 @@ enum class IssueState {
 
 data class Issue(val owner: String, val repo: String, val number: Int) {
 
-    private lateinit var _originalTitle: String
-    lateinit var title: String
+    private var _originalTitle = ""
+    var title = _originalTitle
 
-    private lateinit var _originalBody: String
-    lateinit var body: String
+    private var _originalBody = ""
+    var body = _originalBody
 
-    private lateinit var _originalState: IssueState
-    lateinit var state: IssueState
+    private var _originalState = IssueState.Open
+    var state = _originalState
 
-    private lateinit var _originalLabels: List<Label>
-    lateinit var labels: MutableList<Label>
+    private var _originalLabels = listOf<Label>()
+    var labels = _originalLabels.toMutableList()
 
     val fieldsModified: Boolean
         get() = _originalTitle != title || _originalBody != body || _originalState != state

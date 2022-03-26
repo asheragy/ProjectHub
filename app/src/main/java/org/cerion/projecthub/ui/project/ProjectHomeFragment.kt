@@ -15,7 +15,6 @@ import com.woxthebox.draglistview.BoardView.BoardCallback
 import com.woxthebox.draglistview.BoardView.BoardListener
 import com.woxthebox.draglistview.ColumnProperties
 import org.cerion.projecthub.R
-import org.cerion.projecthub.databinding.ColumnFooterBinding
 import org.cerion.projecthub.databinding.ColumnHeaderBinding
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.cerion.projecthub.model.Card
@@ -71,7 +70,6 @@ class ProjectHomeFragment : Fragment() {
     private fun addColumn(columnViewModel: ColumnViewModel, inflater: LayoutInflater) {
         val adapter = CardListAdapter(getListenerForColumn(columnViewModel))
         val header = ColumnHeaderBinding.inflate(inflater)
-        val footer = ColumnFooterBinding.inflate(inflater)
 
         //val backgroundColor = ContextCompat.getColor(context, R.color.column_background)
         val columnProperties = ColumnProperties.Builder.newBuilder(adapter)
@@ -80,7 +78,6 @@ class ProjectHomeFragment : Fragment() {
             .setColumnBackgroundColor(Color.TRANSPARENT)
             //.setItemsSectionBackgroundColor(backgroundColor)
             .setHeader(header.root)
-            .setFooter(footer.root)
             //.setColumnDragView(header)
             .build()
 
@@ -102,8 +99,21 @@ class ProjectHomeFragment : Fragment() {
         }
 
         header.name.text = columnViewModel.name
-        footer.addIssue.setOnClickListener { columnViewModel.addIssue() }
-        footer.addNote.setOnClickListener { columnViewModel.addNote() }
+        header.add.setOnClickListener {
+            it.showContextMenu()
+        }
+        header.add.setOnCreateContextMenuListener { menu, view, _ ->
+            menu?.apply {
+                add(Menu.NONE, view.id, Menu.NONE, "Issue").setOnMenuItemClickListener {
+                    columnViewModel.addIssue()
+                    true
+                }
+                add(Menu.NONE, view.id, Menu.NONE, "Note").setOnMenuItemClickListener {
+                    columnViewModel.addNote()
+                    true
+                }
+            }
+        }
     }
 
     private fun navigateToNote(columnId: Int, cardId: Int = 0) {

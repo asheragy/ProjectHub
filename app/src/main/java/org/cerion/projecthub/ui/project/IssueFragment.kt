@@ -49,6 +49,7 @@ class IssueFragment : Fragment() {
                 chip.isCheckable = false
                 binding.labelChipGroup.addView(chip)
             }
+
         })
 
         viewModel.message.observe(viewLifecycleOwner, Observer {
@@ -78,7 +79,6 @@ class IssueFragment : Fragment() {
             }
             viewModel.submit()
         }
-
 
         requireActivity().title = viewModel.title
 

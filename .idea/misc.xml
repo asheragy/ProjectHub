@@ -14,8 +14,9 @@
         <entry key="app/src/main/res/drawable/checkbox_black.xml" value="0.1055" />
         <entry key="app/src/main/res/drawable/ic_issue_opened_24.xml" value="0.1475" />
         <entry key="app/src/main/res/drawable/ic_menu.xml" value="0.1475" />
+        <entry key="app/src/main/res/drawable/ic_plus.xml" value="0.161" />
         <entry key="app/src/main/res/layout/column_footer.xml" value="0.14356884057971014" />
-        <entry key="app/src/main/res/layout/column_header.xml" value="0.14356884057971014" />
+        <entry key="app/src/main/res/layout/column_header.xml" value="0.33" />
         <entry key="app/src/main/res/layout/dialog_labels.xml" value="0.18115942028985507" />
         <entry key="app/src/main/res/layout/fragment_column.xml" value="0.12107396149949341" />
         <entry key="app/src/main/res/layout/fragment_issue.xml" value="0.14356884057971014" />
