@@ -2,8 +2,10 @@ package org.cerion.projecthub.ui
 
 import android.view.*
 import androidx.recyclerview.widget.RecyclerView
+import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.ListItemProjectBinding
 import org.cerion.projecthub.model.Project
+import org.cerion.projecthub.model.ProjectType
 
 
 interface ProjectListener {
@@ -37,7 +39,12 @@ class ProjectListAdapter(private val listener: ProjectListener) : RecyclerView.A
         fun bind(item: Project) {
             binding.repo.text = item.owner + '/' + item.repo
             binding.name.text = item.name
-            binding.type.text = item.type.toString()
+            val icon = when (item.type) {
+                ProjectType.Repository -> R.drawable.type_repo
+                ProjectType.User -> R.drawable.type_account
+                ProjectType.Org -> R.drawable.type_org
+            }
+            binding.type.setImageResource(icon)
             binding.root.setOnClickListener {
                 listener.onClick(item)
             }

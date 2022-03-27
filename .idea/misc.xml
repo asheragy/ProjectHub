@@ -15,6 +15,9 @@
         <entry key="app/src/main/res/drawable/ic_issue_opened_24.xml" value="0.1475" />
         <entry key="app/src/main/res/drawable/ic_menu.xml" value="0.1475" />
         <entry key="app/src/main/res/drawable/ic_plus.xml" value="0.161" />
+        <entry key="app/src/main/res/drawable/type_account.xml" value="0.1815" />
+        <entry key="app/src/main/res/drawable/type_org.xml" value="0.1815" />
+        <entry key="app/src/main/res/drawable/type_repo.xml" value="0.1815" />
         <entry key="app/src/main/res/layout/column_footer.xml" value="0.14356884057971014" />
         <entry key="app/src/main/res/layout/column_header.xml" value="0.33" />
         <entry key="app/src/main/res/layout/dialog_labels.xml" value="0.18115942028985507" />
@@ -26,7 +29,7 @@
         <entry key="app/src/main/res/layout/list_item_card_issue.xml" value="0.33" />
         <entry key="app/src/main/res/layout/list_item_card_note.xml" value="0.13779128672745694" />
         <entry key="app/src/main/res/layout/list_item_label.xml" value="0.13541666666666666" />
-        <entry key="app/src/main/res/layout/list_item_project.xml" value="0.10099637681159421" />
+        <entry key="app/src/main/res/layout/list_item_project.xml" value="0.25" />
         <entry key="app/src/main/res/layout/view_fab_child.xml" value="0.1526268115942029" />
         <entry key="app/src/main/res/layout/view_fab_group.xml" value="0.1526268115942029" />
         <entry key="app/src/main/res/layout/view_fab_master.xml" value="0.1526268115942029" />

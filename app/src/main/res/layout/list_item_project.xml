@@ -5,13 +5,13 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-        <TextView
+        <ImageView
             android:id="@+id/type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_gravity="center_vertical"
-            tools:text="User"/>
+            android:src="@drawable/type_repo"/>
 
         <LinearLayout
             android:layout_weight="1"
