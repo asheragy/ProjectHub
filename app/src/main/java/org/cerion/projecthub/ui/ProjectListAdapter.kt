@@ -13,7 +13,7 @@ interface ProjectListener {
     fun onClick(project: Project)
 }
 
-class ProjectListAdapter(private val listener: ProjectListener) : RecyclerView.Adapter<ProjectListAdapter.ViewHolder>() {
+class ProjectListAdapter(private val listener: ProjectListener, private val browser: Boolean = false) : RecyclerView.Adapter<ProjectListAdapter.ViewHolder>() {
 
     private var items = emptyList<Project>()
 
@@ -48,7 +48,11 @@ class ProjectListAdapter(private val listener: ProjectListener) : RecyclerView.A
             binding.root.setOnClickListener {
                 listener.onClick(item)
             }
-            binding.root.setOnCreateContextMenuListener(this)
+
+            if (browser)
+                binding.saved.visibility = if (item.saved) View.VISIBLE else View.GONE
+            else
+                binding.root.setOnCreateContextMenuListener(this)
         }
 
         override fun onCreateContextMenu(menu: ContextMenu?, view: View, contextMenuInfo: ContextMenu.ContextMenuInfo?) {

@@ -29,7 +29,7 @@
         <entry key="app/src/main/res/layout/list_item_card_issue.xml" value="0.33" />
         <entry key="app/src/main/res/layout/list_item_card_note.xml" value="0.13779128672745694" />
         <entry key="app/src/main/res/layout/list_item_label.xml" value="0.13541666666666666" />
-        <entry key="app/src/main/res/layout/list_item_project.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/list_item_project.xml" value="0.33" />
         <entry key="app/src/main/res/layout/view_fab_child.xml" value="0.1526268115942029" />
         <entry key="app/src/main/res/layout/view_fab_group.xml" value="0.1526268115942029" />
         <entry key="app/src/main/res/layout/view_fab_master.xml" value="0.1526268115942029" />
