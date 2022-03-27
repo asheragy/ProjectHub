@@ -2,9 +2,7 @@ package org.cerion.projecthub.ui.project
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -12,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentIssueBinding
+import org.cerion.projecthub.logout
 import org.cerion.projecthub.ui.dialog.LabelsViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -21,9 +20,10 @@ class IssueFragment : Fragment() {
     private val projectViewModel: ProjectHomeViewModel by sharedViewModel()
     private val viewModel: IssueViewModel by viewModel()
     private val labelsViewModel: LabelsViewModel by sharedViewModel()
+    private lateinit var binding: FragmentIssueBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentIssueBinding.inflate(inflater, container, false)
+        binding = FragmentIssueBinding.inflate(inflater, container, false)
 
         val args = IssueFragmentArgs.fromBundle(requireArguments())
         viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
@@ -72,17 +72,29 @@ class IssueFragment : Fragment() {
         binding.labelLayout.setOnClickListener {
             editLabels()
         }
-        binding.submit.setOnClickListener {
-            viewModel.issue.value?.apply {
-                body = binding.body.text.toString()
-                title = binding.title.text.toString()
-            }
-            viewModel.submit()
-        }
 
         requireActivity().title = viewModel.title
+        setHasOptionsMenu(true)
 
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.edit_issue, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.save -> {
+                viewModel.issue.value?.apply {
+                    body = binding.body.text.toString()
+                    title = binding.title.text.toString()
+                }
+                viewModel.submit()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun editLabels() {

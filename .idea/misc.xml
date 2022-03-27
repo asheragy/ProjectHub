@@ -22,7 +22,7 @@
         <entry key="app/src/main/res/layout/column_header.xml" value="0.33" />
         <entry key="app/src/main/res/layout/dialog_labels.xml" value="0.18115942028985507" />
         <entry key="app/src/main/res/layout/fragment_column.xml" value="0.12107396149949341" />
-        <entry key="app/src/main/res/layout/fragment_issue.xml" value="0.14356884057971014" />
+        <entry key="app/src/main/res/layout/fragment_issue.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_project_home.xml" value="0.1526268115942029" />
         <entry key="app/src/main/res/layout/fragment_project_list.xml" value="0.14356884057971014" />
         <entry key="app/src/main/res/layout/label_chip.xml" value="0.14356884057971014" />
@@ -33,6 +33,10 @@
         <entry key="app/src/main/res/layout/view_fab_child.xml" value="0.1526268115942029" />
         <entry key="app/src/main/res/layout/view_fab_group.xml" value="0.1526268115942029" />
         <entry key="app/src/main/res/layout/view_fab_master.xml" value="0.1526268115942029" />
+        <entry key="app/src/main/res/menu/edit_issue.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/menu/edit_note.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/menu/project_home.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/menu/project_list.xml" value="0.35104166666666664" />
       </map>
     </option>
   </component>

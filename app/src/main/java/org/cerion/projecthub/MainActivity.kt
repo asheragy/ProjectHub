@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         val navGraph = graphInflater.inflate(R.navigation.nav_graph)
 
         val token = PreferenceManager.getDefaultSharedPreferences(this).getString("access_token", null)
-        navGraph.startDestination = if (token == null) R.id.loginFragment else R.id.projectListFragment
+        navGraph.setStartDestination(if (token == null) R.id.loginFragment else R.id.projectListFragment)
         navController.graph = navGraph
 
         NavigationUI.setupActionBarWithNavController(this, navController)
