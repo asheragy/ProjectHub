@@ -15,7 +15,6 @@ buildscript {
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
         classpath 'com.apollographql.apollo:apollo-gradle-plugin:2.5.11'
     }
-
 }
 
 allprojects {

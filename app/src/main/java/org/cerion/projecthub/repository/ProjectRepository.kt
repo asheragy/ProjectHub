@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.coroutines.toDeferred
+import com.apollographql.apollo.coroutines.await
 import org.cerion.projecthub.database.DbProject
 import org.cerion.projecthub.database.ProjectDao
 import org.cerion.projecthub.model.Project
@@ -53,8 +53,8 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
 
     private suspend fun getRepositoryProjects(): List<Project> {
         val query = GetRepositoryProjectsQuery.builder().build()
-        val response = apolloClient.query(query).toDeferred().await()
-        val viewer=  response.data()?.viewer()
+        val response = apolloClient.query(query).await()
+        val viewer=  response.data?.viewer()
 
         return viewer?.repositories()?.nodes()!!.flatMap { repo ->
             repo.projects().nodes()!!.map { project ->

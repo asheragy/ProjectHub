@@ -21,7 +21,6 @@ fun ImageView.setCardImage(card: Card) {
             else
                 R.drawable.card_type_issue_open
         }
-        else -> throw NotImplementedError()
     }
 
     setImageDrawable(context.getDrawable(id))

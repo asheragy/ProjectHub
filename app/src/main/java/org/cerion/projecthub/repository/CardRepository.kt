@@ -4,7 +4,7 @@ import GetCardsForColumnQuery
 import android.graphics.Color
 import android.util.Log
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.coroutines.toDeferred
+import com.apollographql.apollo.coroutines.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.cerion.projecthub.TAG
@@ -29,8 +29,8 @@ class CardRepository(private val service: GitHubService, private val apolloClien
             mockColumn2
         else {
             val query = GetCardsForColumnQuery.builder().id(columnId).build()
-            val response = apolloClient.query(query).toDeferred().await()
-            val nodes = response.data()?.node()?.fragments()?.columnDetailFragment()?.cards()?.nodes()
+            val response = apolloClient.query(query).await()
+            val nodes = response.data?.node()?.fragments()?.columnDetailFragment()?.cards()?.nodes()
 
             nodes!!.map {
                 val id = it.databaseId()!!

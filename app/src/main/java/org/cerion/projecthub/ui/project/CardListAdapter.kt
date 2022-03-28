@@ -48,7 +48,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
 
-        when (val item = itemList[position]) {
+        when (val item = itemList[position]!!) {
             is NoteCard -> (holder as NoteViewHolder).bind(item)
             is IssueCard -> (holder as IssueViewHolder).bind(item)
         }

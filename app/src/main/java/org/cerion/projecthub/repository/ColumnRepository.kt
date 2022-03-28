@@ -3,7 +3,7 @@ package org.cerion.projecthub.repository
 import GetColumnsForProjectQuery
 import android.util.Log
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.coroutines.toDeferred
+import com.apollographql.apollo.coroutines.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.cerion.projecthub.TAG
@@ -21,10 +21,10 @@ class ColumnRepository(private val apolloClient: ApolloClient) {
         }
         else {
             val query = GetColumnsForProjectQuery.builder().id(projectId).build()
-            val response = apolloClient.query(query).toDeferred().await()
+            val response = apolloClient.query(query).await()
 
             val nodes =
-                response.data()?.node()?.fragments()?.projectFragment()?.columns()?.nodes()!!
+                response.data?.node()?.fragments()?.projectFragment()?.columns()?.nodes()!!
 
             nodes.map {
                 val col = it.fragments().columnFragment()
