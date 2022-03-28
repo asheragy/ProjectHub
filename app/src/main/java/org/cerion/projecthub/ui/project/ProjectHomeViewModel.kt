@@ -11,12 +11,12 @@ import org.cerion.projecthub.repository.*
 
 class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private val labelsRepo: LabelRepository, private val cardRepo: CardRepository, private val columnRepo: ColumnRepository) : ViewModel() {
 
-    private val _project = MutableLiveData<Project>()
-    val project: LiveData<Project>
+    private val _project = MutableLiveData<Project?>()
+    val project: LiveData<Project?>
         get() = _project
 
-    private val _columns = MutableLiveData<List<ColumnViewModel>>()
-    val columns: LiveData<List<ColumnViewModel>>
+    private val _columns = MutableLiveData<List<ColumnViewModel>?>()
+    val columns: LiveData<List<ColumnViewModel>?>
         get() = _columns
 
     private val _labels = MutableLiveData<List<Label>>()

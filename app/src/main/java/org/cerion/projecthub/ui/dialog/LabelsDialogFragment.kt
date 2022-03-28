@@ -60,8 +60,8 @@ class LabelsViewModel : ViewModel() {
     val selectedLabels: List<String>
         get() = _selectedLabels
 
-    private val _result = MutableLiveData<List<Label>>()
-    val result: LiveData<List<Label>>
+    private val _result = MutableLiveData<List<Label>?>()
+    val result: LiveData<List<Label>?>
         get() = _result
 
     fun setLabels(labels: List<String>) {

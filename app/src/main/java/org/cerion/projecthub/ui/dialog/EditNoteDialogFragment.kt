@@ -20,7 +20,7 @@ class EditNoteDialogFragment : DialogFragment() {
         setStyle(STYLE_NO_FRAME, android.R.style.ThemeOverlay_Material_Dialog)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = DialogEditNoteBinding.inflate(layoutInflater, container, false)
 
         val args = EditNoteDialogFragmentArgs.fromBundle(requireArguments())
