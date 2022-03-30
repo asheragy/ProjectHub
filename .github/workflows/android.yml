@@ -25,6 +25,7 @@ jobs:
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: echo client_secret=\"$CLIENT_SECRET\" > ./apikey.properties
 
+
     - name: TEST
       env:
         CLIENT_TEST: ${{ secrets.CLIENT_TEST }}
