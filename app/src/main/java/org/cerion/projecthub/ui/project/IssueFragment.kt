@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentIssueBinding
-import org.cerion.projecthub.logout
+import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.ui.dialog.LabelsViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -22,52 +21,50 @@ class IssueFragment : Fragment() {
     private val labelsViewModel: LabelsViewModel by sharedViewModel()
     private lateinit var binding: FragmentIssueBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentIssueBinding.inflate(inflater, container, false)
 
         val args = IssueFragmentArgs.fromBundle(requireArguments())
         viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
         val columnViewModel = projectViewModel.findColumnById(args.columnId)!!
 
-        viewModel.finished.observe(viewLifecycleOwner, Observer {
+        viewModel.finished.observe(viewLifecycleOwner) {
             if (it!!) {
                 columnViewModel.refresh()
                 // TODO need to handle keyboard
                 findNavController().navigateUp()
                 //requireActivity().onBackPressed()
             }
-        })
+        }
 
-        viewModel.issue.observe(viewLifecycleOwner, Observer { issue ->
+        viewModel.issue.observe(viewLifecycleOwner) { issue ->
             binding.body.setText(issue.body)
             binding.title.setText(issue.title)
-            binding.labelChipGroup.removeAllViews()
-            issue.labels.forEach {
-                val chip = LayoutInflater.from(binding.root.context).inflate(R.layout.label_chip, binding.labelChipGroup, false) as Chip
-                chip.text = it.name
-                chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
-                chip.isCheckable = false
-                binding.labelChipGroup.addView(chip)
+            setLabels(issue.labels)
+        }
+
+        viewModel.labelsChanged.observe(viewLifecycleOwner) {
+            it?.getContentIfNotHandled()?.run {
+                setLabels(this)
             }
+        }
 
-        })
-
-        viewModel.message.observe(viewLifecycleOwner, Observer {
+        viewModel.message.observe(viewLifecycleOwner) {
             it?.getContentIfNotHandled()?.run {
                 Toast.makeText(requireContext(), this, Toast.LENGTH_SHORT).show()
             }
-        })
+        }
 
-        viewModel.busy.observe(viewLifecycleOwner, Observer { busy ->
+        viewModel.busy.observe(viewLifecycleOwner) { busy ->
             binding.busy.visibility = if (busy == true) View.VISIBLE else View.GONE
-        })
+        }
 
-        labelsViewModel.result.observe(viewLifecycleOwner, Observer {
+        labelsViewModel.result.observe(viewLifecycleOwner) {
             if (it != null) {
                 viewModel.setLabels(it)
                 labelsViewModel.onRecieveResult()
             }
-        })
+        }
 
         binding.labelLayout.setOnClickListener {
             editLabels()
@@ -95,6 +92,17 @@ class IssueFragment : Fragment() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setLabels(labels: List<Label>) {
+        binding.labelChipGroup.removeAllViews()
+        labels.forEach {
+            val chip = LayoutInflater.from(binding.root.context).inflate(R.layout.label_chip, binding.labelChipGroup, false) as Chip
+            chip.text = it.name
+            chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
+            chip.isCheckable = false
+            binding.labelChipGroup.addView(chip)
+        }
     }
 
     private fun editLabels() {

@@ -14,8 +14,9 @@ import org.cerion.projecthub.repository.IssueRepository
 class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
 
     val issue = MutableLiveData<Issue>()
-    val finished = MutableLiveData<Boolean>(false)
+    val finished = MutableLiveData(false)
     val message = MutableLiveData<SingleEventData<String>>()
+    val labelsChanged = MutableLiveData<SingleEventData<List<Label>>>()
 
     private var ownerName: String = ""
     private var repoName: String = ""
@@ -56,8 +57,7 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
             }
         }
 
-        // TODO different way of doing this?  Need to let things know this was updated
-        issue.postValue(issue.value)
+        labelsChanged.value = SingleEventData(labels)
     }
 
     fun submit() {
