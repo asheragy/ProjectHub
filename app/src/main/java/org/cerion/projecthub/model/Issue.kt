@@ -26,13 +26,13 @@ data class Issue(val owner: String, val repo: String, val number: Int) {
     val labelsModified: Boolean
         get() = _originalLabels != labels
 
-    fun init(title: String, body: String, state: IssueState, labels: List<Label>): Issue {
+    fun init(title: String, body: String?, state: IssueState, labels: List<Label>): Issue {
         return this.apply {
             this._originalTitle = title
             this.title = title
 
-            this._originalBody = body
-            this.body = body
+            this._originalBody = body ?: ""
+            this.body = body ?: ""
 
             this._originalState = state
             this.state = state

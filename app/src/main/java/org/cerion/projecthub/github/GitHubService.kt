@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 //data class GitHubColumn(val id: Int, val name: String)
 data class GitHubProject(val id: Int, val name: String, val state: String, val updated_at: Date)
 //data class GitHubCard(val id: Int, val note: String?, val content_url: String?)
-data class GitHubIssue(val id: Int, val title: String, val body: String, val state: String, val url: String, val number: Int, val labels: List<GitHubLabel>)
+data class GitHubIssue(val id: Int, val title: String, val body: String?, val state: String, val url: String, val number: Int, val labels: List<GitHubLabel>)
 data class GitHubLabel(val id: Long, val name: String, val description: String?, val color: String)
 
 // position values: top / bottom / after:<card_id>
