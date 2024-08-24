@@ -32,7 +32,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
 
     val ownerRepositoryProjects: LiveData<List<Project>> = liveData {
         val db = dao.getAllAsync()
-        val remoteProjects = getRepositoryProjects()
+        val remoteProjects = getUserProjects()
 
         // Database values are the only ones that will change
         val merged: LiveData<List<Project>> = db.map { dbProjects ->
@@ -51,16 +51,14 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
 
     fun getById(id: Int): Project? = getAll().firstOrNull { it.id == id }
 
-    private suspend fun getRepositoryProjects(): List<Project> {
-        val query = GetRepositoryProjectsQuery.builder().build()
+    private suspend fun getUserProjects(): List<Project> {
+        val query = GetCurrentUserProjectsQuery.builder().build()
         val response = apolloClient.query(query).await()
-        val viewer=  response.data?.viewer()
+        val viewer = response.data?.viewer()
 
-        return viewer?.repositories()?.nodes()!!.flatMap { repo ->
-            repo.projects().nodes()!!.map { project ->
-                Project(project.databaseId()!!, project.id(), ProjectType.Repository, viewer.login(), repo.name()).apply {
-                    name = project.name()
-                }
+        return viewer?.projectsV2()?.nodes()!!.map { project ->
+            Project(project.databaseId()!!, project.id(), ProjectType.User, viewer.login(), "").apply {
+                name = project.title()
             }
         }
     }

@@ -30,7 +30,8 @@ class LoginFragment : Fragment() {
         val binding = FragmentLoginBinding.inflate(layoutInflater, container, false)
 
         binding.login.setOnClickListener {
-            val url = "https://github.com/login/oauth/authorize?client_id=${BuildConfig.CLIENT_ID}&redirect_uri=${BuildConfig.CALLBACK_URL}&scope=repo"
+            // TODO unsure if repo scope is needed
+            val url = "https://github.com/login/oauth/authorize?client_id=${BuildConfig.CLIENT_ID}&redirect_uri=${BuildConfig.CALLBACK_URL}&scope=repo,read:project"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
         }
