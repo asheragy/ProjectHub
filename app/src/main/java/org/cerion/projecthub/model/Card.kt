@@ -2,15 +2,16 @@ package org.cerion.projecthub.model
 
 
 sealed class Card {
-    abstract val id: Int
+    @Deprecated("unused") val id: Int = 0
+    // ID for this node in context of project
+    abstract val itemId: String
+    // ID for underlying object which lives outside project
+    abstract val contentId: String
 }
 
-data class NoteCard(override val id: Int, val nodeId: String) : Card() {
-    var note = ""
-    var creator = ""
-}
+data class DraftIssueCard(override val itemId: String, override val contentId: String, val title: String) : Card()
 
-data class IssueCard(override val id: Int, val nodeId: String) : Card() {
+data class IssueCard(override val itemId: String, override val contentId: String) : Card() {
     var number = 0
     var author = ""
     var repository = ""

@@ -1,16 +1,19 @@
 package org.cerion.projecthub.repository
 
-import GetCardsForColumnQuery
-import android.graphics.Color
-import android.util.Log
+import GetCardsForProjectQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.cerion.projecthub.TAG
-import org.cerion.projecthub.USE_MOCK_DATA
-import org.cerion.projecthub.github.*
-import org.cerion.projecthub.model.*
+import org.cerion.projecthub.github.ArchiveCardParams
+import org.cerion.projecthub.github.CreateCardParams
+import org.cerion.projecthub.github.GitHubService
+import org.cerion.projecthub.github.MoveCardParams
+import org.cerion.projecthub.github.UpdateCardParams
+import org.cerion.projecthub.github.UpdateIssueState
+import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.DraftIssueCard
+import org.cerion.projecthub.model.Issue
 
 enum class CardPosition {
     TOP,
@@ -20,6 +23,38 @@ enum class CardPosition {
 
 class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
 
+
+    suspend fun getCardsForProject(projectId: String): Map<String, List<Card>> = withContext(Dispatchers.IO) {
+        val query = GetCardsForProjectQuery.builder().id(projectId).build()
+        val response = apolloClient.query(query).await()
+
+        val project = response.data?.node()?.fragments()?.projectFragment_Cards()
+        val items = project?.items()?.nodes()!!
+
+        val result = mutableMapOf<String, MutableList<Card>>()
+
+        items.forEach { item ->
+            val statusOptionId = item.fieldValueByName()?.fragments()?.singleSelectValueFragment()?.optionId()!!
+
+            val draft = item.content()?.fragments()?.draftIssueFragment()
+            val card = if (draft != null) {
+                DraftIssueCard(item.id(), draft.id(), draft.title()).apply {
+                    // TODO add other fields
+                }
+            }
+            else {
+                throw RuntimeException("missing case")
+            }
+
+            val list = result.getOrElse(statusOptionId) { mutableListOf() }
+            list.add(card)
+            result[statusOptionId] = list
+        }
+
+        result
+    }
+
+    /*
     suspend fun getCardsForColumn(columnId: String): List<Card> = withContext(Dispatchers.IO) {
         Log.d(TAG, "getCardsForColumn($columnId)")
 
@@ -58,6 +93,7 @@ class CardRepository(private val service: GitHubService, private val apolloClien
             }
         }
     }
+     */
 
     suspend fun addNoteForColumn(columnId: Int, note: String) {
         val params = CreateCardParams(note)
@@ -103,12 +139,13 @@ class CardRepository(private val service: GitHubService, private val apolloClien
     }
 }
 
+/*
 val mockColumn1 = listOf(
-    NoteCard(38783849, "MDExOlByb2plY3RDYXJkMzg3ODM4NDk=").apply {
+    NoteCard("MDExOlByb2plY3RDYXJkMzg3ODM4NDk=").apply {
         note = "This is a note"
         creator = "asheragy"
     },
-    IssueCard(619602904, "MDU6SXNzdWU2MTk2MDI5MDQ=").apply {
+    IssueCard("MDU6SXNzdWU2MTk2MDI5MDQ=").apply {
         title = "test issue with labels"
         closed = false
         number = 24
@@ -117,7 +154,7 @@ val mockColumn1 = listOf(
         labels.add(Label("duplicate", Color.parseColor("#cfd3d7")))
         labels.add(Label("enhancement", Color.parseColor("#a2eeef")))
     },
-    IssueCard(619604999, "MDU6SXNzdWU2MTk2MDQ5OTk=").apply {
+    IssueCard("MDU6SXNzdWU2MTk2MDQ5OTk=").apply {
         title = "test issue with labels"
         closed = false
         number = 25
@@ -127,7 +164,7 @@ val mockColumn1 = listOf(
 )
 
 val mockColumn2 = listOf(
-    IssueCard(513674595, "MDU6SXNzdWU1MTM2NzQ1OTU=").apply {
+    IssueCard("MDU6SXNzdWU1MTM2NzQ1OTU=").apply {
         title = "test issue"
         closed = true
         number = 1
@@ -136,3 +173,5 @@ val mockColumn2 = listOf(
         labels.add(Label("bug", Color.parseColor("#d73a4a")))
     }
 )
+
+ */

@@ -21,7 +21,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     val name = column.name
 
     val eventAddIssue = MutableLiveData<SingleEvent>()
-    val eventAddNote = MutableLiveData<SingleEvent>()
+    val eventAddDraft = MutableLiveData<SingleEvent>()
 
     private val _cards = MutableLiveData<List<Card>>()
     val cards: LiveData<List<Card>>
@@ -30,10 +30,6 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     private val _busy = MutableLiveData(false)
     val busy: LiveData<Boolean>
         get() = _busy
-
-    init {
-        refresh()
-    }
 
     @Deprecated("use id version")
     fun containsCard(card: Card): Boolean = _cards.value?.contains(card) ?: false
@@ -48,42 +44,37 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
         _cards.value = cards.value?.plus(card)
     }
 
-    fun refresh() {
-        launchBusy {
-            loadCards()
-        }
-    }
-
-    suspend fun loadCards() {
-        // _cards.value = cardRepository.getCardsForColumn(column.node_id)
+    fun setCards(cards: List<Card>) {
+        _cards.value = cards
     }
 
     fun addIssue() {
         eventAddIssue.value = SingleEvent()
     }
 
-    fun addNote() {
-        eventAddNote.value = SingleEvent()
+    fun addDraft() {
+        eventAddDraft.value = SingleEvent()
     }
 
     fun addNote(note: String) {
         launchBusy {
             cardRepository.addNoteForColumn(id, note)
-            loadCards() // TODO need fields for order but can update card manually without this request
+
+            // TODO refresh all cards
         }
     }
 
     fun updateNote(cardId: Int, note: String) {
         launchBusy {
             cardRepository.updateNote(cardId, note)
-            loadCards()
+            // TODO refresh all cards
         }
     }
 
     fun archiveCard(card: Card, archived: Boolean) {
         launchBusy {
             cardRepository.archiveCard(card.id, archived)
-            loadCards()
+            // TODO refresh all cards
         }
     }
 
@@ -93,7 +84,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
 
         launchBusy {
             cardRepository.deleteCard(card.id)
-            loadCards()
+            // TODO refresh all cards
         }
     }
 
@@ -101,7 +92,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
         launchBusy {
             val issue = Issue(parent.project.value!!.owner, card.repository, card.number)
             cardRepository.setIssueState(issue, !card.closed)
-            loadCards()
+            // TODO refresh all cards
         }
     }
 

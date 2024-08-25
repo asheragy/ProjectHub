@@ -30,7 +30,9 @@ class IssueFragment : Fragment() {
 
         viewModel.finished.observe(viewLifecycleOwner) {
             if (it!!) {
-                columnViewModel.refresh()
+                // TODO this needs to refresh ALL cards in project
+                //columnViewModel.refresh()
+
                 // TODO need to handle keyboard
                 findNavController().navigateUp()
                 //requireActivity().onBackPressed()

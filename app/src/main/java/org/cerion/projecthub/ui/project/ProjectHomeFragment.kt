@@ -18,8 +18,8 @@ import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.ColumnHeaderBinding
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.model.NoteCard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 
@@ -93,9 +93,10 @@ class ProjectHomeFragment : Fragment() {
                 navigateToIssue(columnViewModel.id)
         }
 
-        columnViewModel.eventAddNote.observe(viewLifecycleOwner) {
+
+        columnViewModel.eventAddDraft.observe(viewLifecycleOwner) {
             if (it?.getAndSetHandled() == false)
-                navigateToNote(columnViewModel.id)
+                navigateToDraft(columnViewModel.id)
         }
 
         header.name.text = columnViewModel.name
@@ -108,17 +109,17 @@ class ProjectHomeFragment : Fragment() {
                     columnViewModel.addIssue()
                     true
                 }
-                add(Menu.NONE, view.id, Menu.NONE, "Note").setOnMenuItemClickListener {
-                    columnViewModel.addNote()
+                add(Menu.NONE, view.id, Menu.NONE, "Draft").setOnMenuItemClickListener {
+                    columnViewModel.addDraft()
                     true
                 }
             }
         }
     }
 
-    private fun navigateToNote(columnId: Int, cardId: Int = 0) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(columnId, cardId)
-        findNavController().navigate(action)
+    private fun navigateToDraft(columnId: Int, cardId: Int = 0) {
+        //val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(columnId, cardId)
+        //findNavController().navigate(action)
     }
 
     private fun navigateToIssue(columnId: Int, number: Int = 0) {
@@ -164,7 +165,7 @@ class ProjectHomeFragment : Fragment() {
         return object : CardListener {
             override fun onClick(card: Card) {
                 when (card) {
-                    is NoteCard -> navigateToNote(viewModel.id, card.id)
+                    is DraftIssueCard -> navigateToDraft(viewModel.id, card.id)
                     is IssueCard -> navigateToIssue(viewModel.id, card.number)
                 }
             }
@@ -192,7 +193,7 @@ class ProjectHomeFragment : Fragment() {
                     .show()
             }
 
-            override fun onConvertToIssue(note: NoteCard) {
+            override fun onConvertToIssue(note: DraftIssueCard) {
                 Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show() // TODO
             }
 

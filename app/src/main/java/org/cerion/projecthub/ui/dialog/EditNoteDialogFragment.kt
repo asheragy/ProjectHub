@@ -5,9 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.DialogEditNoteBinding
-import org.cerion.projecthub.model.NoteCard
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -27,6 +25,7 @@ class EditNoteDialogFragment : DialogFragment() {
         val viewModel = projectViewModel.findColumnById(args.columnId)!!
 
         val isNew = args.cardId == 0
+        /* TODO repurpose this class as EditDraftIssue
         val note = if (isNew) "" else {
             val card = viewModel.cards.value!!.first { it.id == args.cardId } as NoteCard
             card.note
@@ -48,6 +47,8 @@ class EditNoteDialogFragment : DialogFragment() {
             dismiss()
             true
         }
+
+         */
 
         return binding.root
     }

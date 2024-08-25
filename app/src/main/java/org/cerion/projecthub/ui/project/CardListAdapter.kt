@@ -8,8 +8,8 @@ import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.ListItemCardIssueBinding
 import org.cerion.projecthub.databinding.ListItemCardNoteBinding
 import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.model.NoteCard
 import org.cerion.projecthub.ui.setCardImage
 import org.cerion.projecthub.ui.setFormattedText
 
@@ -25,8 +25,7 @@ interface CardListener {
     // onRemoveFromProject
     // onChangeLabels
 
-    // Notes
-    fun onConvertToIssue(note: NoteCard)
+    fun onConvertToIssue(note: DraftIssueCard)
 }
 
 internal class CardListAdapter(private val listener: CardListener) : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>() {
@@ -37,7 +36,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
         val layoutInflater = LayoutInflater.from(parent.context)
 
         return when(viewType) {
-            TypeNote -> NoteViewHolder(ListItemCardNoteBinding.inflate(layoutInflater, parent, false))
+            TypeNote -> DraftIssueViewHolder(ListItemCardNoteBinding.inflate(layoutInflater, parent, false))
             TypeIssue -> IssueViewHolder(ListItemCardIssueBinding.inflate(layoutInflater, parent, false))
             else -> throw NotImplementedError()
         }
@@ -49,8 +48,8 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
         super.onBindViewHolder(holder, position)
 
         when (val item = itemList[position]!!) {
-            is NoteCard -> (holder as NoteViewHolder).bind(item)
             is IssueCard -> (holder as IssueViewHolder).bind(item)
+            is DraftIssueCard -> (holder as DraftIssueViewHolder).bind(item)
         }
     }
 
@@ -58,14 +57,14 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
         return mItemList[position]!!.id.toLong()
     }
 
-    inner class NoteViewHolder(val binding: ListItemCardNoteBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
+    inner class DraftIssueViewHolder(private val binding: ListItemCardNoteBinding) : ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
 
-        private var note: NoteCard? = null
+        private var note: DraftIssueCard? = null
 
-        fun bind(item: NoteCard) {
+        fun bind(item: DraftIssueCard) {
             note = item
-            binding.createdBy.text = "Added by ${item.creator}"
-            setFormattedText(binding.title, item.note)
+            //binding.createdBy.text = "Added by ${item.creator}"
+            setFormattedText(binding.title, item.title)
             binding.root.setOnCreateContextMenuListener(this)
             binding.menu.setOnClickListener {
                 it.showContextMenu()
@@ -85,6 +84,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
                     true
                 }
                 add(Menu.NONE, view.id, Menu.NONE, "Convert to issue").setOnMenuItemClickListener {
+                    // TODO still applies
                     listener.onConvertToIssue(card)
                     true
                 }
@@ -96,7 +96,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
         }
     }
 
-    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
+    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
         private var issue: IssueCard? = null
 
         fun bind(item: IssueCard) {

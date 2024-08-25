@@ -1,24 +1,34 @@
-query getCardsForColumn($id: ID!) { 
+
+query getCardsForProject($id: ID!) {
 	node(id: $id) {
-		...ColumnDetailFragment 
+		...ProjectFragment_Cards
 	}
 }
 
-fragment ColumnDetailFragment on ProjectColumn {
-	cards {
+fragment ProjectFragment_Cards on ProjectV2 {
+	items(first: 100) {
 		nodes {
-			databaseId
 			id
-			note
 			content {
+				...DraftIssueFragment
 				...IssueFragment
 				...PullRequestFragment
 			}
-			creator {
-				login
+			fieldValueByName(name: "Status") {
+				...SingleSelectValueFragment
 			}
 		}
 	}
+}
+
+fragment SingleSelectValueFragment on ProjectV2ItemFieldSingleSelectValue {
+	optionId
+}
+
+fragment DraftIssueFragment on DraftIssue {
+	id
+	title
+	body
 }
 
 fragment IssueFragment on Issue {

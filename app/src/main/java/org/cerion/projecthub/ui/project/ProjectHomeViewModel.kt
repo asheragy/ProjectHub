@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.repository.*
@@ -39,9 +40,13 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
         val vm = this
         viewModelScope.launch {
             _project.value = projectRepo.getById(projectId)
+            val items = cardRepo.getCardsForProject(_project.value!!.nodeId)
             val cols = columnRepo.getColumnsForProject(_project.value!!.nodeId)
             _columns.value = cols.map {
-                ColumnViewModel(vm, cardRepo, it)
+                val cards = items[it.node_id]
+                ColumnViewModel(vm, cardRepo, it).apply {
+                    setCards(cards ?: listOf())
+                }
             }
 
             // TODO see if this can be lazy loaded somehow, but need to handle various cases of that
