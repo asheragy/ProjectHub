@@ -1,6 +1,7 @@
 package org.cerion.projecthub.repository
 
 import GetCardsForProjectQuery
+import UpdateItemPositionMutation
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.await
 import kotlinx.coroutines.Dispatchers
@@ -127,6 +128,15 @@ class CardRepository(private val service: GitHubService, private val apolloClien
 
         val params = MoveCardParams(columnId, pos)
         service.moveCard(card.id, params).await()
+    }
+
+    suspend fun changeCardPosition(projectId: String, card: Card, afterCardId: String?) {
+        val mutation = UpdateItemPositionMutation.builder()
+            .projectId(projectId)
+            .afterItemId(afterCardId)
+            .itemId(card.itemId)
+
+        apolloClient.mutate(mutation.build()).await()
     }
 
     suspend fun archiveCard(id: Int, archived: Boolean) {

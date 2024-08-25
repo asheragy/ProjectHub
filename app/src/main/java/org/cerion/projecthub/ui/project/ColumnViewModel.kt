@@ -10,12 +10,11 @@ import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.repository.CardPosition.*
 import org.cerion.projecthub.repository.CardRepository
 
 
 // TODO verify this gets destroyed + onCleared is called
-class ColumnViewModel(private val parent: ProjectHomeViewModel, private val cardRepository: CardRepository, private val column: Column) : ViewModel() {
+class ColumnViewModel(private val parent: ProjectHomeViewModel, private val cardRepository: CardRepository, column: Column) : ViewModel() {
 
     val id = column.id
     val name = column.name
@@ -100,32 +99,21 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
         if (oldPosition == newPosition)
             return
 
+        val projectId = parent.project.value!!.nodeId
         val cards = cards.value!!.toMutableList()
-        val movedCard = cards[newPosition]
+        val movedCard = cards[oldPosition]
 
-        // Get position AND Update internal list order, adapter will get updates but should already have the new order
-        val position =
-            when (newPosition) {
-                0 -> {
-                    //cards.removeAt(oldPosition)
-                    //cards.add(0, movedCard)
-                    TOP
-                }
-                cards.size - 1 -> {
-                    //cards.removeAt(oldPosition)
-                    //cards.add(movedCard)
-                    BOTTOM
-                }
-                else -> AFTER
-            }
-
-        val relativeCardId = if (position == AFTER) cards[newPosition - 1].id else 0
-
+        cards.removeAt(oldPosition)
+        cards.add(newPosition, movedCard)
         _cards.value = cards
+
+        val afterCardId = if (newPosition > 0) cards[newPosition - 1].itemId else null
+        if (movedCard.itemId == afterCardId)
+            throw RuntimeException("This should never happen")
 
         viewModelScope.launch {
             // If move fails it won't have any major side effects and get refreshed on load or other operations
-            cardRepository.move(movedCard, column.id, position, relativeCardId)
+            cardRepository.changeCardPosition(projectId, movedCard, afterCardId)
         }
     }
 
