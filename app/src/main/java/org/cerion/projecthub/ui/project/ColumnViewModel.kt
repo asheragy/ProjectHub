@@ -55,7 +55,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     }
 
     suspend fun loadCards() {
-        _cards.value = cardRepository.getCardsForColumn(column.node_id)
+        // _cards.value = cardRepository.getCardsForColumn(column.node_id)
     }
 
     fun addIssue() {

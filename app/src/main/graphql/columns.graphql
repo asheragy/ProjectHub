@@ -1,20 +1,22 @@
-query getColumnsForProject($id: ID!) {
+
+
+query getColumnsByStatus($id: ID!) {
 	node(id: $id) {
 		...ProjectFragment
 	}
 }
 
-
-fragment ProjectFragment on Project {
-	columns(first: 100) {
-		nodes {		
-			...ColumnFragment
-		}
+fragment ProjectFragment on ProjectV2 {
+	field(name: "Status") {
+		...ProjectField
 	}
 }
 
-fragment ColumnFragment on ProjectColumn {
-	databaseId
-	id
+fragment ProjectField on ProjectV2SingleSelectField {
 	name
+	options {
+		id
+		name
+		color
+	}
 }

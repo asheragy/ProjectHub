@@ -45,7 +45,7 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
             }
 
             // TODO see if this can be lazy loaded somehow, but need to handle various cases of that
-            _labels.value = labelsRepo.getAll(_project.value!!.owner, _project.value!!.repo)
+            // _labels.value = labelsRepo.getAll(_project.value!!.owner, _project.value!!.repo)
         }
     }
 
