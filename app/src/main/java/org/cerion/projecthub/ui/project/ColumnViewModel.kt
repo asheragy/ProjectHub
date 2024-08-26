@@ -30,14 +30,9 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     val busy: LiveData<Boolean>
         get() = _busy
 
-    @Deprecated("use id version")
-    fun containsCard(card: Card): Boolean = _cards.value?.contains(card) ?: false
-    fun containsCard(cardId: Int): Boolean = _cards.value?.any { it.id == cardId} ?: false
-
     fun removeCard(card: Card) {
         _cards.value = _cards.value?.filter { it.id != card.id }
     }
-
 
     internal fun addCard(card: Card) {
         _cards.value = cards.value?.plus(card)
@@ -101,11 +96,11 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
 
         val projectId = parent.project.value!!.nodeId
         val cards = cards.value!!.toMutableList()
-        val movedCard = cards[oldPosition]
+        val movedCard = cards[newPosition]
 
-        cards.removeAt(oldPosition)
-        cards.add(newPosition, movedCard)
-        _cards.value = cards
+        //cards.removeAt(oldPosition)
+        //cards.add(newPosition, movedCard)
+        //_cards.value = cards
 
         val afterCardId = if (newPosition > 0) cards[newPosition - 1].itemId else null
         if (movedCard.itemId == afterCardId)

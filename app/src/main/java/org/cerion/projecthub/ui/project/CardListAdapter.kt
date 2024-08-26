@@ -1,7 +1,11 @@
 package org.cerion.projecthub.ui.project
 
 import android.content.res.ColorStateList
-import android.view.*
+import android.view.ContextMenu
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
 import com.google.android.material.chip.Chip
 import com.woxthebox.draglistview.DragItemAdapter
 import org.cerion.projecthub.R
@@ -54,10 +58,10 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
     }
 
     override fun getUniqueItemId(position: Int): Long {
-        return mItemList[position]!!.id.toLong()
+        return mItemList[position]!!.databaseId.toLong()
     }
 
-    inner class DraftIssueViewHolder(private val binding: ListItemCardNoteBinding) : ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
+    inner class DraftIssueViewHolder(private val binding: ListItemCardNoteBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
 
         private var note: DraftIssueCard? = null
 
@@ -96,7 +100,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
         }
     }
 
-    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
+    inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
         private var issue: IssueCard? = null
 
         fun bind(item: IssueCard) {

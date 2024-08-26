@@ -24,9 +24,6 @@ data class GitHubProject(val id: Int, val name: String, val state: String, val u
 data class GitHubIssue(val id: Int, val title: String, val body: String?, val state: String, val url: String, val number: Int, val labels: List<GitHubLabel>)
 data class GitHubLabel(val id: Long, val name: String, val description: String?, val color: String)
 
-// position values: top / bottom / after:<card_id>
-data class MoveCardParams(val column_id: Int, val position: String = "bottom")
-
 data class ArchiveCardParams(val archived: Boolean)
 data class UpdateCardParams(val note: String, val archived: Boolean = false)
 data class CreateCardParams(val note: String)
@@ -49,9 +46,6 @@ interface GitHubService {
     //fun getIssuesForRepo(@Path("user") user: String, @Path("repo")repo: String): Deferred<List<GitHubIssue>>
 
     //region Cards
-    @POST("projects/columns/cards/{card_id}/moves")
-    fun moveCard(@Path("card_id")cardId: Int, @Body params: MoveCardParams): Deferred<ResponseBody>
-
     @PATCH("projects/columns/cards/{card_id}")
     fun updateCard(@Path("card_id")cardId: Int, @Body params: UpdateCardParams): Deferred<ResponseBody>
 

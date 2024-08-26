@@ -45,7 +45,7 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
             _columns.value = cols.map {
                 val cards = items[it.node_id]
                 ColumnViewModel(vm, cardRepo, it).apply {
-                    setCards(cards ?: listOf())
+                    setCards(cards ?: arrayListOf())
                 }
             }
 

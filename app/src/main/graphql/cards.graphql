@@ -9,6 +9,7 @@ fragment ProjectFragment_Cards on ProjectV2 {
 	items(first: 100) {
 		nodes {
 			id
+			databaseId
 			content {
 				...DraftIssueFragment
 				...IssueFragment

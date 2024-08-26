@@ -10,18 +10,11 @@ import kotlinx.coroutines.withContext
 import org.cerion.projecthub.github.ArchiveCardParams
 import org.cerion.projecthub.github.CreateCardParams
 import org.cerion.projecthub.github.GitHubService
-import org.cerion.projecthub.github.MoveCardParams
 import org.cerion.projecthub.github.UpdateCardParams
 import org.cerion.projecthub.github.UpdateIssueState
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.Issue
-
-enum class CardPosition {
-    TOP,
-    BOTTOM,
-    AFTER
-}
 
 class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
 
@@ -33,14 +26,14 @@ class CardRepository(private val service: GitHubService, private val apolloClien
         val project = response.data?.node()?.fragments()?.projectFragment_Cards()
         val items = project?.items()?.nodes()!!
 
-        val result = mutableMapOf<String, List<Card>>()
+        val result = mutableMapOf<String, MutableList<Card>>()
 
         items.forEach { item ->
             val statusOptionId = item.fieldValueByName()?.fragments()?.singleSelectValueFragment()?.optionId()!!
 
             val draft = item.content()?.fragments()?.draftIssueFragment()
             val card = if (draft != null) {
-                DraftIssueCard(item.id(), draft.id(), draft.title()).apply {
+                DraftIssueCard(item.databaseId()!!, item.id(), draft.id(), draft.title()).apply {
                     // TODO add other fields
                 }
             }
@@ -48,9 +41,9 @@ class CardRepository(private val service: GitHubService, private val apolloClien
                 throw RuntimeException("missing case")
             }
 
-            val list = result.getOrElse(statusOptionId) { listOf() }.toMutableList()
+            val list = result.getOrElse(statusOptionId) { mutableListOf() }
             list.add(card)
-            result[statusOptionId] = list.toList()
+            result[statusOptionId] = list
         }
 
         result
@@ -111,24 +104,6 @@ class CardRepository(private val service: GitHubService, private val apolloClien
         withContext(Dispatchers.IO) {
             service.deleteCard(id).execute() // For some reason the deferred/await was throwing exception
         }
-    }
-
-    /**
-     * @param card              Card to move
-     * @param columnId          New or existing column to move card to
-     * @param position          New position
-     * @param relativeCardId    Card id that this card goes AFTER
-     */
-    suspend fun move(card: Card, columnId: Int, position: CardPosition, relativeCardId: Int = 0) {
-        val pos =
-            when (position) {
-                CardPosition.TOP -> "top"
-                CardPosition.BOTTOM -> "bottom"
-                CardPosition.AFTER -> "after:$relativeCardId"
-            }
-
-        val params = MoveCardParams(columnId, pos)
-        service.moveCard(card.id, params).await()
     }
 
     suspend fun changeCardPosition(projectId: String, card: Card, afterCardId: String?) {
