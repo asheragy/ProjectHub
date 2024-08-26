@@ -67,3 +67,16 @@ mutation updateItemPosition($projectId: ID!, $itemId: ID!, $afterItemId: ID) {
 		clientMutationId
 	}
 }
+
+mutation updateItemStatus($projectId: ID!, $itemId: ID!, $statusFieldId: ID!, $optionId: String!) {
+	updateProjectV2ItemFieldValue(input: {
+		projectId: $projectId
+		itemId: $itemId
+		fieldId: $statusFieldId
+		value: {
+			singleSelectOptionId: $optionId
+		}
+	}) {
+		clientMutationId
+	}
+}

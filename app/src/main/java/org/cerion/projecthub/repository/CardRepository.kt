@@ -2,6 +2,7 @@ package org.cerion.projecthub.repository
 
 import GetCardsForProjectQuery
 import UpdateItemPositionMutation
+import UpdateItemStatusMutation
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.await
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,7 @@ class CardRepository(private val service: GitHubService, private val apolloClien
         val project = response.data?.node()?.fragments()?.projectFragment_Cards()
         val items = project?.items()?.nodes()!!
 
-        val result = mutableMapOf<String, MutableList<Card>>()
+        val result = mutableMapOf<String, List<Card>>()
 
         items.forEach { item ->
             val statusOptionId = item.fieldValueByName()?.fragments()?.singleSelectValueFragment()?.optionId()!!
@@ -47,9 +48,9 @@ class CardRepository(private val service: GitHubService, private val apolloClien
                 throw RuntimeException("missing case")
             }
 
-            val list = result.getOrElse(statusOptionId) { mutableListOf() }
+            val list = result.getOrElse(statusOptionId) { listOf() }.toMutableList()
             list.add(card)
-            result[statusOptionId] = list
+            result[statusOptionId] = list.toList()
         }
 
         result
@@ -135,6 +136,16 @@ class CardRepository(private val service: GitHubService, private val apolloClien
             .projectId(projectId)
             .afterItemId(afterCardId)
             .itemId(card.itemId)
+
+        apolloClient.mutate(mutation.build()).await()
+    }
+
+    suspend fun changeCardColumn(projectId: String, card: Card, fieldId: String, optionId: String) {
+        val mutation = UpdateItemStatusMutation.builder()
+            .projectId(projectId)
+            .itemId(card.itemId)
+            .statusFieldId(fieldId)
+            .optionId(optionId)
 
         apolloClient.mutate(mutation.build()).await()
     }

@@ -10,11 +10,11 @@ def apikeyProperties = new Properties()
 apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     defaultConfig {
         applicationId "org.cerion.projecthub"
         minSdkVersion 28
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -94,7 +94,7 @@ dependencies {
     //implementation "org.koin:koin-android-scope:$koin_version"
     //implementation "org.koin:koin-android-viewmodel:$koin_version"
     //implementation "org.koin:koin-androidx-viewmodel:$koin_version"
-    implementation "com.github.woxthebox:draglistview:1.7.2"
+    implementation "com.github.woxthebox:draglistview:1.7.3"
 
     // Test
     testImplementation 'junit:junit:4.13.2'

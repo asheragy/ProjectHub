@@ -13,6 +13,7 @@ fragment ProjectFragment on ProjectV2 {
 }
 
 fragment ProjectField on ProjectV2SingleSelectField {
+	id
 	name
 	options {
 		id

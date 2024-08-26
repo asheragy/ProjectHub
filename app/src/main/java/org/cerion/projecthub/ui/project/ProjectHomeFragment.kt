@@ -146,17 +146,27 @@ class ProjectHomeFragment : Fragment() {
                         viewModel.columns.value!![fromColumn].move(fromRow, toRow)
                 }
 
+                override fun onColumnDragEnded(fromPosition: Int, toPosition: Int) {
+                    TODO("Not yet implemented")
+                }
+
                 override fun onItemChangedPosition(oldColumn: Int, oldRow: Int, newColumn: Int, newRow: Int) {}
                 override fun onItemChangedColumn(oldColumn: Int, newColumn: Int) {}
                 override fun onFocusedColumnChanged(oldColumn: Int, newColumn: Int) {}
                 override fun onColumnDragStarted(position: Int) {}
                 override fun onColumnDragChangedPosition(oldPosition: Int, newPosition: Int) {}
-                override fun onColumnDragEnded(position: Int) {}
             })
 
             setBoardCallback(object : BoardCallback {
                 override fun canDragItemAtPosition(column: Int, dragPosition: Int): Boolean = true
                 override fun canDropItemAtPosition(oldColumn: Int, oldRow: Int, newColumn: Int, newRow: Int): Boolean = true
+                override fun canDragColumnAtPosition(index: Int): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun canDropColumnAtPosition(oldIndex: Int, newIndex: Int): Boolean {
+                    TODO("Not yet implemented")
+                }
             })
         }
     }

@@ -1,5 +1,6 @@
 package org.cerion.projecthub.repository
 
+import GetColumnsByStatusQuery
 import android.util.Log
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.await
@@ -23,15 +24,16 @@ class ColumnRepository(private val apolloClient: ApolloClient) {
             val response = apolloClient.query(query).await()
 
             val project = response.data?.node()?.fragments()?.projectFragment()
-            val options = project?.field()?.fragments()?.projectField()?.options()!!
+            val field = project?.field()?.fragments()?.projectField()!!
+            val options = field.options()
 
             options.map {
-                Column(0, it.id(), it.name(), it.color().toString())
+                Column(0, field.id(), it.id(), it.name(), it.color().toString())
             }
         }
     }
 }
 
 val mockColumns = listOf(
-    Column(9319546, "MDEzOlByb2plY3RDb2x1bW45MzE5NTQ2", "New", "GRAY"),
-    Column(9319547, "MDEzOlByb2plY3RDb2x1bW45MzE5NTQ3", "Done", "GRAY"))
+    Column(9319546, "", "MDEzOlByb2plY3RDb2x1bW45MzE5NTQ2", "New", "GRAY"),
+    Column(9319547, "","MDEzOlByb2plY3RDb2x1bW45MzE5NTQ3", "Done", "GRAY"))

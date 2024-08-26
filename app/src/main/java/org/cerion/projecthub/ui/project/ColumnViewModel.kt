@@ -14,7 +14,7 @@ import org.cerion.projecthub.repository.CardRepository
 
 
 // TODO verify this gets destroyed + onCleared is called
-class ColumnViewModel(private val parent: ProjectHomeViewModel, private val cardRepository: CardRepository, column: Column) : ViewModel() {
+class ColumnViewModel(private val parent: ProjectHomeViewModel, private val cardRepository: CardRepository, val column: Column) : ViewModel() {
 
     val id = column.id
     val name = column.name

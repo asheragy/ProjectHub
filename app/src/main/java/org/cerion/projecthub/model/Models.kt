@@ -5,7 +5,8 @@ package org.cerion.projecthub.model
 data class Column(
     @Deprecated("unused")
     val id: Int,
-    // TODO rename to id
+    val fieldId: String,
+    // TODO rename to id or optionId
     val node_id: String,
     val name: String,
     // TODO change to enum before using

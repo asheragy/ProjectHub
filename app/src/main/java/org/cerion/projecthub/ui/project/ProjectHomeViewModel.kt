@@ -66,21 +66,13 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
 
         viewModelScope.launch {
             try {
-                val position = when(newRowPosition) {
-                    0 -> CardPosition.TOP
-                    column.cards.value!!.size - 1 -> CardPosition.BOTTOM
-                    else -> CardPosition.AFTER
-                }
-
-                val relativeCardId = if (position == CardPosition.AFTER) column.cards.value!![newRowPosition - 1].id else 0
-                cardRepo.move(card, column.id, position, relativeCardId)
+                cardRepo.changeCardColumn(_project.value!!.nodeId, card, column.column.fieldId, column.column.node_id)
             }
             catch(e: Exception) {
                 e.printStackTrace()
-
-                // TODO may fail because no internet, can undo operation by moving back
-                //oldColumn.loadCards()
-                //newColumn.loadCards()
+            }
+            finally {
+                refresh()
             }
         }
     }
