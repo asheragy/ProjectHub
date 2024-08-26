@@ -117,9 +117,9 @@ class ProjectHomeFragment : Fragment() {
         }
     }
 
-    private fun navigateToDraft(columnId: Int, cardId: Int = 0) {
-        //val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditNoteDialogFragment(columnId, cardId)
-        //findNavController().navigate(action)
+    private fun navigateToDraft(columnId: Int, cardId: String = "") {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditDraftDialogFragment(columnId, cardId)
+        findNavController().navigate(action)
     }
 
     private fun navigateToIssue(columnId: Int, number: Int = 0) {
@@ -175,8 +175,8 @@ class ProjectHomeFragment : Fragment() {
         return object : CardListener {
             override fun onClick(card: Card) {
                 when (card) {
-                    is DraftIssueCard -> navigateToDraft(viewModel.id, card.id)
-                    is IssueCard -> navigateToIssue(viewModel.id, card.number)
+                    is DraftIssueCard -> navigateToDraft(viewModel.column.index, card.itemId)
+                    is IssueCard -> navigateToIssue(viewModel.column.index, card.number)
                 }
             }
 

@@ -5,11 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.DialogEditNoteBinding
+import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class EditNoteDialogFragment : DialogFragment() {
+class EditDraftDialogFragment : DialogFragment() {
 
     private val projectViewModel: ProjectHomeViewModel by sharedViewModel()
 
@@ -21,23 +23,26 @@ class EditNoteDialogFragment : DialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = DialogEditNoteBinding.inflate(layoutInflater, container, false)
 
-        val args = EditNoteDialogFragmentArgs.fromBundle(requireArguments())
-        val viewModel = projectViewModel.findColumnById(args.columnId)!!
+        val args = EditDraftDialogFragmentArgs.fromBundle(requireArguments())
+        val viewModel = projectViewModel.columns.value!![args.columnIndex]
 
-        val isNew = args.cardId == 0
-        /* TODO repurpose this class as EditDraftIssue
-        val note = if (isNew) "" else {
-            val card = viewModel.cards.value!!.first { it.id == args.cardId } as NoteCard
-            card.note
+        val isNew = args.cardId == ""
+
+        viewModel.cards.value!!.firstOrNull { it.itemId == args.cardId }.let {
+            it as DraftIssueCard
+            binding.title.setText(it.title)
+            binding.body.setText(it.body)
         }
 
-        binding.text.setText(note)
         binding.save.setOnClickListener {
-            val newNote = binding.text.text.toString()
+            //val newNote = binding.text.text.toString()
+            /* TODO save
             if (isNew)
                 viewModel.addNote(newNote)
             else if(note != newNote)
                 viewModel.updateNote(args.cardId, newNote)
+
+             */
 
             dismiss()
         }
@@ -47,8 +52,6 @@ class EditNoteDialogFragment : DialogFragment() {
             dismiss()
             true
         }
-
-         */
 
         return binding.root
     }

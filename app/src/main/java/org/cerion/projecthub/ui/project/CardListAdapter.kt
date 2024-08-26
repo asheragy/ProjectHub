@@ -40,13 +40,13 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
         val layoutInflater = LayoutInflater.from(parent.context)
 
         return when(viewType) {
-            TypeNote -> DraftIssueViewHolder(ListItemCardNoteBinding.inflate(layoutInflater, parent, false))
+            TypeDraft -> DraftIssueViewHolder(ListItemCardNoteBinding.inflate(layoutInflater, parent, false))
             TypeIssue -> IssueViewHolder(ListItemCardIssueBinding.inflate(layoutInflater, parent, false))
             else -> throw NotImplementedError()
         }
     }
 
-    override fun getItemViewType(position: Int): Int = if (mItemList[position] is IssueCard) TypeIssue else TypeNote
+    override fun getItemViewType(position: Int): Int = if (mItemList[position] is IssueCard) TypeIssue else TypeDraft
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
@@ -152,7 +152,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
     }
 
     companion object {
-        private const val TypeNote = 0
+        private const val TypeDraft = 0
         private const val TypeIssue = 1
     }
 }

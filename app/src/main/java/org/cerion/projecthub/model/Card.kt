@@ -12,7 +12,9 @@ data class DraftIssueCard(
     override val databaseId: Int,
     override val itemId: String,
     override val contentId: String,
-    val title: String) : Card()
+    val title: String,
+    val body: String
+) : Card()
 
 data class IssueCard(
     override val databaseId: Int,

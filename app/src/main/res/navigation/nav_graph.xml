@@ -32,28 +32,28 @@
             android:name="projectId"
             app:argType="integer" />
         <action
-            android:id="@+id/action_projectHomeFragment_to_editNoteDialogFragment"
-            app:destination="@id/editNoteDialogFragment" />
+            android:id="@+id/action_projectHomeFragment_to_editDraftDialogFragment"
+            app:destination="@id/editDraftDialogFragment" />
         <action
             android:id="@+id/action_projectHomeFragment_to_issueFragment"
             app:destination="@id/issueFragment" />
     </fragment>
 
     <dialog
-        android:id="@+id/editNoteDialogFragment"
-        android:name="org.cerion.projecthub.ui.dialog.EditNoteDialogFragment">
+        android:id="@+id/editDraftDialogFragment"
+        android:name="org.cerion.projecthub.ui.dialog.EditDraftDialogFragment">
         <argument
-            android:name="columnId"
+            android:name="columnIndex"
             app:argType="integer" />
         <argument
             android:name="cardId"
-            app:argType="integer" />
+            app:argType="string" />
     </dialog>
     <fragment
         android:id="@+id/issueFragment"
         android:name="org.cerion.projecthub.ui.project.IssueFragment">
         <argument
-            android:name="columnId"
+            android:name="columnIndex"
             app:argType="integer" />
         <argument
             android:name="repoOwner"

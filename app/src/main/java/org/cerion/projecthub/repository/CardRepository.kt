@@ -18,7 +18,6 @@ import org.cerion.projecthub.model.Issue
 
 class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
 
-
     suspend fun getCardsForProject(projectId: String): Map<String, List<Card>> = withContext(Dispatchers.IO) {
         val query = GetCardsForProjectQuery.builder().id(projectId).build()
         val response = apolloClient.query(query).await()
@@ -33,7 +32,7 @@ class CardRepository(private val service: GitHubService, private val apolloClien
 
             val draft = item.content()?.fragments()?.draftIssueFragment()
             val card = if (draft != null) {
-                DraftIssueCard(item.databaseId()!!, item.id(), draft.id(), draft.title()).apply {
+                DraftIssueCard(item.databaseId()!!, item.id(), draft.id(), draft.title(), draft.body()).apply {
                     // TODO add other fields
                 }
             }

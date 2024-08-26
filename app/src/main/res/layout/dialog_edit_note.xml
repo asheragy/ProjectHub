@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_margin="8dp">
 
@@ -18,16 +19,35 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="18dp"
-        android:text="Note"
+        android:text="Title"
         android:layout_marginBottom="8dp">
-
     </TextView>
+
     <EditText
-        android:id="@+id/text"
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:hint="Title">
+    </EditText>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        android:text="Body"
+        android:layout_marginBottom="8dp">
+    </TextView>
+
+    <EditText
+        android:id="@+id/body"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="top"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:hint="Body"
+        >
     </EditText>
 
     <Button

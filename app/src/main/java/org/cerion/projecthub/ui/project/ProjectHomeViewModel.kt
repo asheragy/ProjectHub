@@ -5,10 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
-import org.cerion.projecthub.repository.*
+import org.cerion.projecthub.repository.CardRepository
+import org.cerion.projecthub.repository.ColumnRepository
+import org.cerion.projecthub.repository.LabelRepository
+import org.cerion.projecthub.repository.ProjectRepository
 
 class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private val labelsRepo: LabelRepository, private val cardRepo: CardRepository, private val columnRepo: ColumnRepository) : ViewModel() {
 
@@ -76,6 +78,4 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
             }
         }
     }
-
-    fun findColumnById(id: Int) = _columns.value?.first { it.id == id}
 }

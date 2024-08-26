@@ -27,13 +27,13 @@ class ColumnRepository(private val apolloClient: ApolloClient) {
             val field = project?.field()?.fragments()?.projectField()!!
             val options = field.options()
 
-            options.map {
-                Column(0, field.id(), it.id(), it.name(), it.color().toString())
+            options.mapIndexed { index, it ->
+                Column(0, index, field.id(), it.id(), it.name(), it.color().toString())
             }
         }
     }
 }
 
 val mockColumns = listOf(
-    Column(9319546, "", "MDEzOlByb2plY3RDb2x1bW45MzE5NTQ2", "New", "GRAY"),
-    Column(9319547, "","MDEzOlByb2plY3RDb2x1bW45MzE5NTQ3", "Done", "GRAY"))
+    Column(9319546, 0, "", "MDEzOlByb2plY3RDb2x1bW45MzE5NTQ2", "New", "GRAY"),
+    Column(9319547, 1, "","MDEzOlByb2plY3RDb2x1bW45MzE5NTQ3", "Done", "GRAY"))

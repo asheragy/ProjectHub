@@ -25,8 +25,9 @@ class IssueFragment : Fragment() {
         binding = FragmentIssueBinding.inflate(inflater, container, false)
 
         val args = IssueFragmentArgs.fromBundle(requireArguments())
-        viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
-        val columnViewModel = projectViewModel.findColumnById(args.columnId)!!
+
+        //viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
+        //val columnViewModel = projectViewModel.findColumnById(args.columnId)!!
 
         viewModel.finished.observe(viewLifecycleOwner) {
             if (it!!) {
