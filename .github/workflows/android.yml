@@ -35,10 +35,6 @@ jobs:
         --schema=app/src/main/graphql/schema.json \
         --header='Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}'
 
-      # Above command is not downloading a json file, but fails unless the extension is .json.  Renaming afterwards seems to work
-    - name: Rename schema file workaround
-      run: mv app/src/main/graphql/schema.json app/src/main/graphql/schema.graphqls
-
     - name: Build with Gradle
       run: ./gradlew build
 
