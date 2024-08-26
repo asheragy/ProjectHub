@@ -29,7 +29,11 @@ jobs:
       run: chmod +x gradlew
 
     - name: Download schema
-      run: ./gradlew :app:downloadApolloSchema --endpoint='https://api.github.com/graphql' --schema=app/src/main/graphql/schema.json
+      run: |
+        ./gradlew :app:downloadApolloSchema \
+        --endpoint='https://api.github.com/graphql' \
+        --schema=app/src/main/graphql/schema.json \
+        --header='Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}'
 
       # Above command is not downloading a json file, but fails unless the extension is .json.  Renaming afterwards seems to work
     - name: Rename schema file workaround
