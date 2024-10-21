@@ -81,3 +81,12 @@ mutation updateItemStatus($projectId: ID!, $itemId: ID!, $statusFieldId: ID!, $o
 		clientMutationId
 	}
 }
+
+mutation archiveItem($projectId: ID!, $itemId: ID!) {
+	archiveProjectV2Item(input: {
+		projectId: $projectId
+		itemId: $itemId
+	}) {
+		clientMutationId
+	}
+}

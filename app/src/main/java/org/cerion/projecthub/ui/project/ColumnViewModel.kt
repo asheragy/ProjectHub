@@ -50,25 +50,10 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
         eventAddDraft.value = SingleEvent()
     }
 
-    fun addNote(note: String) {
-        launchBusy {
-            cardRepository.addNoteForColumn(id, note)
-
-            // TODO refresh all cards
-        }
-    }
-
-    fun updateNote(cardId: Int, note: String) {
-        launchBusy {
-            cardRepository.updateNote(cardId, note)
-            // TODO refresh all cards
-        }
-    }
-
     fun archiveCard(card: Card, archived: Boolean) {
         launchBusy {
-            cardRepository.archiveCard(card.id, archived)
-            // TODO refresh all cards
+            cardRepository.archiveCard(parent.project.value!!, card)
+            parent.refresh()
         }
     }
 
@@ -78,7 +63,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
 
         launchBusy {
             cardRepository.deleteCard(card.id)
-            // TODO refresh all cards
+            parent.refresh()
         }
     }
 
@@ -86,7 +71,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
         launchBusy {
             val issue = Issue(parent.project.value!!.owner, card.repository, card.number)
             cardRepository.setIssueState(issue, !card.closed)
-            // TODO refresh all cards
+            parent.refresh()
         }
     }
 

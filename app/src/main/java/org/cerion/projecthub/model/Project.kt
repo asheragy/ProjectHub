@@ -6,6 +6,7 @@ enum class ProjectType {
     Org
 }
 
+// TODO nodeId should be id or projectId, see if integer id is used anymore
 data class Project(val id: Int, val nodeId: String, val type: ProjectType, val owner: String, val repo: String) {
     var name: String = ""
     var description: String = ""

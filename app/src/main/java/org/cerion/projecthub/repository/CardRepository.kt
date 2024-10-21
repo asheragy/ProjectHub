@@ -15,6 +15,7 @@ import org.cerion.projecthub.github.UpdateIssueState
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.Issue
+import org.cerion.projecthub.model.Project
 
 class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
 
@@ -89,16 +90,6 @@ class CardRepository(private val service: GitHubService, private val apolloClien
     }
      */
 
-    suspend fun addNoteForColumn(columnId: Int, note: String) {
-        val params = CreateCardParams(note)
-        service.createCard(columnId, params).await()
-    }
-
-    suspend fun updateNote(id: Int, note: String) {
-        val params = UpdateCardParams(note)
-        service.updateCard(id, params).await()
-    }
-
     suspend fun deleteCard(id: Int) {
         withContext(Dispatchers.IO) {
             service.deleteCard(id).execute() // For some reason the deferred/await was throwing exception
@@ -124,8 +115,12 @@ class CardRepository(private val service: GitHubService, private val apolloClien
         apolloClient.mutate(mutation.build()).await()
     }
 
-    suspend fun archiveCard(id: Int, archived: Boolean) {
-        service.archiveCard(id, ArchiveCardParams(archived)).await()
+    suspend fun archiveCard(project: Project, card: Card) {
+        val mutation = ArchiveItemMutation.builder()
+            .projectId(project.nodeId)
+            .itemId(card.itemId)
+
+        apolloClient.mutate(mutation.build()).await()
     }
 
     suspend fun setIssueState(issue: Issue, closed: Boolean) {
