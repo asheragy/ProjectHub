@@ -45,7 +45,7 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
             val items = cardRepo.getCardsForProject(_project.value!!.nodeId)
             val cols = columnRepo.getColumnsForProject(_project.value!!.nodeId)
             _columns.value = cols.map {
-                val cards = items[it.node_id]
+                val cards = items[it.optionId]
                 ColumnViewModel(vm, cardRepo, it).apply {
                     setCards(cards ?: arrayListOf())
                 }
@@ -68,7 +68,7 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
 
         viewModelScope.launch {
             try {
-                cardRepo.changeCardColumn(_project.value!!.nodeId, card, column.column.fieldId, column.column.node_id)
+                cardRepo.changeCardColumn(_project.value!!.nodeId, card, column.column.fieldId, column.column.optionId)
             }
             catch(e: Exception) {
                 e.printStackTrace()

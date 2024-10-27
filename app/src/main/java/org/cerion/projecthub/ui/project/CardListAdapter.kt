@@ -58,7 +58,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
     }
 
     override fun getUniqueItemId(position: Int): Long {
-        return mItemList[position]!!.databaseId.toLong()
+        return mItemList[position]!!.itemId.hashCode().toLong()
     }
 
     inner class DraftIssueViewHolder(private val binding: ListItemCardNoteBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {

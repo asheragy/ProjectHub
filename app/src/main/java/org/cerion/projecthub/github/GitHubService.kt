@@ -18,15 +18,10 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 // TODO all ids might be longs
-//data class GitHubColumn(val id: Int, val name: String)
 data class GitHubProject(val id: Int, val name: String, val state: String, val updated_at: Date)
-//data class GitHubCard(val id: Int, val note: String?, val content_url: String?)
 data class GitHubIssue(val id: Int, val title: String, val body: String?, val state: String, val url: String, val number: Int, val labels: List<GitHubLabel>)
 data class GitHubLabel(val id: Long, val name: String, val description: String?, val color: String)
 
-data class ArchiveCardParams(val archived: Boolean)
-data class UpdateCardParams(val note: String, val archived: Boolean = false)
-data class CreateCardParams(val note: String)
 data class CreateIssueCardParams(val content_id: Int, val content_type: String = "Issue")
 data class CreateIssueParams(val title: String, val body: String)
 data class UpdateIssueParams(val title: String, val body: String)
@@ -45,25 +40,11 @@ interface GitHubService {
     //@GET("repos/{user}/{repo}/issues?state=all&per_page=100")
     //fun getIssuesForRepo(@Path("user") user: String, @Path("repo")repo: String): Deferred<List<GitHubIssue>>
 
-    //region Cards
-    @PATCH("projects/columns/cards/{card_id}")
-    fun updateCard(@Path("card_id")cardId: Int, @Body params: UpdateCardParams): Deferred<ResponseBody>
-
-    @PATCH("projects/columns/cards/{card_id}")
-    fun archiveCard(@Path("card_id")cardId: Int, @Body params: ArchiveCardParams): Deferred<ResponseBody>
-
-    @POST("projects/columns/{column_id}/cards")
-    fun createCard(@Path("column_id")columnId: Int, @Body params: CreateCardParams): Deferred<ResponseBody>
-
     @POST("projects/columns/{column_id}/cards")
     fun createCard(@Path("column_id")columnId: Int, @Body params: CreateIssueCardParams): Deferred<ResponseBody>
 
     @DELETE("projects/columns/cards/{card_id}")
     fun deleteCard(@Path("card_id")id: Int): Call<ResponseBody>
-
-    //endregion
-
-    //region Issues
 
     @POST("repos/{owner}/{repo}/issues")
     fun createIssue(@Path("owner")owner: String, @Path("repo")repo: String, @Body params: CreateIssueParams): Deferred<GitHubIssue>
@@ -79,8 +60,6 @@ interface GitHubService {
 
     @PATCH("repos/{owner}/{repo}/issues/{number}")
     fun updateIssueState(@Path("owner")owner: String, @Path("repo")repo: String, @Path("number")number: Int, @Body state: UpdateIssueState): Deferred<GitHubIssue>
-
-    //endregion
 
     @GET("repos/{owner}/{repo}/labels")
     fun getLabelsAsync(@Path("owner")owner: String, @Path("repo")repo: String): Deferred<List<GitHubLabel>>

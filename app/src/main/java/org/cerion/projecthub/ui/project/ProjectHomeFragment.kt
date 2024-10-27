@@ -90,13 +90,13 @@ class ProjectHomeFragment : Fragment() {
 
         columnViewModel.eventAddIssue.observe(viewLifecycleOwner) {
             if (it != null && !it.getAndSetHandled())
-                navigateToIssue(columnViewModel.id)
+                navigateToIssue(columnViewModel.index)
         }
 
 
         columnViewModel.eventAddDraft.observe(viewLifecycleOwner) {
             if (it?.getAndSetHandled() == false)
-                navigateToDraft(columnViewModel.id)
+                navigateToDraft(columnViewModel.index)
         }
 
         header.name.text = columnViewModel.name
@@ -117,8 +117,8 @@ class ProjectHomeFragment : Fragment() {
         }
     }
 
-    private fun navigateToDraft(columnId: Int, cardId: String = "") {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditDraftDialogFragment(columnId, cardId)
+    private fun navigateToDraft(columnIndex: Int, cardId: String = "") {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToEditDraftDialogFragment(columnIndex, cardId)
         findNavController().navigate(action)
     }
 

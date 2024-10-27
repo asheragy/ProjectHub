@@ -9,12 +9,21 @@ sealed class Card {
 }
 
 data class DraftIssueCard(
-    override val databaseId: Int,
     override val itemId: String,
     override val contentId: String,
     val title: String,
     val body: String
-) : Card()
+) : Card() {
+
+    companion object {
+        fun create(title: String, body: String): DraftIssueCard {
+            return DraftIssueCard("", "", title, body)
+        }
+    }
+
+    override val databaseId: Int
+        get() = 0
+}
 
 data class IssueCard(
     override val databaseId: Int,

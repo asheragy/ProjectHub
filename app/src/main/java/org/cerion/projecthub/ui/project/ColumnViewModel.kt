@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import org.cerion.projecthub.common.SingleEvent
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
+import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.repository.CardRepository
@@ -16,7 +17,7 @@ import org.cerion.projecthub.repository.CardRepository
 // TODO verify this gets destroyed + onCleared is called
 class ColumnViewModel(private val parent: ProjectHomeViewModel, private val cardRepository: CardRepository, val column: Column) : ViewModel() {
 
-    val id = column.id
+    val index = column.index
     val name = column.name
 
     val eventAddIssue = MutableLiveData<SingleEvent>()
@@ -71,6 +72,20 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
         launchBusy {
             val issue = Issue(parent.project.value!!.owner, card.repository, card.number)
             cardRepository.setIssueState(issue, !card.closed)
+            parent.refresh()
+        }
+    }
+
+    fun addDraft(card: DraftIssueCard) {
+        launchBusy {
+            cardRepository.addDraftIssue(parent.project.value!!, column, card)
+            parent.refresh()
+        }
+    }
+
+    fun updateDraft(card: DraftIssueCard) {
+        launchBusy {
+            cardRepository.updateDraftIssue(card)
             parent.refresh()
         }
     }

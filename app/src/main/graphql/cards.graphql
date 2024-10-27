@@ -90,3 +90,26 @@ mutation archiveItem($projectId: ID!, $itemId: ID!) {
 		clientMutationId
 	}
 }
+
+mutation addDraftIssue($projectId: ID!, $title: String!, $body: String) {
+	addProjectV2DraftIssue(input: {
+		projectId: $projectId
+		title: $title
+		body: $body
+	}) {
+		clientMutationId
+		projectItem {
+			id
+		}
+	}
+}
+
+mutation updateDraftIssue($id: ID!, $title: String!, $body: String) {
+	updateProjectV2DraftIssue(input: {
+		draftIssueId: $id
+		title: $title
+		body: $body
+	}) {
+		clientMutationId
+	}
+}

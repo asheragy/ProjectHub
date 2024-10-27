@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import org.cerion.projecthub.R
-import org.cerion.projecthub.databinding.DialogEditNoteBinding
+import org.cerion.projecthub.databinding.DialogEditDraftBinding
 import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -21,28 +21,34 @@ class EditDraftDialogFragment : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val binding = DialogEditNoteBinding.inflate(layoutInflater, container, false)
+        val binding = DialogEditDraftBinding.inflate(layoutInflater, container, false)
 
         val args = EditDraftDialogFragmentArgs.fromBundle(requireArguments())
         val viewModel = projectViewModel.columns.value!![args.columnIndex]
 
         val isNew = args.cardId == ""
+        var contentId = ""
 
-        viewModel.cards.value!!.firstOrNull { it.itemId == args.cardId }.let {
+        viewModel.cards.value!!.firstOrNull { it.itemId == args.cardId }?.let {
             it as DraftIssueCard
             binding.title.setText(it.title)
             binding.body.setText(it.body)
+            contentId = it.contentId
         }
 
         binding.save.setOnClickListener {
-            //val newNote = binding.text.text.toString()
-            /* TODO save
-            if (isNew)
-                viewModel.addNote(newNote)
-            else if(note != newNote)
-                viewModel.updateNote(args.cardId, newNote)
+            val title = binding.title.text.toString()
+            val body = binding.body.text.toString()
 
-             */
+            if (isNew) {
+                val card = DraftIssueCard.create(title, body)
+                viewModel.addDraft(card)
+            }
+            // TODO check if data changed
+            else {
+                val card = DraftIssueCard(args.cardId, contentId, title, body)
+                viewModel.updateDraft(card)
+            }
 
             dismiss()
         }
