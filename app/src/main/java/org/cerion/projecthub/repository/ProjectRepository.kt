@@ -1,6 +1,6 @@
 package org.cerion.projecthub.repository
 
-import GetRepositoryProjectsQuery
+import GetCurrentUserProjectsQuery
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map

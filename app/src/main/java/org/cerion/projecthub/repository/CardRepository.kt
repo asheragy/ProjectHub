@@ -2,7 +2,9 @@ package org.cerion.projecthub.repository
 
 import AddDraftIssueMutation
 import ArchiveItemMutation
+import DeleteItemMutation
 import GetCardsForProjectQuery
+import UpdateDraftIssueMutation
 import UpdateItemPositionMutation
 import UpdateItemStatusMutation
 import com.apollographql.apollo.ApolloClient
@@ -53,9 +55,14 @@ class CardRepository(private val service: GitHubService, private val apolloClien
         result
     }
 
-    suspend fun deleteCard(id: Int) {
-        withContext(Dispatchers.IO) {
-            service.deleteCard(id).execute() // For some reason the deferred/await was throwing exception
+    suspend fun deleteCard(project: Project, card: Card) {
+        if (card is DraftIssueCard) {
+            val mutation = DeleteItemMutation.builder().projectId(project.nodeId).itemId(card.itemId)
+            apolloClient.mutate(mutation.build()).await()
+        }
+        else {
+            // TODO for issue
+            throw NotImplementedError()
         }
     }
 

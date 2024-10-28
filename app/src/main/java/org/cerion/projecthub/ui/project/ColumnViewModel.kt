@@ -31,10 +31,6 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     val busy: LiveData<Boolean>
         get() = _busy
 
-    fun removeCard(card: Card) {
-        _cards.value = _cards.value?.filter { it.id != card.id }
-    }
-
     internal fun addCard(card: Card) {
         _cards.value = cards.value?.plus(card)
     }
@@ -59,11 +55,8 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     }
 
     fun deleteCard(card: Card) {
-        if (card is IssueCard)
-            throw NotImplementedError() // TODO deleting issue is different than deleting note
-
         launchBusy {
-            cardRepository.deleteCard(card.id)
+            cardRepository.deleteCard(parent.project.value!!, card)
             parent.refresh()
         }
     }

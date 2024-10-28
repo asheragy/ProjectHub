@@ -10,10 +10,14 @@ import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okio.Buffer
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -42,9 +46,6 @@ interface GitHubService {
 
     @POST("projects/columns/{column_id}/cards")
     fun createCard(@Path("column_id")columnId: Int, @Body params: CreateIssueCardParams): Deferred<ResponseBody>
-
-    @DELETE("projects/columns/cards/{card_id}")
-    fun deleteCard(@Path("card_id")id: Int): Call<ResponseBody>
 
     @POST("repos/{owner}/{repo}/issues")
     fun createIssue(@Path("owner")owner: String, @Path("repo")repo: String, @Body params: CreateIssueParams): Deferred<GitHubIssue>
