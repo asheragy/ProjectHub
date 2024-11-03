@@ -7,6 +7,7 @@ import GetCardsForProjectQuery
 import UpdateDraftIssueMutation
 import UpdateItemPositionMutation
 import UpdateItemStatusMutation
+import android.graphics.Color
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.await
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,8 @@ import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.Issue
+import org.cerion.projecthub.model.IssueCard
+import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 
 class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
@@ -38,11 +41,25 @@ class CardRepository(private val service: GitHubService, private val apolloClien
             val statusOptionId = item.fieldValueByName()?.fragments()?.singleSelectValueFragment()?.optionId()!!
 
             val draft = item.content()?.fragments()?.draftIssueFragment()
+            val issue = item.content()?.fragments()?.issueFragment()
+
             val card = if (draft != null) {
                 DraftIssueCard(item.id(), draft.id(), draft.title(), draft.body()).apply {
                     // TODO add other fields
                 }
-            } else {
+            } else if (issue != null) {
+                IssueCard(item.id(), issue.id()).apply {
+                    author = issue.author()?.login() ?: ""
+                    repository = issue.repository().name()
+                    title = issue.title()
+                    body = issue.body()
+                    closed = issue.closed()
+                    number = issue.number()
+
+                    labels.addAll(issue.labels()?.nodes()?.map { node -> Label(node.name(), Color.parseColor("#${node.color()}")) }!!)
+                }
+            }
+            else {
                 throw RuntimeException("missing case")
             }
 

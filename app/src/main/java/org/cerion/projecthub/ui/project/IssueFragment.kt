@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.FragmentIssueBinding
+import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.ui.dialog.LabelsViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -25,14 +26,12 @@ class IssueFragment : Fragment() {
         binding = FragmentIssueBinding.inflate(inflater, container, false)
 
         val args = IssueFragmentArgs.fromBundle(requireArguments())
-
-        //viewModel.load(args.columnId, args.repoOwner, args.repo, args.number)
-        //val columnViewModel = projectViewModel.findColumnById(args.columnId)!!
+        val issue = projectViewModel.findCardById(args.id) as IssueCard
+        viewModel.load(issue)
 
         viewModel.finished.observe(viewLifecycleOwner) {
             if (it!!) {
-                // TODO this needs to refresh ALL cards in project
-                //columnViewModel.refresh()
+                projectViewModel.refresh()
 
                 // TODO need to handle keyboard
                 findNavController().navigateUp()

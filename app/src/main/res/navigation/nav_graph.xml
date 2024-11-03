@@ -53,17 +53,8 @@
         android:id="@+id/issueFragment"
         android:name="org.cerion.projecthub.ui.project.IssueFragment">
         <argument
-            android:name="columnIndex"
-            app:argType="integer" />
-        <argument
-            android:name="repoOwner"
+            android:name="id"
             app:argType="string" />
-        <argument
-            android:name="repo"
-            app:argType="string" />
-        <argument
-            android:name="number"
-            app:argType="integer" />
         <action
             android:id="@+id/action_issueFragment_to_labelsDialogFragment"
             app:destination="@id/labelsDialogFragment" />

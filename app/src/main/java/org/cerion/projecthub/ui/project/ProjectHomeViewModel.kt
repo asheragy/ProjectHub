@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.repository.CardRepository
@@ -77,5 +78,9 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
                 refresh()
             }
         }
+    }
+
+    fun findCardById(id: String): Card? {
+        return columns.value!!.flatMap { it.cards.value!! }.find { it.contentId == id }
     }
 }

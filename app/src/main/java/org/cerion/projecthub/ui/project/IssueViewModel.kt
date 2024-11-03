@@ -7,13 +7,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.common.SingleEventData
 import org.cerion.projecthub.model.Issue
+import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.repository.IssueRepository
 
 
 class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
 
-    val issue = MutableLiveData<Issue>()
+    val issue = MutableLiveData<IssueCard>()
     val finished = MutableLiveData(false)
     val message = MutableLiveData<SingleEventData<String>>()
     val labelsChanged = MutableLiveData<SingleEventData<List<Label>>>()
@@ -33,21 +34,25 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
     val title: String
         get() = if (isNew) "New Issue" else "Issue $number"
 
-    fun load(columnId: Int, owner: String, repo: String, number: Int) {
-        this.columnId = columnId
-        this.ownerName = owner
-        this.repoName = repo
-        this.number = number
+    fun load(issueCard: IssueCard) {
+        //this.columnId = columnId
+        //this.ownerName = issue.author
+        this.repoName = issueCard.repository
+        this.number = issueCard.number
 
         if (isNew) {
-            issue.value = Issue(owner, repo, 0)
+            //issue.value = Issue(owner, repo, 0)
         }
         else {
-            launchBusy {
-                issue.value = issueRepo.getByNumber(owner, repo, number)
-            }
+
+            issue.value = issueCard
+            //launchBusy {
+            //    issue.value = issueRepo.getByNumber(owner, repo, number)
+            //}
         }
     }
+
+
 
     fun setLabels(labels: List<Label>) {
         issue.value!!.labels.apply {
@@ -70,6 +75,7 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
                 return
             }
 
+            /*
             launchBusy {
                 if (isNew) {
                     issueRepo.add(it, columnId)
@@ -80,6 +86,8 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
                     finished.value = true
                 }
             }
+
+             */
         }
 
 

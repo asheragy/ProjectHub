@@ -90,7 +90,7 @@ class ProjectHomeFragment : Fragment() {
 
         columnViewModel.eventAddIssue.observe(viewLifecycleOwner) {
             if (it != null && !it.getAndSetHandled())
-                navigateToIssue(columnViewModel.index)
+                navigateToIssue()
         }
 
 
@@ -122,9 +122,8 @@ class ProjectHomeFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-    private fun navigateToIssue(columnId: Int, number: Int = 0) {
-        val project = viewModel.project.value!!
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(columnId, project.owner, project.repo, number)
+    private fun navigateToIssue(issue: IssueCard? = null) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(issue?.contentId ?: "")
         findNavController().navigate(action)
     }
 
@@ -176,7 +175,7 @@ class ProjectHomeFragment : Fragment() {
             override fun onClick(card: Card) {
                 when (card) {
                     is DraftIssueCard -> navigateToDraft(viewModel.column.index, card.itemId)
-                    is IssueCard -> navigateToIssue(viewModel.column.index, card.number)
+                    is IssueCard -> navigateToIssue(card)
                 }
             }
 

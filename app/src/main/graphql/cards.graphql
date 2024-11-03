@@ -36,6 +36,7 @@ fragment IssueFragment on Issue {
 	databaseId
 	id
 	title
+	body
 	closed
 	number
 	repository {
