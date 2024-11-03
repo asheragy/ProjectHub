@@ -43,6 +43,10 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
         val vm = this
         viewModelScope.launch {
             _project.value = projectRepo.getById(projectId)
+
+            // TODO these could be lazy loaded on demand
+            _labels.value = projectRepo.getProjectLabels(_project.value!!)
+
             val items = cardRepo.getCardsForProject(_project.value!!.nodeId)
             val cols = columnRepo.getColumnsForProject(_project.value!!.nodeId)
             _columns.value = cols.map {
@@ -51,9 +55,6 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
                     setCards(cards ?: arrayListOf())
                 }
             }
-
-            // TODO see if this can be lazy loaded somehow, but need to handle various cases of that
-            // _labels.value = labelsRepo.getAll(_project.value!!.owner, _project.value!!.repo)
         }
     }
 

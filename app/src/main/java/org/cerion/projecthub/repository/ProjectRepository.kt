@@ -1,6 +1,8 @@
 package org.cerion.projecthub.repository
 
 import GetCurrentUserProjectsQuery
+import GetProjectLabelsQuery
+import android.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
@@ -8,6 +10,7 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.await
 import org.cerion.projecthub.database.DbProject
 import org.cerion.projecthub.database.ProjectDao
+import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
@@ -44,6 +47,21 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
         }
 
         emitSource(merged)
+    }
+
+    suspend fun getProjectLabels(project: Project): List<Label> {
+        val query = GetProjectLabelsQuery.builder().projectId(project.nodeId).build()
+        val result = apolloClient.query(query).await()
+
+        val repositories = result.data?.node()?.fragments()?.projectLabels()?.repositories()?.nodes()!!
+        if (repositories.size == 0)
+            return listOf()
+        else if (repositories.size > 1)
+            throw RuntimeException("Project must be linked to only 1 repository")
+
+        return repositories[0].labels()?.nodes()!!.map { label ->
+            Label(label.name(), Color.parseColor("#${label.color()}"))
+        }
     }
 
     // TODO remove and add single function to get by id
