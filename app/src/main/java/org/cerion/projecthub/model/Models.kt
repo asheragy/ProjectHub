@@ -11,7 +11,7 @@ data class Column(
     val color: String
     )
 
-data class Label(val name: String, val color: Int) {
+data class Label(val id: String, val name: String, val color: Int) {
     var description: String = ""
     var included = false
 }

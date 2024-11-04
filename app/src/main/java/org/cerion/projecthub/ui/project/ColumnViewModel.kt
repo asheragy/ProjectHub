@@ -9,7 +9,6 @@ import org.cerion.projecthub.common.SingleEvent
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.DraftIssueCard
-import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.repository.CardRepository
 
@@ -63,8 +62,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
 
     fun toggleIssueState(card: IssueCard) {
         launchBusy {
-            val issue = Issue(parent.project.value!!.owner, card.repository, card.number)
-            cardRepository.setIssueState(issue, !card.closed)
+            cardRepository.updateIssueState(card, !card.closed)
             parent.refresh()
         }
     }

@@ -60,7 +60,10 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
             throw RuntimeException("Project must be linked to only 1 repository")
 
         return repositories[0].labels()?.nodes()!!.map { label ->
-            Label(label.name(), Color.parseColor("#${label.color()}"))
+            val color = Color.parseColor("#${label.color()}")
+            Label(label.id(), label.name(), color).apply {
+                description = label.description() ?: ""
+            }
         }
     }
 

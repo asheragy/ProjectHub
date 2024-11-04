@@ -49,6 +49,8 @@ fragment IssueFragment on Issue {
 		nodes {
 			color
 			name
+			id
+			description
 		}
 	}
 }
@@ -119,6 +121,26 @@ mutation deleteItem($projectId: ID!, $itemId: ID!) {
 	deleteProjectV2Item(input: {
 		projectId: $projectId
 		itemId: $itemId
+	}) {
+		clientMutationId
+	}
+}
+
+mutation updateIssue($id: ID!, $title: String!, $body: String, $labelIds: [ID!]) {
+	updateIssue(input: {
+		id: $id
+		title: $title
+		body: $body
+		labelIds: $labelIds
+	}) {
+		clientMutationId
+	}
+}
+
+mutation updateIssueState($id: ID!, $state: IssueState!) {
+	updateIssue(input: {
+		id: $id
+		state: $state
 	}) {
 		clientMutationId
 	}

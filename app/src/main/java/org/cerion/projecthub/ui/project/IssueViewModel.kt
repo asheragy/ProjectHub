@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.common.SingleEventData
-import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
+import org.cerion.projecthub.repository.CardRepository
 import org.cerion.projecthub.repository.IssueRepository
 
 
-class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
+class IssueViewModel(private val issueRepo: IssueRepository, private val cardRepo: CardRepository) : ViewModel() {
 
     val issue = MutableLiveData<IssueCard>()
     val finished = MutableLiveData(false)
@@ -75,19 +75,16 @@ class IssueViewModel(private val issueRepo: IssueRepository) : ViewModel() {
                 return
             }
 
-            /*
             launchBusy {
                 if (isNew) {
-                    issueRepo.add(it, columnId)
-                    finished.value = true
+                    //issueRepo.add(it, columnId)
+                    //finished.value = true
                 }
                 else {
-                    issueRepo.update(it)
+                    cardRepo.updateIssue(it)
                     finished.value = true
                 }
             }
-
-             */
         }
 
 

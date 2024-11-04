@@ -51,15 +51,14 @@ val databaseModule = module {
 val repositoryModule = module {
     single { IssueRepository(get()) }
     single { ProjectRepository(get(), get()) }
-    single { LabelRepository(get()) }
-    single { CardRepository(get(), get()) }
+    single { CardRepository(get()) }
     single { ColumnRepository(get()) }
 }
 
 val viewModelModule = module {
-    viewModel { IssueViewModel(get()) }
+    viewModel { IssueViewModel(get(), get()) }
     viewModel { ProjectBrowserViewModel(get()) }
     viewModel { ProjectListViewModel(get()) }
-    viewModel { ProjectHomeViewModel(get(), get(), get(), get()) }
+    viewModel { ProjectHomeViewModel(get(), get(), get()) }
     viewModel { LabelsViewModel() }
 }

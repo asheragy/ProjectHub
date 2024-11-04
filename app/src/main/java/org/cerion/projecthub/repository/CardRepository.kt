@@ -5,6 +5,8 @@ import ArchiveItemMutation
 import DeleteItemMutation
 import GetCardsForProjectQuery
 import UpdateDraftIssueMutation
+import UpdateIssueMutation
+import UpdateIssueStateMutation
 import UpdateItemPositionMutation
 import UpdateItemStatusMutation
 import android.graphics.Color
@@ -12,17 +14,15 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.coroutines.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.cerion.projecthub.github.GitHubService
-import org.cerion.projecthub.github.UpdateIssueState
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.DraftIssueCard
-import org.cerion.projecthub.model.Issue
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
+import type.IssueState
 
-class CardRepository(private val service: GitHubService, private val apolloClient: ApolloClient) {
+class CardRepository(private val apolloClient: ApolloClient) {
 
     suspend fun getCardsForProject(projectId: String): Map<String, List<Card>> = withContext(Dispatchers.IO) {
         val query = GetCardsForProjectQuery.builder().id(projectId).build()
@@ -56,7 +56,12 @@ class CardRepository(private val service: GitHubService, private val apolloClien
                     closed = issue.closed()
                     number = issue.number()
 
-                    labels.addAll(issue.labels()?.nodes()?.map { node -> Label(node.name(), Color.parseColor("#${node.color()}")) }!!)
+                    labels.addAll(issue.labels()?.nodes()!!.map { node ->
+                        val color = Color.parseColor("#${node.color()}")
+                        Label(node.id(), node.name(), color).apply {
+                            description = node.description() ?: ""
+                        }
+                    })
                 }
             }
             else {
@@ -139,9 +144,24 @@ class CardRepository(private val service: GitHubService, private val apolloClien
         println(result)
     }
 
-    suspend fun setIssueState(issue: Issue, closed: Boolean) {
-        val state = UpdateIssueState(if(closed) "closed" else "open")
-        service.updateIssueState(issue.owner, issue.repo, issue.number, state).await()
+    suspend fun updateIssue(card: IssueCard) {
+        val mutation = UpdateIssueMutation.builder()
+            .id(card.contentId)
+            .title(card.title)
+            .body(card.body)
+            .labelIds(card.labels.map { it.id })
+
+        val result = apolloClient.mutate(mutation.build()).await()
+        println(result)
+    }
+
+    suspend fun updateIssueState(card: IssueCard, closed: Boolean) {
+        val mutation = UpdateIssueStateMutation.builder()
+            .id(card.contentId)
+            .state(if(closed) IssueState.CLOSED else IssueState.OPEN)
+
+        val result = apolloClient.mutate(mutation.build()).await()
+        println(result)
     }
 }
 
