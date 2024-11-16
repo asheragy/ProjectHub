@@ -3,7 +3,6 @@ package org.cerion.projecthub
 import android.app.Application
 import org.cerion.projecthub.database.AppDatabase
 import org.cerion.projecthub.github.getGraphQLClient
-import org.cerion.projecthub.github.getService
 import org.cerion.projecthub.repository.*
 import org.cerion.projecthub.ui.ProjectBrowserViewModel
 import org.cerion.projecthub.ui.ProjectListViewModel
@@ -39,7 +38,6 @@ class App : Application() {
 }
 
 val networkModule = module {
-    single { getService(androidContext()) }
     single { getGraphQLClient(androidContext()) }
 }
 
@@ -49,14 +47,13 @@ val databaseModule = module {
 }
 
 val repositoryModule = module {
-    single { IssueRepository(get()) }
     single { ProjectRepository(get(), get()) }
     single { CardRepository(get()) }
     single { ColumnRepository(get()) }
 }
 
 val viewModelModule = module {
-    viewModel { IssueViewModel(get(), get()) }
+    viewModel { IssueViewModel(get()) }
     viewModel { ProjectBrowserViewModel(get()) }
     viewModel { ProjectListViewModel(get()) }
     viewModel { ProjectHomeViewModel(get(), get(), get()) }

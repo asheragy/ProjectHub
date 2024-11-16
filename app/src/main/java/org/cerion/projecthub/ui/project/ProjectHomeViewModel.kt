@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.repository.CardRepository
@@ -26,6 +27,12 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
     val labels: LiveData<List<Label>>
         get() = _labels
 
+    lateinit var repositoryId: String
+
+    //private val _repositoryId = MutableLiveData<String>()
+    //val repositoryId: LiveData<String>
+    //    get() = _repositoryId
+
     fun load(projectId: Int) {
         val existingId = project.value?.id
         // When loading new project clear everything first since delay in load
@@ -44,7 +51,9 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
             _project.value = projectRepo.getById(projectId)
 
             // TODO these could be lazy loaded on demand
-            _labels.value = projectRepo.getProjectLabels(_project.value!!)
+            val repoWithLabels = projectRepo.getProjectLabels(_project.value!!)
+            _labels.value = repoWithLabels.second
+            repositoryId = repoWithLabels.first
 
             val items = cardRepo.getCardsForProject(_project.value!!.nodeId)
             val cols = columnRepo.getColumnsForProject(_project.value!!.nodeId)
@@ -69,7 +78,7 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
 
         viewModelScope.launch {
             try {
-                cardRepo.changeCardColumn(_project.value!!.nodeId, card, column.column.fieldId, column.column.optionId)
+                cardRepo.changeCardColumn(_project.value!!.nodeId, card, column.column)
             }
             catch(e: Exception) {
                 e.printStackTrace()
@@ -78,9 +87,5 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
                 refresh()
             }
         }
-    }
-
-    fun findCardById(id: String): Card? {
-        return columns.value!!.flatMap { it.cards.value!! }.find { it.contentId == id }
     }
 }

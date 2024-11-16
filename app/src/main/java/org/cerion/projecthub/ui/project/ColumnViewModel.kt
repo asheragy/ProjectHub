@@ -114,4 +114,8 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
             }
         }
     }
+
+    fun findCardById(id: String): Card? {
+        return cards.value!!.find { it.contentId == id }
+    }
 }

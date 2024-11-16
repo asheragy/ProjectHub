@@ -26,8 +26,15 @@ class IssueFragment : Fragment() {
         binding = FragmentIssueBinding.inflate(inflater, container, false)
 
         val args = IssueFragmentArgs.fromBundle(requireArguments())
-        val issue = projectViewModel.findCardById(args.id) as IssueCard
-        viewModel.load(issue)
+        val column = projectViewModel.columns.value!!.first { it.column.optionId == args.columnId }
+
+        if (args.id.isEmpty()) {
+            viewModel.load(projectViewModel.project.value!!, projectViewModel.repositoryId, column.column)
+        }
+        else {
+            val issue = column.findCardById(args.id)
+            viewModel.load(issue as IssueCard)
+        }
 
         viewModel.finished.observe(viewLifecycleOwner) {
             if (it!!) {

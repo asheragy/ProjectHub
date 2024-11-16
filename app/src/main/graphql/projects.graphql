@@ -23,6 +23,7 @@ query getProjectLabels($projectId: ID!)  {
 fragment ProjectLabels on ProjectV2 {
   repositories(first: 100) {
     nodes {
+      id
       labels(first: 100) {
         nodes {
           color

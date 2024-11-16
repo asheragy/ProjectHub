@@ -49,22 +49,22 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
         emitSource(merged)
     }
 
-    suspend fun getProjectLabels(project: Project): List<Label> {
+    suspend fun getProjectLabels(project: Project): Pair<String,List<Label>> {
         val query = GetProjectLabelsQuery.builder().projectId(project.nodeId).build()
         val result = apolloClient.query(query).await()
 
         val repositories = result.data?.node()?.fragments()?.projectLabels()?.repositories()?.nodes()!!
-        if (repositories.size == 0)
-            return listOf()
-        else if (repositories.size > 1)
+        if (repositories.size != 1)
             throw RuntimeException("Project must be linked to only 1 repository")
 
-        return repositories[0].labels()?.nodes()!!.map { label ->
+        val labels = repositories[0].labels()?.nodes()!!.map { label ->
             val color = Color.parseColor("#${label.color()}")
             Label(label.id(), label.name(), color).apply {
                 description = label.description() ?: ""
             }
         }
+
+        return Pair(repositories[0].id(), labels)
     }
 
     // TODO remove and add single function to get by id

@@ -4,15 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fragment.IssueFragment.Repository
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.common.SingleEventData
+import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
+import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.repository.CardRepository
-import org.cerion.projecthub.repository.IssueRepository
 
 
-class IssueViewModel(private val issueRepo: IssueRepository, private val cardRepo: CardRepository) : ViewModel() {
+class IssueViewModel(private val cardRepo: CardRepository) : ViewModel() {
 
     val issue = MutableLiveData<IssueCard>()
     val finished = MutableLiveData(false)
@@ -52,7 +54,16 @@ class IssueViewModel(private val issueRepo: IssueRepository, private val cardRep
         }
     }
 
+    private var column: Column? = null
+    private var repositoryId: String? = null
+    private var project: Project? = null
 
+    fun load(project: Project, repositoryId: String, column: Column) {
+        this.project = project
+        this.repositoryId = repositoryId
+        this.column = column
+        issue.value = IssueCard("", "")
+    }
 
     fun setLabels(labels: List<Label>) {
         issue.value!!.labels.apply {
@@ -67,7 +78,6 @@ class IssueViewModel(private val issueRepo: IssueRepository, private val cardRep
 
     fun submit() {
         // TODO failure to update indicator
-
         issue.value?.let {
 
             if (it.title.isEmpty()) {
@@ -77,17 +87,14 @@ class IssueViewModel(private val issueRepo: IssueRepository, private val cardRep
 
             launchBusy {
                 if (isNew) {
-                    //issueRepo.add(it, columnId)
-                    //finished.value = true
+                    cardRepo.addIssue(project!!, repositoryId!!, column!!, it)
                 }
-                else {
+                else
                     cardRepo.updateIssue(it)
-                    finished.value = true
-                }
+
+                finished.value = true
             }
         }
-
-
     }
 
     private fun launchBusy(action: suspend () -> Unit) {

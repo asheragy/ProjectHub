@@ -1,6 +1,7 @@
 package org.cerion.projecthub.repository
 
 import AddDraftIssueMutation
+import AddProjectItemMutation
 import ArchiveItemMutation
 import DeleteItemMutation
 import GetCardsForProjectQuery
@@ -97,12 +98,12 @@ class CardRepository(private val apolloClient: ApolloClient) {
         apolloClient.mutate(mutation.build()).await()
     }
 
-    suspend fun changeCardColumn(projectId: String, card: Card, fieldId: String, optionId: String) {
+    suspend fun changeCardColumn(projectId: String, card: Card, column: Column) {
         val mutation = UpdateItemStatusMutation.builder()
             .projectId(projectId)
             .itemId(card.itemId)
-            .statusFieldId(fieldId)
-            .optionId(optionId)
+            .statusFieldId(column.fieldId)
+            .optionId(column.optionId)
 
         apolloClient.mutate(mutation.build()).await()
     }
@@ -154,6 +155,33 @@ class CardRepository(private val apolloClient: ApolloClient) {
         val result = apolloClient.mutate(mutation.build()).await()
         println(result)
     }
+
+    suspend fun addIssue(project: Project, repositoryId: String, column: Column, issue: IssueCard) {
+        val addMutation = CreateIssueMutation.builder()
+            .repositoryId(repositoryId)
+            .title(issue.title)
+            .body(issue.body)
+            .labelIds(issue.labels.map { it.id })
+
+        val createResult = apolloClient.mutate(addMutation.build()).await()
+        val id = createResult.data?.createIssue()?.issue()?.id()!!
+
+        // Add to project
+        // TODO for some reason this was not working as part of the add mutation
+        val addToProjectMutation = AddProjectItemMutation.builder().projectId(project.nodeId).itemId(id)
+        val result = apolloClient.mutate(addToProjectMutation.build()).await()
+        val itemId = result.data?.addProjectV2ItemById()?.item()?.id()!!
+
+        // Set column
+        val columnMutation = UpdateItemStatusMutation.builder()
+            .projectId(project.nodeId)
+            .itemId(itemId)
+            .statusFieldId(column.fieldId)
+            .optionId(column.optionId)
+
+        apolloClient.mutate(columnMutation.build()).await()
+    }
+
 
     suspend fun updateIssueState(card: IssueCard, closed: Boolean) {
         val mutation = UpdateIssueStateMutation.builder()

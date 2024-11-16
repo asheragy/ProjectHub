@@ -58,6 +58,9 @@
         <action
             android:id="@+id/action_issueFragment_to_labelsDialogFragment"
             app:destination="@id/labelsDialogFragment" />
+        <argument
+            android:name="columnId"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/projectBrowserFragment"

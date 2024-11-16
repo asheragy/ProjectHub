@@ -18,6 +18,7 @@ import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.ColumnHeaderBinding
 import org.cerion.projecthub.databinding.FragmentProjectHomeBinding
 import org.cerion.projecthub.model.Card
+import org.cerion.projecthub.model.Column
 import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.IssueCard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -90,9 +91,8 @@ class ProjectHomeFragment : Fragment() {
 
         columnViewModel.eventAddIssue.observe(viewLifecycleOwner) {
             if (it != null && !it.getAndSetHandled())
-                navigateToIssue()
+                navigateToIssue(columnViewModel.column)
         }
-
 
         columnViewModel.eventAddDraft.observe(viewLifecycleOwner) {
             if (it?.getAndSetHandled() == false)
@@ -122,8 +122,8 @@ class ProjectHomeFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-    private fun navigateToIssue(issue: IssueCard? = null) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(issue?.contentId ?: "")
+    private fun navigateToIssue(column: Column, issue: IssueCard? = null) {
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(issue?.contentId ?: "", column.optionId)
         findNavController().navigate(action)
     }
 
@@ -175,7 +175,7 @@ class ProjectHomeFragment : Fragment() {
             override fun onClick(card: Card) {
                 when (card) {
                     is DraftIssueCard -> navigateToDraft(viewModel.column.index, card.itemId)
-                    is IssueCard -> navigateToIssue(card)
+                    is IssueCard -> navigateToIssue(viewModel.column, card)
                 }
             }
 

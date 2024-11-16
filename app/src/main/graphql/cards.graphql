@@ -137,6 +137,32 @@ mutation updateIssue($id: ID!, $title: String!, $body: String, $labelIds: [ID!])
 	}
 }
 
+mutation createIssue($repositoryId: ID!, $title: String!, $body: String, $labelIds: [ID!]) {
+	createIssue(input: {
+		repositoryId: $repositoryId
+		title: $title
+		body: $body
+		labelIds: $labelIds
+	}) {
+		clientMutationId
+		issue {
+			id
+		}
+	}
+}
+
+mutation addProjectItem($projectId: ID!, $itemId: ID!) {
+	addProjectV2ItemById(input: {
+		projectId: $projectId
+		contentId: $itemId
+	}) {
+		clientMutationId
+		item {
+			id
+		}
+	}
+}
+
 mutation updateIssueState($id: ID!, $state: IssueState!) {
 	updateIssue(input: {
 		id: $id
