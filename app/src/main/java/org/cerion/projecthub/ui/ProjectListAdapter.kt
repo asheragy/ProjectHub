@@ -40,7 +40,7 @@ class ProjectListAdapter(private val listener: ProjectListener, private val brow
             binding.repo.text = item.owner + '/' + item.repo
             binding.name.text = item.name
             val icon = when (item.type) {
-                ProjectType.Repository -> R.drawable.type_repo
+                //ProjectType.Repository -> R.drawable.type_repo
                 ProjectType.User -> R.drawable.type_account
                 ProjectType.Org -> R.drawable.type_org
             }

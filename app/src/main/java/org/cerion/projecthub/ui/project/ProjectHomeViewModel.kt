@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.cerion.projecthub.model.Card
-import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.repository.CardRepository
@@ -33,7 +31,7 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
     //val repositoryId: LiveData<String>
     //    get() = _repositoryId
 
-    fun load(projectId: Int) {
+    fun load(projectId: String) {
         val existingId = project.value?.id
         // When loading new project clear everything first since delay in load
         if (existingId != null) {
@@ -55,8 +53,8 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
             _labels.value = repoWithLabels.second
             repositoryId = repoWithLabels.first
 
-            val items = cardRepo.getCardsForProject(_project.value!!.nodeId)
-            val cols = columnRepo.getColumnsForProject(_project.value!!.nodeId)
+            val items = cardRepo.getCardsForProject(_project.value!!.id)
+            val cols = columnRepo.getColumnsForProject(_project.value!!.id)
             _columns.value = cols.map {
                 val cards = items[it.optionId]
                 ColumnViewModel(vm, cardRepo, it).apply {
@@ -78,7 +76,7 @@ class ProjectHomeViewModel(private val projectRepo: ProjectRepository, private v
 
         viewModelScope.launch {
             try {
-                cardRepo.changeCardColumn(_project.value!!.nodeId, card, column.column)
+                cardRepo.changeCardColumn(_project.value!!.id, card, column.column)
             }
             catch(e: Exception) {
                 e.printStackTrace()

@@ -5,8 +5,7 @@ import androidx.room.*
 
 @Entity(tableName = "projects")
 data class DbProject(
-    @PrimaryKey val id: Int,
-    val nodeId: String,
+    @PrimaryKey val id: String,
     val type: Int,
     val owner: String,
     val repo: String,

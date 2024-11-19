@@ -30,7 +30,7 @@
         tools:layout="@layout/fragment_project_home" >
         <argument
             android:name="projectId"
-            app:argType="integer" />
+            app:argType="string" />
         <action
             android:id="@+id/action_projectHomeFragment_to_editDraftDialogFragment"
             app:destination="@id/editDraftDialogFragment" />

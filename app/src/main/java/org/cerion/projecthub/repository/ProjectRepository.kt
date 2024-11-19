@@ -15,22 +15,11 @@ import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 
-// Temp for testing larger project than my own
-val mpAndroidChart = Project(1481924, "MDc6UHJvamVjdDE0ODE5MjQ=", ProjectType.Repository,"PhilJay" , "MPAndroidChart").apply {
-    name = "Support"
-    description = ":fire: Automated issue tracking :fire:\\r\\n\\r\\n*Never-ending*"
-}
 
 class ProjectRepository(private val dao: ProjectDao, private val apolloClient: ApolloClient) {
 
-    // FEATURE store project as combo of type / owner / repo?
-    // Org/user projects can have multiple repos
-    //GET /repos/:owner/:repo/projects
-    //GET /orgs/:org/projects
-    //GET /users/:username/projects
-
     val projects = dao.getAllAsync().map { projects ->
-        projects.map { it.toProject() }.plus(mpAndroidChart)
+        projects.map { it.toProject() }
     }
 
     val ownerRepositoryProjects: LiveData<List<Project>> = liveData {
@@ -50,7 +39,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
     }
 
     suspend fun getProjectLabels(project: Project): Pair<String,List<Label>> {
-        val query = GetProjectLabelsQuery.builder().projectId(project.nodeId).build()
+        val query = GetProjectLabelsQuery.builder().projectId(project.id).build()
         val result = apolloClient.query(query).await()
 
         val repositories = result.data?.node()?.fragments()?.projectLabels()?.repositories()?.nodes()!!
@@ -67,10 +56,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
         return Pair(repositories[0].id(), labels)
     }
 
-    // TODO remove and add single function to get by id
-    private fun getAll(): List<Project> = dao.getAll().map { it.toProject() }.plus(mpAndroidChart)
-
-    fun getById(id: Int): Project? = getAll().firstOrNull { it.id == id }
+    fun getById(id: String): Project? = dao.getAll().map { it.toProject() }.firstOrNull { it.id == id }
 
     private suspend fun getUserProjects(): List<Project> {
         val query = GetCurrentUserProjectsQuery.builder().build()
@@ -78,7 +64,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
         val viewer = response.data?.viewer()
 
         return viewer?.projectsV2()?.nodes()!!.map { project ->
-            Project(project.databaseId()!!, project.id(), ProjectType.User, viewer.login(), "").apply {
+            Project(project.id(), ProjectType.User, viewer.login(), "").apply {
                 name = project.title()
             }
         }
@@ -91,16 +77,12 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
     suspend fun delete(project: Project) {
         dao.delete(project.toDbProject())
     }
-
-    //GET /repos/:owner/:repo/projects
-    //GET /orgs/:org/projects
-    //GET /users/:username/projects
 }
 
-fun DbProject.toProject(): Project = Project(id, nodeId, ProjectType.values()[type], owner, repo).also {
+fun DbProject.toProject(): Project = Project(id, ProjectType.values()[type], owner, repo).also {
     it.name = name
     it.description = this.description
     it.saved = true
 }
 
-fun Project.toDbProject(): DbProject = DbProject(id, nodeId, type.ordinal, owner, repo, name, description)
+fun Project.toDbProject(): DbProject = DbProject(id, type.ordinal, owner, repo, name, description)

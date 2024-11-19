@@ -80,7 +80,7 @@ class CardRepository(private val apolloClient: ApolloClient) {
 
     suspend fun deleteCard(project: Project, card: Card) {
         if (card is DraftIssueCard) {
-            val mutation = DeleteItemMutation.builder().projectId(project.nodeId).itemId(card.itemId)
+            val mutation = DeleteItemMutation.builder().projectId(project.id).itemId(card.itemId)
             apolloClient.mutate(mutation.build()).await()
         }
         else {
@@ -110,7 +110,7 @@ class CardRepository(private val apolloClient: ApolloClient) {
 
     suspend fun archiveCard(project: Project, card: Card) {
         val mutation = ArchiveItemMutation.builder()
-            .projectId(project.nodeId)
+            .projectId(project.id)
             .itemId(card.itemId)
 
         apolloClient.mutate(mutation.build()).await()
@@ -118,7 +118,7 @@ class CardRepository(private val apolloClient: ApolloClient) {
 
     suspend fun addDraftIssue(project: Project, column: Column, card: DraftIssueCard) {
         val addMutation = AddDraftIssueMutation.builder()
-            .projectId(project.nodeId)
+            .projectId(project.id)
             .title(card.title)
             .body(card.body)
 
@@ -127,7 +127,7 @@ class CardRepository(private val apolloClient: ApolloClient) {
 
         // Set column
         val columnMutation = UpdateItemStatusMutation.builder()
-            .projectId(project.nodeId)
+            .projectId(project.id)
             .itemId(cardId)
             .statusFieldId(column.fieldId)
             .optionId(column.optionId)
@@ -168,13 +168,27 @@ class CardRepository(private val apolloClient: ApolloClient) {
 
         // Add to project
         // TODO for some reason this was not working as part of the add mutation
-        val addToProjectMutation = AddProjectItemMutation.builder().projectId(project.nodeId).itemId(id)
+        /*
+mutation {
+	createIssue(input: {
+	repositoryId: "MDEwOlJlcG9zaXRvcnkzODU0ODg5NDM="
+    projectIds: ["PVT_kwHOAMMyYM4Aml3M"]
+		title: "test"
+	}) {
+		clientMutationId
+		issue {
+			id
+		}
+	}
+}
+         */
+        val addToProjectMutation = AddProjectItemMutation.builder().projectId(project.id).itemId(id)
         val result = apolloClient.mutate(addToProjectMutation.build()).await()
         val itemId = result.data?.addProjectV2ItemById()?.item()?.id()!!
 
         // Set column
         val columnMutation = UpdateItemStatusMutation.builder()
-            .projectId(project.nodeId)
+            .projectId(project.id)
             .itemId(itemId)
             .statusFieldId(column.fieldId)
             .optionId(column.optionId)

@@ -85,7 +85,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
         if (oldPosition == newPosition)
             return
 
-        val projectId = parent.project.value!!.nodeId
+        val projectId = parent.project.value!!.id
         val cards = cards.value!!.toMutableList()
         val movedCard = cards[newPosition]
 

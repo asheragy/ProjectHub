@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fragment.IssueFragment.Repository
 import kotlinx.coroutines.launch
 import org.cerion.projecthub.common.SingleEventData
 import org.cerion.projecthub.model.Column
