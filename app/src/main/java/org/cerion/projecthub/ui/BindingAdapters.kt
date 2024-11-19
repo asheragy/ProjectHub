@@ -14,7 +14,7 @@ import org.cerion.projecthub.model.IssueCard
 
 fun ImageView.setCardImage(card: Card) {
     val id = when (card) {
-        is DraftIssueCard -> R.drawable.card_type_note // TODO add new image
+        is DraftIssueCard -> R.drawable.card_type_draft_issue
         is IssueCard -> {
             if (card.closed)
                 R.drawable.card_type_issue_closed

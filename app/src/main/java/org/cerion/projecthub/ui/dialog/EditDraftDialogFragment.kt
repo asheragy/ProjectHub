@@ -33,7 +33,7 @@ class EditDraftDialogFragment : DialogFragment() {
             it as DraftIssueCard
             binding.title.setText(it.title)
             binding.body.setText(it.body)
-            contentId = it.contentId
+            contentId = it.id
         }
 
         binding.save.setOnClickListener {

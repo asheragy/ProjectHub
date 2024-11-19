@@ -23,7 +23,8 @@ abstract class AppDatabase : RoomDatabase() {
                 var db = instance
                 if (db == null) {
                     db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
-                        .allowMainThreadQueries() // TODO try removing later
+                        // Allowing since database is very minimal
+                        .allowMainThreadQueries()
                         .build()
 
                     instance = db

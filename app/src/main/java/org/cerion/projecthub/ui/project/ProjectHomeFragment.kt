@@ -24,8 +24,6 @@ import org.cerion.projecthub.model.IssueCard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 
-// TODO https://issuetracker.google.com/issues/111614463
-
 class ProjectHomeFragment : Fragment() {
 
     private val args: ProjectHomeFragmentArgs by navArgs()
@@ -123,7 +121,7 @@ class ProjectHomeFragment : Fragment() {
     }
 
     private fun navigateToIssue(column: Column, issue: IssueCard? = null) {
-        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(issue?.contentId ?: "", column.optionId)
+        val action = ProjectHomeFragmentDirections.actionProjectHomeFragmentToIssueFragment(issue?.id ?: "", column.optionId)
         findNavController().navigate(action)
     }
 

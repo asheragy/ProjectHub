@@ -2,8 +2,7 @@ package org.cerion.projecthub.common
 
 
 open class SingleEventData<out T>(private val content: T) {
-    var handled = false
-        private set
+    private var handled = false
 
     fun getContentIfNotHandled(): T? {
         return if (handled) {
@@ -16,8 +15,7 @@ open class SingleEventData<out T>(private val content: T) {
 }
 
 open class SingleEvent {
-    var handled = false
-        private set
+    private var handled = false
 
     fun getAndSetHandled(): Boolean {
         return if (handled)

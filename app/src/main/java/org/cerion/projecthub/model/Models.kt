@@ -1,5 +1,6 @@
 package org.cerion.projecthub.model
 
+import type.ProjectV2SingleSelectFieldOptionColor
 
 
 data class Column(
@@ -7,8 +8,7 @@ data class Column(
     val fieldId: String,
     val optionId: String,
     val name: String,
-    // TODO change to enum before using
-    val color: String
+    val color: ProjectV2SingleSelectFieldOptionColor
     )
 
 data class Label(val id: String, val name: String, val color: Int) {

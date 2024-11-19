@@ -31,7 +31,7 @@ class LabelsDialogFragment : DialogFragment() {
         val view = li.inflate(R.layout.dialog_labels, null)
 
         val labels = mutableListOf<Label>()
-        val listView = view.findViewById(R.id.listView) as ListView
+        val listView: ListView = view.findViewById(R.id.listView)
 
         val builder = AlertDialog.Builder(activity)
             .setView(view)

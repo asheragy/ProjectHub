@@ -137,7 +137,7 @@ class CardRepository(private val apolloClient: ApolloClient) {
 
     suspend fun updateDraftIssue(card: DraftIssueCard) {
         val mutation = UpdateDraftIssueMutation.builder()
-            .id(card.contentId)
+            .id(card.id)
             .title(card.title)
             .body(card.body)
 
@@ -147,7 +147,7 @@ class CardRepository(private val apolloClient: ApolloClient) {
 
     suspend fun updateIssue(card: IssueCard) {
         val mutation = UpdateIssueMutation.builder()
-            .id(card.contentId)
+            .id(card.id)
             .title(card.title)
             .body(card.body)
             .labelIds(card.labels.map { it.id })
@@ -199,7 +199,7 @@ mutation {
 
     suspend fun updateIssueState(card: IssueCard, closed: Boolean) {
         val mutation = UpdateIssueStateMutation.builder()
-            .id(card.contentId)
+            .id(card.id)
             .state(if(closed) IssueState.CLOSED else IssueState.OPEN)
 
         val result = apolloClient.mutate(mutation.build()).await()

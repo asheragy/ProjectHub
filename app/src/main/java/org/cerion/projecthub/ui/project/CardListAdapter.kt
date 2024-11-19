@@ -1,5 +1,6 @@
 package org.cerion.projecthub.ui.project
 
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.view.ContextMenu
 import android.view.LayoutInflater
@@ -58,7 +59,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
     }
 
     override fun getUniqueItemId(position: Int): Long {
-        return mItemList[position]!!.itemId.hashCode().toLong()
+        return mItemList[position]!!.id.hashCode().toLong()
     }
 
     inner class DraftIssueViewHolder(private val binding: ListItemCardNoteBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
@@ -103,6 +104,7 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
     inner class IssueViewHolder(private val binding: ListItemCardIssueBinding) : DragItemAdapter.ViewHolder(binding.root, mGrabHandleId, true), View.OnCreateContextMenuListener {
         private var issue: IssueCard? = null
 
+        @SuppressLint("SetTextI18n")
         fun bind(item: IssueCard) {
             issue = item
             // FEATURE add repository if this is a multi repo project (associated to user/org)

@@ -7,7 +7,6 @@ import okhttp3.OkHttpClient
 fun getGraphQLClient(context: Context): ApolloClient {
     val accessToken = getAccessToken(context)
 
-    // TODO may be able to share client with REST version
     val okHttpClient: OkHttpClient = OkHttpClient.Builder()
         .addInterceptor { chain ->
             val request = chain.request().newBuilder()

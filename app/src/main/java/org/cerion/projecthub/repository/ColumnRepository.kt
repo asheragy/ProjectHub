@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import org.cerion.projecthub.TAG
 import org.cerion.projecthub.USE_MOCK_DATA
 import org.cerion.projecthub.model.Column
+import type.ProjectV2SingleSelectFieldOptionColor
 
 
 class ColumnRepository(private val apolloClient: ApolloClient) {
@@ -28,12 +29,12 @@ class ColumnRepository(private val apolloClient: ApolloClient) {
             val options = field.options()
 
             options.mapIndexed { index, it ->
-                Column(index, field.id(), it.id(), it.name(), it.color().toString())
+                Column(index, field.id(), it.id(), it.name(), it.color())
             }
         }
     }
 }
 
 val mockColumns = listOf(
-    Column(0, "", "MDEzOlByb2plY3RDb2x1bW45MzE5NTQ2", "New", "GRAY"),
-    Column(1, "","MDEzOlByb2plY3RDb2x1bW45MzE5NTQ3", "Done", "GRAY"))
+    Column(0, "", "MDEzOlByb2plY3RDb2x1bW45MzE5NTQ2", "New", ProjectV2SingleSelectFieldOptionColor.GRAY),
+    Column(1, "","MDEzOlByb2plY3RDb2x1bW45MzE5NTQ3", "Done", ProjectV2SingleSelectFieldOptionColor.RED))

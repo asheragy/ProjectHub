@@ -1,5 +1,6 @@
 package org.cerion.projecthub.ui
 
+import android.annotation.SuppressLint
 import android.view.*
 import androidx.recyclerview.widget.RecyclerView
 import org.cerion.projecthub.R
@@ -36,6 +37,7 @@ class ProjectListAdapter(private val listener: ProjectListener, private val brow
     }
 
     inner class ViewHolder(private val binding: ListItemProjectBinding) : RecyclerView.ViewHolder(binding.root), View.OnCreateContextMenuListener {
+        @SuppressLint("SetTextI18n")
         fun bind(item: Project) {
             binding.repo.text = item.owner + '/' + item.repo
             binding.name.text = item.name
