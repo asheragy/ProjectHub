@@ -177,17 +177,14 @@ class ProjectHomeFragment : Fragment() {
                 }
             }
 
-            override fun onArchive(card: Card) {
-                viewModel.archiveCard(card, true)
-            }
-
             override fun onDelete(card: Card) {
                 AlertDialog.Builder(requireContext())
                     .setTitle("Delete")
                     .setMessage("Are you sure?")
                     .setPositiveButton("YES") { dialog, _ ->
+                        // Ignore for issues, web UI only deletes these from project but still leaves in repo
                         if (card is IssueCard)
-                            Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show() // TODO
+                            Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show()
                         else
                             viewModel.deleteCard(card)
 
@@ -200,13 +197,9 @@ class ProjectHomeFragment : Fragment() {
                     .show()
             }
 
-            override fun onConvertToIssue(note: DraftIssueCard) {
-                Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show() // TODO
-            }
-
-            override fun onCloseOrOpen(issue: IssueCard) {
-                viewModel.toggleIssueState(issue)
-            }
+            override fun onConvertToIssue(card: DraftIssueCard) = viewModel.convertDraftToIssue(card)
+            override fun onCloseOrOpen(issue: IssueCard) = viewModel.toggleIssueState(issue)
+            override fun onArchive(card: Card) = viewModel.archiveCard(card)
         }
     }
 }

@@ -171,3 +171,12 @@ mutation updateIssueState($id: ID!, $state: IssueState!) {
 		clientMutationId
 	}
 }
+
+mutation convertDraftToIssue($itemId: ID!, $repositoryId: ID!) {
+	convertProjectV2DraftIssueItemToIssue(input: {
+		itemId: $itemId
+		repositoryId: $repositoryId
+	}) {
+		clientMutationId
+	}
+}

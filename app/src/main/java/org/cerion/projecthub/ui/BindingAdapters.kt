@@ -48,7 +48,7 @@ fun setFormattedText(textView: TextView, text: String) {
     textView.text = sb
 }
 
-// TODO more efficient way of doing this by searching for tags rather than 100+ replaces
+// Make more efficient if more is added here
 fun replaceMarkdown(str: String): String {
     var result = str
     result = result.replace(":sparkles:", getEmojiByUnicode(0x2728))

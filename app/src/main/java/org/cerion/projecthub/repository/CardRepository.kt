@@ -3,6 +3,7 @@ package org.cerion.projecthub.repository
 import AddDraftIssueMutation
 import AddProjectItemMutation
 import ArchiveItemMutation
+import ConvertDraftToIssueMutation
 import DeleteItemMutation
 import GetCardsForProjectQuery
 import UpdateDraftIssueMutation
@@ -45,9 +46,7 @@ class CardRepository(private val apolloClient: ApolloClient) {
             val issue = item.content()?.fragments()?.issueFragment()
 
             val card = if (draft != null) {
-                DraftIssueCard(item.id(), draft.id(), draft.title(), draft.body()).apply {
-                    // TODO add other fields
-                }
+                DraftIssueCard(item.id(), draft.id(), draft.title(), draft.body())
             } else if (issue != null) {
                 IssueCard(item.id(), issue.id()).apply {
                     author = issue.author()?.login() ?: ""
@@ -196,14 +195,21 @@ mutation {
         apolloClient.mutate(columnMutation.build()).await()
     }
 
+    suspend fun convertToIssue(card: DraftIssueCard, repositoryId: String) {
+        val mutation = ConvertDraftToIssueMutation.builder()
+            .itemId(card.itemId)
+            .repositoryId(repositoryId)
+
+        apolloClient.mutate(mutation.build()).await()
+    }
+
 
     suspend fun updateIssueState(card: IssueCard, closed: Boolean) {
         val mutation = UpdateIssueStateMutation.builder()
             .id(card.id)
             .state(if(closed) IssueState.CLOSED else IssueState.OPEN)
 
-        val result = apolloClient.mutate(mutation.build()).await()
-        println(result)
+        apolloClient.mutate(mutation.build()).await()
     }
 }
 

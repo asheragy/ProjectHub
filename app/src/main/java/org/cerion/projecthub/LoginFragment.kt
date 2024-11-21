@@ -29,7 +29,6 @@ class LoginFragment : Fragment() {
         val binding = FragmentLoginBinding.inflate(layoutInflater, container, false)
 
         binding.login.setOnClickListener {
-            // TODO unsure if repo scope is needed
             val url = "https://github.com/login/oauth/authorize?client_id=${BuildConfig.CLIENT_ID}&redirect_uri=${BuildConfig.CALLBACK_URL}&scope=repo,project"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
@@ -64,8 +63,6 @@ class LoginFragment : Fragment() {
                     findNavController().navigate(action)
                 }
             }
-
-            // TODO handle error cases
         }
     }
 

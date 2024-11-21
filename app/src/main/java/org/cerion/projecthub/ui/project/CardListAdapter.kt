@@ -30,7 +30,7 @@ interface CardListener {
     // onRemoveFromProject
     // onChangeLabels
 
-    fun onConvertToIssue(note: DraftIssueCard)
+    fun onConvertToIssue(card: DraftIssueCard)
 }
 
 internal class CardListAdapter(private val listener: CardListener) : DragItemAdapter<Card?, DragItemAdapter.ViewHolder>() {
@@ -89,7 +89,6 @@ internal class CardListAdapter(private val listener: CardListener) : DragItemAda
                     true
                 }
                 add(Menu.NONE, view.id, Menu.NONE, "Convert to issue").setOnMenuItemClickListener {
-                    // TODO still applies
                     listener.onConvertToIssue(card)
                     true
                 }

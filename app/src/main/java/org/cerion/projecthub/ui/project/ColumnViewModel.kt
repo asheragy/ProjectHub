@@ -46,7 +46,7 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
         eventAddDraft.value = SingleEvent()
     }
 
-    fun archiveCard(card: Card, archived: Boolean) {
+    fun archiveCard(card: Card) {
         launchBusy {
             cardRepository.archiveCard(parent.project.value!!, card)
             parent.refresh()
@@ -77,6 +77,13 @@ class ColumnViewModel(private val parent: ProjectHomeViewModel, private val card
     fun updateDraft(card: DraftIssueCard) {
         launchBusy {
             cardRepository.updateDraftIssue(card)
+            parent.refresh()
+        }
+    }
+
+    fun convertDraftToIssue(card: DraftIssueCard) {
+        launchBusy {
+            cardRepository.convertToIssue(card, parent.repositoryId)
             parent.refresh()
         }
     }
