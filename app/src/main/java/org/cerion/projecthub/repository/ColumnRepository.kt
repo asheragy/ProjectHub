@@ -2,8 +2,7 @@ package org.cerion.projecthub.repository
 
 import GetColumnsByStatusQuery
 import android.util.Log
-import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.coroutines.await
+import com.apollographql.apollo3.ApolloClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.cerion.projecthub.TAG
@@ -21,15 +20,15 @@ class ColumnRepository(private val apolloClient: ApolloClient) {
             mockColumns
         }
         else {
-            val query = GetColumnsByStatusQuery.builder().id(projectId).build();
-            val response = apolloClient.query(query).await()
+            val query = GetColumnsByStatusQuery(projectId)
+            val response = apolloClient.query(query).execute()
 
-            val project = response.data?.node()?.fragments()?.projectFragment()
-            val field = project?.field()?.fragments()?.projectField()!!
-            val options = field.options()
+            val project = response.data?.node?.fragments?.projectFragment
+            val field = project?.field?.fragments?.projectField!!
+            val options = field.options
 
             options.mapIndexed { index, it ->
-                Column(index, field.id(), it.id(), it.name(), it.color())
+                Column(index, field.id, it.id, it.name, it.color)
             }
         }
     }

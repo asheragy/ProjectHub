@@ -6,8 +6,7 @@ import android.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
-import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.coroutines.await
+import com.apollographql.apollo3.ApolloClient
 import org.cerion.projecthub.database.DbProject
 import org.cerion.projecthub.database.ProjectDao
 import org.cerion.projecthub.model.Label
@@ -39,33 +38,33 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
     }
 
     suspend fun getProjectLabels(project: Project): Pair<String,List<Label>> {
-        val query = GetProjectLabelsQuery.builder().projectId(project.id).build()
-        val result = apolloClient.query(query).await()
+        val query = GetProjectLabelsQuery(project.id)
+        val result = apolloClient.query(query).execute()
 
-        val repositories = result.data?.node()?.fragments()?.projectLabels()?.repositories()?.nodes()!!
+        val repositories = result.data?.node?.fragments?.projectLabels?.repositories?.nodes!!
         if (repositories.size != 1)
             throw RuntimeException("Project must be linked to only 1 repository")
 
-        val labels = repositories[0].labels()?.nodes()!!.map { label ->
-            val color = Color.parseColor("#${label.color()}")
-            Label(label.id(), label.name(), color).apply {
-                description = label.description() ?: ""
+        val labels = repositories[0]!!.labels?.nodes!!.map { label ->
+            val color = Color.parseColor("#${label!!.color}")
+            Label(label.id, label.name, color).apply {
+                description = label.description ?: ""
             }
         }
 
-        return Pair(repositories[0].id(), labels)
+        return Pair(repositories[0]!!.id, labels)
     }
 
     fun getById(id: String): Project? = dao.getAll().map { it.toProject() }.firstOrNull { it.id == id }
 
     private suspend fun getUserProjects(): List<Project> {
-        val query = GetCurrentUserProjectsQuery.builder().build()
-        val response = apolloClient.query(query).await()
-        val viewer = response.data?.viewer()
+        val query = GetCurrentUserProjectsQuery()
+        val response = apolloClient.query(query).execute()
+        val viewer = response.data?.viewer
 
-        return viewer?.projectsV2()?.nodes()!!.map { project ->
-            Project(project.id(), ProjectType.User, viewer.login(), "").apply {
-                name = project.title()
+        return viewer?.projectsV2?.nodes!!.map { project ->
+            Project(project!!.id, ProjectType.User, viewer.login, "").apply {
+                name = project.title
             }
         }
     }

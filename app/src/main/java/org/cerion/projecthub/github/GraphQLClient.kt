@@ -1,7 +1,8 @@
 package org.cerion.projecthub.github
 
 import android.content.Context
-import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo3.network.okHttpClient
 import okhttp3.OkHttpClient
 
 fun getGraphQLClient(context: Context): ApolloClient {
