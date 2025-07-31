@@ -18,7 +18,7 @@ fun getGraphQLClient(context: Context): ApolloClient {
         }
         .build()
 
-    return ApolloClient.builder()
+    return ApolloClient.Builder()
         .serverUrl("https://api.github.com/graphql")
         .okHttpClient(okHttpClient)
         .build()
