@@ -1,13 +1,18 @@
 package org.cerion.projecthub.ui.dialog
 
+import EditDraftDialog
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
 import org.cerion.projecthub.R
 import org.cerion.projecthub.databinding.DialogEditDraftBinding
 import org.cerion.projecthub.model.DraftIssueCard
+import org.cerion.projecthub.ui.AppTheme
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -21,6 +26,7 @@ class EditDraftDialogFragment : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        /*
         val binding = DialogEditDraftBinding.inflate(layoutInflater, container, false)
 
         val args = EditDraftDialogFragmentArgs.fromBundle(requireArguments())
@@ -60,6 +66,23 @@ class EditDraftDialogFragment : DialogFragment() {
         }
 
         return binding.root
+         */
+
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    EditDraftDialog(
+                        title = "Initial Title",
+                        body = "Initial Body",
+                        onTitleChange = { /* handle title update */ },
+                        onBodyChange = { /* handle body update */ },
+                        onSaveClick = {
+                            dismiss()
+                        }
+                    )
+                }
+            }
+        }
     }
 
     override fun onResume() {
