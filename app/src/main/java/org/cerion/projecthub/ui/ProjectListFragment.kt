@@ -10,7 +10,9 @@ import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import org.cerion.projecthub.R
 import org.cerion.projecthub.logout
@@ -18,12 +20,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class ProjectListFragment : Fragment() {
-
     private val viewModel: ProjectListViewModel by viewModel()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        setHasOptionsMenu(true)
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme {
@@ -43,21 +42,26 @@ class ProjectListFragment : Fragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.project_list, menu)
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.project_list, menu)
+            }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.action_add -> onBrowseProjects()
-            R.id.action_logout -> logout()
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun onBrowseProjects() {
-        val action = ProjectListFragmentDirections.actionProjectListFragmentToProjectBrowserFragment()
-        findNavController().navigate(action)
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_add -> {
+                        val action = ProjectListFragmentDirections.actionProjectListFragmentToProjectBrowserFragment()
+                        findNavController().navigate(action)
+                        true
+                    }
+                    R.id.action_logout -> {
+                        logout()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 }
