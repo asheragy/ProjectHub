@@ -3,10 +3,11 @@ package org.cerion.projecthub.repository
 import GetCurrentUserProjectsQuery
 import GetProjectLabelsQuery
 import android.graphics.Color
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
 import com.apollographql.apollo3.ApolloClient
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import org.cerion.projecthub.database.DbProject
 import org.cerion.projecthub.database.ProjectDao
 import org.cerion.projecthub.model.Label
@@ -14,27 +15,19 @@ import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 
-
 class ProjectRepository(private val dao: ProjectDao, private val apolloClient: ApolloClient) {
 
-    val projects = dao.getAllAsync().map { projects ->
-        projects.map { it.toProject() }
+    val projects: Flow<List<Project>> = dao.getAllFlow().map { dbProjects ->
+        dbProjects.map { it.toProject() }
     }
 
-    val ownerRepositoryProjects: LiveData<List<Project>> = liveData {
-        val db = dao.getAllAsync()
-        val remoteProjects = getUserProjects()
-
-        // Database values are the only ones that will change
-        val merged: LiveData<List<Project>> = db.map { dbProjects ->
-            remoteProjects.forEach {
-                it.saved = dbProjects.any { dbProject -> it.id == dbProject.id }
-            }
-
-            remoteProjects
+    val ownerRepositoryProjects: Flow<List<Project>> = combine(
+        flow { emit(getUserProjects()) }, // emits once
+        dao.getAllFlow()
+    ) { remoteProjects, dbProjects ->
+        remoteProjects.map { project ->
+            project.copy(saved = dbProjects.any { it.id == project.id })
         }
-
-        emitSource(merged)
     }
 
     suspend fun getProjectLabels(project: Project): Pair<String,List<Label>> {
@@ -63,9 +56,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
         val viewer = response.data?.viewer
 
         return viewer?.projectsV2?.nodes!!.map { project ->
-            Project(project!!.id, ProjectType.User, viewer.login, "").apply {
-                name = project.title
-            }
+            Project(project!!.id, ProjectType.User, viewer.login, "", name = project.title)
         }
     }
 
@@ -78,10 +69,5 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
     }
 }
 
-fun DbProject.toProject(): Project = Project(id, ProjectType.values()[type], owner, repo).also {
-    it.name = name
-    it.description = this.description
-    it.saved = true
-}
-
+fun DbProject.toProject(): Project = Project(id, ProjectType.values()[type], owner, repo, name = name, description = description, saved = true)
 fun Project.toDbProject(): DbProject = DbProject(id, type.ordinal, owner, repo, name, description)

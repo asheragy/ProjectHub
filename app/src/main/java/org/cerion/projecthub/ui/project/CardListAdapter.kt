@@ -15,8 +15,6 @@ import org.cerion.projecthub.databinding.ListItemCardNoteBinding
 import org.cerion.projecthub.model.Card
 import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.ui.setCardImage
-import org.cerion.projecthub.ui.setFormattedText
 
 
 interface CardListener {

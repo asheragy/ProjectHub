@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,7 +35,12 @@ import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 @Composable
-fun ProjectList(projects: List<Project>, onClick: (Project) -> Unit, onDelete: (Project) -> Unit) {
+fun ProjectList(
+    projects: List<Project>,
+    onClick: (Project) -> Unit,
+    onDelete: (Project) -> Unit,
+    browser: Boolean = false)
+{
     var menuExpanded by remember { mutableStateOf(false) }
     var selectedProject by remember { mutableStateOf<Project?>(null) }
 
@@ -78,9 +86,7 @@ fun ProjectList(projects: List<Project>, onClick: (Project) -> Unit, onDelete: (
                         )
                     }
 
-                    // Saved star icon (conditionally visible)
-                    /*
-                    if (isSaved) {
+                    if (browser && project.saved) {
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = "Saved",
@@ -89,7 +95,6 @@ fun ProjectList(projects: List<Project>, onClick: (Project) -> Unit, onDelete: (
                                 .wrapContentSize()
                         )
                     }
-                     */
                 }
                 HorizontalDivider()
             }

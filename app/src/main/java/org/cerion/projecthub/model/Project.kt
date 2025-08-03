@@ -5,8 +5,11 @@ enum class ProjectType {
     Org
 }
 
-data class Project(val id: String, val type: ProjectType, val owner: String, val repo: String) {
-    var name: String = ""
-    var description: String = ""
-    var saved = false
-}
+data class Project(
+    val id: String,
+    val type: ProjectType,
+    val owner: String,
+    val repo: String,
+    val name: String = "",
+    val description: String = "",
+    val saved: Boolean = false)

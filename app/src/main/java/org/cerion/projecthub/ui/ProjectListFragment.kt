@@ -7,8 +7,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -26,7 +26,8 @@ class ProjectListFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme {
-                    val projects by viewModel.projects.observeAsState(initial = emptyList())
+                    val projects by viewModel.projects.collectAsState()
+
                     ProjectList(
                         projects,
                         onClick = {

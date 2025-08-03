@@ -1,4 +1,4 @@
-package org.cerion.projecthub.ui
+package org.cerion.projecthub.ui.project
 
 import android.graphics.Typeface
 import android.text.Spannable

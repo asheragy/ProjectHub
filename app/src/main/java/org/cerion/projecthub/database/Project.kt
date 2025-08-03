@@ -1,7 +1,7 @@
 package org.cerion.projecthub.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "projects")
 data class DbProject(
@@ -19,7 +19,7 @@ interface ProjectDao {
     fun getAll(): List<DbProject>
 
     @Query("SELECT * FROM projects")
-    fun getAllAsync(): LiveData<List<DbProject>>
+    fun getAllFlow(): Flow<List<DbProject>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(project: DbProject)
