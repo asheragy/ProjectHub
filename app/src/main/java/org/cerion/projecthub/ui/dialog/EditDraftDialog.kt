@@ -54,7 +54,7 @@ fun EditDraftDialog(
                 actions = {
                     IconButton(onClick = { onDismiss(null) }) {
                         Icon(
-                            imageVector = Icons.Default.Close, // or use a custom painterResource
+                            imageVector = Icons.Default.Close,
                             contentDescription = "Close"
                         )
                     }
@@ -107,7 +107,7 @@ fun EditDraftDialog(
                 onClick = {
                     onDismiss(state)
                 },
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier.align(Alignment.End)
             ) {
                 Text("Save")
             }

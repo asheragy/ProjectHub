@@ -1,22 +1,20 @@
 package org.cerion.projecthub.ui.dialog
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ListView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import org.cerion.projecthub.R
-import org.cerion.projecthub.databinding.ListItemLabelBinding
 import org.cerion.projecthub.model.Label
+import org.cerion.projecthub.ui.AppTheme
 import org.cerion.projecthub.ui.project.ProjectHomeViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -25,33 +23,45 @@ class LabelsDialogFragment : DialogFragment() {
     private val projectViewModel: ProjectHomeViewModel by sharedViewModel()
     private val viewModel: LabelsViewModel by sharedViewModel()
 
-    // TODO copy format used for edit note dialog that uses onCreateView
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val li = LayoutInflater.from(requireActivity())
-        val view = li.inflate(R.layout.dialog_labels, null)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_FRAME, android.R.style.ThemeOverlay_Material_Dialog)
+    }
 
-        val labels = mutableListOf<Label>()
-        val listView: ListView = view.findViewById(R.id.listView)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    val globalLabels by projectViewModel.labels.observeAsState(listOf())
+                    val labels = remember(globalLabels) {
+                        mutableStateListOf<LabelSelection>().apply {
+                            addAll(
+                                globalLabels.map { label ->
+                                    LabelSelection(label, viewModel.selectedLabels.any { it == label.name })
+                                }
+                            )
+                        }
+                    }
 
-        val builder = AlertDialog.Builder(activity)
-            .setView(view)
-            .setTitle("Labels")
-            .setPositiveButton("Save") { _, _ ->
-                val result = labels.filter { it.included }
-                viewModel.setResult(result)
+                    LabelsDialog(
+                        labels,
+                        onSelect = { selection ->
+                            val index = labels.indexOfFirst { it.label.name == selection.label.name }
+                            if (index != -1) {
+                                val updated = selection.copy(selected = !selection.selected)
+                                labels[index] = updated
+                            }
+                        }, onClose = {
+                            dismiss()
+                        }, onSave = {
+                            val selected = labels.filter { it.selected }.map { it.label }
+                            viewModel.setResult(selected)
+                            dismiss()
+                        }
+                    )
+                }
             }
-
-        projectViewModel.labels.observe(this, Observer { it ->
-            labels.addAll(it)
-            labels.forEach { label ->
-                label.included = (viewModel.selectedLabels.any { it == label.name })
-            }
-
-            val adapter = LabelListAdapter(requireContext(), labels)
-            listView.adapter = adapter
-        })
-
-        return builder.create()
+        }
     }
 }
 
@@ -75,28 +85,5 @@ class LabelsViewModel : ViewModel() {
 
     fun onRecieveResult() {
         _result.value = null
-    }
-}
-
-private class LabelListAdapter(context: Context, private val items: List<Label>) : ArrayAdapter<Label>(context, 0, items) {
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val binding =
-            if (convertView?.tag != null)
-                convertView.tag as ListItemLabelBinding
-            else
-                ListItemLabelBinding.inflate(LayoutInflater.from(context), parent, false)
-
-        val item = items[position]
-        binding.name.text = item.name
-        binding.description.text = item.description
-        binding.checked.visibility = if(item.included) View.VISIBLE else View.INVISIBLE
-        binding.color.setBackgroundColor(item.color)
-        binding.root.setOnClickListener {
-            item.included = !item.included
-            binding.checked.visibility = if(item.included) View.VISIBLE else View.INVISIBLE
-        }
-
-        return binding.root
     }
 }
