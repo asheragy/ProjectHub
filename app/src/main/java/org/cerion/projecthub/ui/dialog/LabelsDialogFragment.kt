@@ -43,6 +43,7 @@ class LabelsDialogFragment : DialogFragment() {
                         }
                     }
 
+                    /*
                     LabelsDialog(
                         labels,
                         onSelect = { selection ->
@@ -59,6 +60,8 @@ class LabelsDialogFragment : DialogFragment() {
                             dismiss()
                         }
                     )
+
+                     */
                 }
             }
         }

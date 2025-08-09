@@ -28,6 +28,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -43,10 +47,16 @@ data class LabelSelection(val label: Label, val selected: Boolean)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelsDialog(
-    labels: List<LabelSelection>,
-    onSelect: (LabelSelection) -> Unit,
+    allLabels: List<Label>,
+    selectedLabels: List<Label>,
     onClose: () -> Unit,
-    onSave: () -> Unit) {
+    onSave: (List<Label>) -> Unit) {
+
+    val labelSelection = allLabels.map { globalLabel ->
+        LabelSelection(globalLabel, selectedLabels.any { selected -> selected.id == globalLabel.id })
+    }
+    var labelState by remember { mutableStateOf(labelSelection) }
+
     Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
         Column(
             modifier = Modifier
@@ -71,11 +81,15 @@ fun LabelsDialog(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(labels) { label ->
+                items(labelState) { label ->
                     LabelRow(
                         label = label,
                         onClick = {
-                            onSelect(label)
+                            labelState = labelState.map {
+                               if (it.label.id == label.label.id)
+                                    it.copy(selected = !it.selected)
+                                else it
+                            }
                         }
                     )
                     HorizontalDivider()
@@ -85,7 +99,9 @@ fun LabelsDialog(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = onSave,
+                onClick = {
+                    onSave(labelState.filter { it.selected }.map { it.label })
+                },
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text("Done")
@@ -150,8 +166,8 @@ fun LabelsDialogPreview() {
 
     AppTheme {
         LabelsDialog(
-            listOf(LabelSelection(labelA, true), LabelSelection(labelB, false)),
-            onSelect = {},
+            allLabels = listOf(labelA, labelB),
+            selectedLabels = listOf(labelA),
             onClose = {},
             onSave = {}
         )

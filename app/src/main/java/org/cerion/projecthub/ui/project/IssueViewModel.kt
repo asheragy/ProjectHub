@@ -75,6 +75,18 @@ class IssueViewModel(private val cardRepo: CardRepository) : ViewModel() {
         labelsChanged.value = SingleEventData(labels)
     }
 
+    suspend fun save(issue: IssueCard) {
+        if (issue.title.isEmpty()) {
+            throw IllegalArgumentException("Title must not be blank")
+        }
+
+        if (isNew) {
+            cardRepo.addIssue(project!!, repositoryId!!, column!!, issue)
+        }
+        else
+            cardRepo.updateIssue(issue)
+    }
+
     fun submit() {
         // TODO failure to update indicator
         issue.value?.let {

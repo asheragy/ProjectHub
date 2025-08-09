@@ -1,17 +1,21 @@
 package org.cerion.projecthub.ui.project
 
-import android.content.res.ColorStateList
+import IssueEditScreen
+import IssueEditState
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import com.google.android.material.chip.Chip
-import org.cerion.projecthub.R
-import org.cerion.projecthub.databinding.FragmentIssueBinding
+import kotlinx.coroutines.launch
 import org.cerion.projecthub.model.IssueCard
-import org.cerion.projecthub.model.Label
-import org.cerion.projecthub.ui.dialog.LabelsViewModel
+import org.cerion.projecthub.ui.AppTheme
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -19,104 +23,66 @@ class IssueFragment : Fragment() {
 
     private val projectViewModel: ProjectHomeViewModel by sharedViewModel()
     private val viewModel: IssueViewModel by viewModel()
-    private val labelsViewModel: LabelsViewModel by sharedViewModel()
-    private lateinit var binding: FragmentIssueBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentIssueBinding.inflate(inflater, container, false)
-
         val args = IssueFragmentArgs.fromBundle(requireArguments())
         val column = projectViewModel.columns.value!!.first { it.column.optionId == args.columnId }
 
-        if (args.id.isEmpty()) {
+        val issue = if (args.id.isEmpty()) {
             viewModel.load(projectViewModel.project.value!!, projectViewModel.repositoryId, column.column)
-        }
-        else {
+            IssueCard("", "")
+        } else {
             val issue = column.findCardById(args.id)
             viewModel.load(issue as IssueCard)
+            issue
         }
 
-        viewModel.finished.observe(viewLifecycleOwner) {
-            if (it!!) {
-                projectViewModel.refresh()
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val globalLabels by projectViewModel.labels.observeAsState(listOf())
+                val tempState = IssueEditState(issue.title, issue.body, issue.labels)
+                val scope = rememberCoroutineScope()
 
-                // TODO need to handle keyboard
-                findNavController().navigateUp()
-                //requireActivity().onBackPressed()
-            }
-        }
+                AppTheme {
+                    IssueEditScreen(
+                        initialState = tempState,
+                        labels =  globalLabels,
+                        onClose = {
+                            // TODO findNavController().navigateUp() instead?
+                            parentFragmentManager.popBackStack()
+                        },
+                        onSave = {
+                            issue.title = it.title
+                            issue.body = it.body
+                            if (issue.labels !== it.labels) {
+                                issue.labels.clear()
+                                issue.labels.addAll(it.labels)
+                            }
 
-        viewModel.issue.observe(viewLifecycleOwner) { issue ->
-            binding.body.setText(issue.body)
-            binding.title.setText(issue.title)
-            setLabels(issue.labels)
-        }
-
-        viewModel.labelsChanged.observe(viewLifecycleOwner) {
-            it?.getContentIfNotHandled()?.run {
-                setLabels(this)
-            }
-        }
-
-        viewModel.message.observe(viewLifecycleOwner) {
-            it?.getContentIfNotHandled()?.run {
-                Toast.makeText(requireContext(), this, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        viewModel.busy.observe(viewLifecycleOwner) { busy ->
-            binding.busy.visibility = if (busy == true) View.VISIBLE else View.GONE
-        }
-
-        labelsViewModel.result.observe(viewLifecycleOwner) {
-            if (it != null) {
-                viewModel.setLabels(it)
-                labelsViewModel.onRecieveResult()
-            }
-        }
-
-        binding.labelLayout.setOnClickListener {
-            editLabels()
-        }
-
-        requireActivity().title = viewModel.title
-        setHasOptionsMenu(true)
-
-        return binding.root
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.edit_issue, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.save -> {
-                viewModel.issue.value?.apply {
-                    body = binding.body.text.toString()
-                    title = binding.title.text.toString()
+                            // TODO add busy indicator, simulate long save to test
+                            scope.launch {
+                                try {
+                                    viewModel.save(issue)
+                                    projectViewModel.refresh()
+                                    parentFragmentManager.popBackStack()
+                                }
+                                catch (e: IllegalArgumentException) {
+                                    Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        })
                 }
-                viewModel.submit()
             }
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
-    private fun setLabels(labels: List<Label>) {
-        binding.labelChipGroup.removeAllViews()
-        labels.forEach {
-            val chip = LayoutInflater.from(binding.root.context).inflate(R.layout.label_chip, binding.labelChipGroup, false) as Chip
-            chip.text = it.name
-            chip.chipBackgroundColor = ColorStateList.valueOf(it.color)
-            chip.isCheckable = false
-            binding.labelChipGroup.addView(chip)
-        }
+    override fun onStart() {
+        super.onStart()
+        (requireActivity() as AppCompatActivity).supportActionBar?.hide()
     }
 
-    private fun editLabels() {
-        labelsViewModel.setLabels(viewModel.issue.value!!.labels.map { it.name })
-        val action = IssueFragmentDirections.actionIssueFragmentToLabelsDialogFragment()
-        findNavController().navigate(action)
+    override fun onStop() {
+        (requireActivity() as AppCompatActivity).supportActionBar?.show()
+        super.onStop()
     }
 }
