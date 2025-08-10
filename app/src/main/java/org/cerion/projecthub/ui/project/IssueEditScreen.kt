@@ -37,23 +37,19 @@ import androidx.compose.ui.window.Dialog
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.ui.AppTheme
 import org.cerion.projecthub.ui.dialog.LabelsDialog
+import org.cerion.projecthub.ui.project.IssueEvent
+import org.cerion.projecthub.ui.project.IssueUiState
 
-
-data class IssueEditState(
-    val title: String = "",
-    val body: String = "",
-    val labels: List<Label> = listOf()
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IssueEditScreen(
-    initialState: IssueEditState,
+    state: IssueUiState,
+    onEvent: (IssueEvent) -> Unit,
     labels: List<Label>,
     onClose: () -> Unit,
-    onSave: (IssueEditState) -> Unit,
+    onSave: (IssueUiState) -> Unit,
 ) {
-    var state by remember { mutableStateOf(initialState) }
     var showDialog by remember { mutableStateOf(false) }
 
     Surface(color = MaterialTheme.colorScheme.surface) {
@@ -63,7 +59,7 @@ fun IssueEditScreen(
                 .padding(8.dp)
         ) {
             TopAppBar(
-                title = { Text(if(initialState.title.isEmpty()) "New Issue" else "Edit Issue") },
+                title = { Text(if(state.new) "New Issue" else "Edit Issue") },
                 modifier = Modifier.fillMaxWidth(),
                 navigationIcon = {
                     IconButton(onClick = onClose) {
@@ -94,7 +90,7 @@ fun IssueEditScreen(
             OutlinedTextField(
                 value = state.title,
                 onValueChange = {
-                    state = state.copy(title = it)
+                    onEvent(IssueEvent.TitleChanged(it))
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Title") },
@@ -119,7 +115,7 @@ fun IssueEditScreen(
             OutlinedTextField(
                 value = state.body,
                 onValueChange = {
-                    state = state.copy(body = it)
+                    onEvent(IssueEvent.BodyChanged(it))
                 },
                 modifier = Modifier
                     .weight(1f)
@@ -134,7 +130,7 @@ fun IssueEditScreen(
                         allLabels = labels,
                         selectedLabels = state.labels,
                         onSave = {
-                            state = state.copy(labels = it)
+                            onEvent(IssueEvent.LabelsChanged(it))
                             showDialog = false
                         },
                         onClose = {
@@ -183,8 +179,13 @@ fun IssueEditScreenPreview() {
         Label("", "bugs", Color.Red.toArgb()),
         Label("", "features", Color.Blue.toArgb())
     )
-    val initialState = IssueEditState("New Issue", "some body text", labels)
+    val state = IssueUiState(false, "New Issue", "some body text", labels)
     AppTheme {
-        IssueEditScreen(initialState = initialState, labels = labels, onClose = {}, onSave = {})
+        IssueEditScreen(
+            state = state,
+            onEvent = {
+
+            },
+            labels = labels, onClose = {}, onSave = {})
     }
 }

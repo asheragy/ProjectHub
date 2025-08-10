@@ -55,9 +55,6 @@
         <argument
             android:name="id"
             app:argType="string" />
-        <action
-            android:id="@+id/action_issueFragment_to_labelsDialogFragment"
-            app:destination="@id/labelsDialogFragment" />
         <argument
             android:name="columnId"
             app:argType="string" />
@@ -66,8 +63,4 @@
         android:id="@+id/projectBrowserFragment"
         android:name="org.cerion.projecthub.ui.ProjectBrowserFragment"
         android:label="Project Browser" />
-    <dialog
-        android:id="@+id/labelsDialogFragment"
-        android:name="org.cerion.projecthub.ui.dialog.LabelsDialogFragment"
-        android:label="LabelsDialogFragment" />
 </navigation>
