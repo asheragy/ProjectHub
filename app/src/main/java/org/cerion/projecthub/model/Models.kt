@@ -1,6 +1,6 @@
 package org.cerion.projecthub.model
 
-import type.ProjectV2SingleSelectFieldOptionColor
+import org.cerion.projecthub.graphql.type.ProjectV2SingleSelectFieldOptionColor
 
 
 data class Column(
@@ -15,5 +15,4 @@ data class Label(val id: String, val name: String, val color: Int) {
     var description: String = ""
     var included = false
 }
-
 

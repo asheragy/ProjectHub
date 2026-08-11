@@ -1,14 +1,14 @@
 package org.cerion.projecthub.repository
 
-import GetColumnsByStatusQuery
 import android.util.Log
-import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo.ApolloClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.cerion.projecthub.TAG
 import org.cerion.projecthub.USE_MOCK_DATA
+import org.cerion.projecthub.graphql.GetColumnsByStatusQuery
+import org.cerion.projecthub.graphql.type.ProjectV2SingleSelectFieldOptionColor
 import org.cerion.projecthub.model.Column
-import type.ProjectV2SingleSelectFieldOptionColor
 
 
 class ColumnRepository(private val apolloClient: ApolloClient) {
@@ -23,8 +23,8 @@ class ColumnRepository(private val apolloClient: ApolloClient) {
             val query = GetColumnsByStatusQuery(projectId)
             val response = apolloClient.query(query).execute()
 
-            val project = response.data?.node?.fragments?.projectFragment
-            val field = project?.field?.fragments?.projectField!!
+            val project = response.data?.node?.projectFragment
+            val field = project?.field?.projectField!!
             val options = field.options
 
             options.mapIndexed { index, it ->

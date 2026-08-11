@@ -1,20 +1,20 @@
 package org.cerion.projecthub.repository
 
-import AddDraftIssueMutation
-import AddProjectItemMutation
-import ArchiveItemMutation
-import ConvertDraftToIssueMutation
-import CreateIssueMutation
-import DeleteItemMutation
-import GetCardsForProjectQuery
-import UpdateDraftIssueMutation
-import UpdateIssueMutation
-import UpdateIssueStateMutation
-import UpdateItemPositionMutation
-import UpdateItemStatusMutation
+import org.cerion.projecthub.graphql.AddDraftIssueMutation
+import org.cerion.projecthub.graphql.AddProjectItemMutation
+import org.cerion.projecthub.graphql.ArchiveItemMutation
+import org.cerion.projecthub.graphql.ConvertDraftToIssueMutation
+import org.cerion.projecthub.graphql.CreateIssueMutation
+import org.cerion.projecthub.graphql.DeleteItemMutation
+import org.cerion.projecthub.graphql.GetCardsForProjectQuery
+import org.cerion.projecthub.graphql.UpdateDraftIssueMutation
+import org.cerion.projecthub.graphql.UpdateIssueMutation
+import org.cerion.projecthub.graphql.UpdateIssueStateMutation
+import org.cerion.projecthub.graphql.UpdateItemPositionMutation
+import org.cerion.projecthub.graphql.UpdateItemStatusMutation
 import android.graphics.Color
-import com.apollographql.apollo3.ApolloClient
-import com.apollographql.apollo3.api.Optional
+import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Optional
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.cerion.projecthub.model.Card
@@ -23,7 +23,7 @@ import org.cerion.projecthub.model.DraftIssueCard
 import org.cerion.projecthub.model.IssueCard
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
-import type.IssueState
+import org.cerion.projecthub.graphql.type.IssueState
 import java.util.*
 
 class CardRepository(private val apolloClient: ApolloClient) {
@@ -32,7 +32,7 @@ class CardRepository(private val apolloClient: ApolloClient) {
         val query = GetCardsForProjectQuery(projectId)
         val response = apolloClient.query(query).execute()
 
-        val project = response.data?.node?.fragments?.projectFragment_Cards
+        val project = response.data?.node?.projectFragment_Cards
         val items = project?.items?.nodes!!
 
         val result = mutableMapOf<String, MutableList<Card>>()
@@ -42,10 +42,10 @@ class CardRepository(private val apolloClient: ApolloClient) {
             if (item?.fieldValueByName == null)
                 return@forEach
 
-            val statusOptionId = item.fieldValueByName.fragments.singleSelectValueFragment?.optionId!!
+            val statusOptionId = item.fieldValueByName.singleSelectValueFragment?.optionId ?: return@forEach
 
-            val draft = item.content?.fragments?.draftIssueFragment
-            val issue = item.content?.fragments?.issueFragment
+            val draft = item.content?.draftIssueFragment
+            val issue = item.content?.issueFragment
 
             val card = if (draft != null) {
                 DraftIssueCard(item.id, draft.id, draft.title, draft.body)

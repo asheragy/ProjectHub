@@ -1,15 +1,15 @@
 package org.cerion.projecthub.repository
 
-import GetCurrentUserProjectsQuery
-import GetProjectLabelsQuery
 import android.graphics.Color
-import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo.ApolloClient
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import org.cerion.projecthub.database.DbProject
 import org.cerion.projecthub.database.ProjectDao
+import org.cerion.projecthub.graphql.GetCurrentUserProjectsQuery
+import org.cerion.projecthub.graphql.GetProjectLabelsQuery
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
@@ -34,7 +34,7 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
         val query = GetProjectLabelsQuery(project.id)
         val result = apolloClient.query(query).execute()
 
-        val repositories = result.data?.node?.fragments?.projectLabels?.repositories?.nodes!!
+        val repositories = result.data?.node?.projectLabels?.repositories?.nodes!!
         if (repositories.size != 1)
             throw RuntimeException("Project must be linked to only 1 repository")
 
