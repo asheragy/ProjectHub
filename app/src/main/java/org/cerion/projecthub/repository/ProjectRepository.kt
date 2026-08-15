@@ -3,7 +3,9 @@ package org.cerion.projecthub.repository
 import android.graphics.Color
 import com.apollographql.apollo.ApolloClient
 import org.cerion.projecthub.graphql.GetCurrentUserProjectsQuery
+import org.cerion.projecthub.graphql.GetProjectQuery
 import org.cerion.projecthub.graphql.GetProjectLabelsQuery
+import org.cerion.projecthub.graphql.fragment.ProjectDetails
 import org.cerion.projecthub.model.Label
 import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
@@ -29,8 +31,13 @@ class ProjectRepository(private val apolloClient: ApolloClient) {
         return Pair(repositories[0]!!.id, labels)
     }
 
-    // TODO fetch 1 not all or get the project from the previous screen
-    suspend fun getById(id: String) = getUserProjects().find { it.id == id }
+    suspend fun getById(id: String): Project? {
+        val query = GetProjectQuery(id)
+        val response = apolloClient.query(query).execute()
+        val project = response.data?.node?.projectDetails ?: return null
+
+        return project.toProject()
+    }
 
     suspend fun getUserProjects(): List<Project> {
         val query = GetCurrentUserProjectsQuery()
@@ -38,7 +45,21 @@ class ProjectRepository(private val apolloClient: ApolloClient) {
         val viewer = response.data?.viewer
 
         return viewer?.projectsV2?.nodes!!.map { project ->
-            Project(project!!.id, ProjectType.User, viewer.login, "", name = project.title)
+            project!!.projectDetails.toProject()
         }
+    }
+
+    private fun ProjectDetails.toProject(): Project {
+        val ownerLogin = owner.onUser?.login
+            ?: owner.onOrganization?.login
+            ?: error("Unsupported project owner type ${owner.__typename}")
+
+        val projectType = if (owner.onOrganization != null) {
+            ProjectType.Org
+        } else {
+            ProjectType.User
+        }
+
+        return Project(id, projectType, ownerLogin, name = title)
     }
 }

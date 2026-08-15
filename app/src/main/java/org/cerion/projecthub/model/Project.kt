@@ -9,7 +9,4 @@ data class Project(
     val id: String,
     val type: ProjectType,
     val owner: String,
-    val repo: String,
-    val name: String = "",
-    val description: String = "",
-    val saved: Boolean = false)
+    val name: String)

@@ -4,11 +4,29 @@ query getCurrentUserProjects {
     login
     projectsV2(first: 100) {
       nodes {
-        title
-        id
-        databaseId
-        number
+        ...ProjectDetails
       }
+    }
+  }
+}
+
+query getProject($projectId: ID!) {
+  node(id: $projectId) {
+    ...ProjectDetails
+  }
+}
+
+fragment ProjectDetails on ProjectV2 {
+  title
+  id
+  databaseId
+  number
+  owner {
+    ... on User {
+      login
+    }
+    ... on Organization {
+      login
     }
   }
 }
