@@ -2,12 +2,6 @@ package org.cerion.projecthub.repository
 
 import android.graphics.Color
 import com.apollographql.apollo.ApolloClient
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import org.cerion.projecthub.database.DbProject
-import org.cerion.projecthub.database.ProjectDao
 import org.cerion.projecthub.graphql.GetCurrentUserProjectsQuery
 import org.cerion.projecthub.graphql.GetProjectLabelsQuery
 import org.cerion.projecthub.model.Label
@@ -15,20 +9,7 @@ import org.cerion.projecthub.model.Project
 import org.cerion.projecthub.model.ProjectType
 
 
-class ProjectRepository(private val dao: ProjectDao, private val apolloClient: ApolloClient) {
-
-    val projects: Flow<List<Project>> = dao.getAllFlow().map { dbProjects ->
-        dbProjects.map { it.toProject() }
-    }
-
-    val ownerRepositoryProjects: Flow<List<Project>> = combine(
-        flow { emit(getUserProjects()) }, // emits once
-        dao.getAllFlow()
-    ) { remoteProjects, dbProjects ->
-        remoteProjects.map { project ->
-            project.copy(saved = dbProjects.any { it.id == project.id })
-        }
-    }
+class ProjectRepository(private val apolloClient: ApolloClient) {
 
     suspend fun getProjectLabels(project: Project): Pair<String,List<Label>> {
         val query = GetProjectLabelsQuery(project.id)
@@ -48,9 +29,10 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
         return Pair(repositories[0]!!.id, labels)
     }
 
-    fun getById(id: String): Project? = dao.getAll().map { it.toProject() }.firstOrNull { it.id == id }
+    // TODO fetch 1 not all or get the project from the previous screen
+    suspend fun getById(id: String) = getUserProjects().find { it.id == id }
 
-    private suspend fun getUserProjects(): List<Project> {
+    suspend fun getUserProjects(): List<Project> {
         val query = GetCurrentUserProjectsQuery()
         val response = apolloClient.query(query).execute()
         val viewer = response.data?.viewer
@@ -59,15 +41,4 @@ class ProjectRepository(private val dao: ProjectDao, private val apolloClient: A
             Project(project!!.id, ProjectType.User, viewer.login, "", name = project.title)
         }
     }
-
-    suspend fun add(project: Project) {
-        dao.insert(project.toDbProject())
-    }
-
-    suspend fun delete(project: Project) {
-        dao.delete(project.toDbProject())
-    }
 }
-
-fun DbProject.toProject(): Project = Project(id, ProjectType.values()[type], owner, repo, name = name, description = description, saved = true)
-fun Project.toDbProject(): DbProject = DbProject(id, type.ordinal, owner, repo, name, description)

@@ -12,8 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,7 +36,6 @@ import org.cerion.projecthub.model.ProjectType
 fun ProjectList(
     projects: List<Project>,
     onClick: (Project) -> Unit,
-    onDelete: (Project) -> Unit,
     browser: Boolean = false)
 {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -99,22 +96,6 @@ fun ProjectList(
                 HorizontalDivider()
             }
         }
-    }
-
-    DropdownMenu(
-        expanded = menuExpanded,
-        onDismissRequest = {
-            menuExpanded = false
-            selectedProject = null
-        }
-    ) {
-        DropdownMenuItem(
-            text = { Text("Delete") },
-            onClick = {
-                selectedProject?.let { onDelete(it) }
-                menuExpanded = false
-            }
-        )
     }
 }
 

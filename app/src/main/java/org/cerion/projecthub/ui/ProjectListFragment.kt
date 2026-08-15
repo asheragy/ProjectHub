@@ -34,9 +34,6 @@ class ProjectListFragment : Fragment() {
                             val action = ProjectListFragmentDirections.actionProjectListFragmentToProjectHomeFragment(it.id)
                             findNavController().navigate(action)
                         },
-                        onDelete = {
-                            viewModel.deleteProject(it)
-                        }
                     )
                 }
             }
@@ -51,11 +48,6 @@ class ProjectListFragment : Fragment() {
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
-                    R.id.action_add -> {
-                        val action = ProjectListFragmentDirections.actionProjectListFragmentToProjectBrowserFragment()
-                        findNavController().navigate(action)
-                        true
-                    }
                     R.id.action_logout -> {
                         logout()
                         true
